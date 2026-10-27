@@ -1,0 +1,270 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Colors */
+  --color-eager-green: #58cc02;
+  --color-storybook-green: #d7ffb8;
+  --color-spark-blue: #1cb0f6;
+  --color-fresh-leaf: #a5ed6e;
+  --color-night-ink: #000437;
+  --color-paper-white: #ffffff;
+  --color-charcoal: #4b4b4b;
+  --color-pencil-gray: #777777;
+  --color-faded-gray: #afafaf;
+
+  /* Typography — Font Families */
+  --font-feather: 'Nunito', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-duolingo-sans: 'Nunito Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  /* Typography — Scale */
+  --text-caption: 13px;
+  --leading-caption: 1.23;
+  --text-nav-label: 15px;
+  --leading-nav-label: 1.33;
+  --tracking-nav-label: 0.795px;
+  --text-body: 17px;
+  --leading-body: 1.18;
+  --text-subheading: 19px;
+  --leading-subheading: 1.4;
+  --text-heading-sm: 32px;
+  --leading-heading-sm: 1.2;
+  --text-heading: 48px;
+  --leading-heading: 1.2;
+  --tracking-heading: -0.96px;
+  --text-display: 64px;
+  --leading-display: 1.2;
+  --tracking-display: -1.28px;
+
+  /* Typography — Weights */
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+
+  /* Spacing */
+  --spacing-unit: 4px;
+  --spacing-8: 8px;
+  --spacing-12: 12px;
+  --spacing-16: 16px;
+  --spacing-24: 24px;
+  --spacing-32: 32px;
+  --spacing-40: 40px;
+  --spacing-48: 48px;
+  --spacing-64: 64px;
+  --spacing-80: 80px;
+  --spacing-96: 96px;
+
+  /* Layout */
+  --page-max-width: 1200px;
+  --section-gap: 80px;
+  --card-padding: 24px;
+  --element-gap: 12px;
+
+  /* Border Radius */
+  --radius-xl: 12px;
+  --radius-links: 12px;
+  --radius-buttons: 12px;
+  --radius-nav-items: 12px;
+
+  /* Surfaces */
+  --surface-paper-white: #ffffff;
+  --surface-storybook-green: #d7ffb8;
+  --surface-eager-green: #58cc02;
+  --surface-night-ink: #000437;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-paper-white);
+    color: var(--color-charcoal);
+    font-family: var(--font-duolingo-sans);
+    font-size: var(--text-body);
+    font-weight: var(--font-weight-medium);
+    line-height: var(--leading-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-duolingo-sans);
+    font-weight: 700;
+    color: var(--color-charcoal);
+  }
+
+  button, a, input, select, textarea {
+    border-radius: 12px;
+  }
+}
+
+/* Duolingo Typography & Component Archetypes */
+.duo-section-headline {
+  font-family: var(--font-feather);
+  font-weight: 800;
+  font-size: clamp(36px, 4.5vw, 48px);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--color-eager-green);
+}
+
+.duo-display-headline {
+  font-family: var(--font-feather);
+  font-weight: 800;
+  font-size: clamp(42px, 5.5vw, 64px);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--color-eager-green);
+}
+
+.duo-hero-headline {
+  font-family: var(--font-duolingo-sans);
+  font-weight: 700;
+  font-size: 32px;
+  line-height: 1.2;
+  color: var(--color-charcoal);
+}
+
+.duo-subheading {
+  font-family: var(--font-duolingo-sans);
+  font-weight: 700;
+  font-size: 19px;
+  line-height: 1.4;
+  color: var(--color-charcoal);
+}
+
+.duo-body-copy {
+  font-family: var(--font-duolingo-sans);
+  font-weight: 500;
+  font-size: 17px;
+  line-height: 1.18;
+  color: var(--color-pencil-gray);
+}
+
+.duo-nav-label {
+  font-family: var(--font-duolingo-sans);
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1.33;
+  letter-spacing: 0.053em;
+  text-transform: uppercase;
+}
+
+/* Primary CTA Button: Fill #58cc02, white text, duolingo-sans 700 at 15px uppercase with 0.0530em tracking, 12px border-radius, 16px horizontal padding. No border. */
+.duo-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: var(--color-eager-green);
+  color: var(--color-paper-white);
+  font-family: var(--font-duolingo-sans);
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1.33;
+  letter-spacing: 0.053em;
+  text-transform: uppercase;
+  border-radius: 12px;
+  padding: 12px 16px;
+  border: none;
+  cursor: pointer;
+  transition: filter 0.15s ease, transform 0.1s ease;
+}
+
+.duo-btn-primary:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+.duo-btn-primary:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.duo-btn-primary:disabled {
+  background-color: var(--color-faded-gray);
+  color: var(--color-paper-white);
+  cursor: not-allowed;
+}
+
+/* Outlined Account / Secondary Button: Transparent fill, text in #1cb0f6, duolingo-sans 700 at 14-15px uppercase, 12px border-radius, 16px horizontal padding, 2px solid border in #afafaf */
+.duo-btn-outlined {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: transparent;
+  color: var(--color-spark-blue);
+  font-family: var(--font-duolingo-sans);
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.33;
+  letter-spacing: 0.053em;
+  text-transform: uppercase;
+  border-radius: 12px;
+  padding: 10px 16px;
+  border: 2px solid var(--color-faded-gray);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.duo-btn-outlined:hover:not(:disabled) {
+  border-color: var(--color-spark-blue);
+}
+
+/* Nav Language Pill: Transparent fill, text in #777777 at 15px uppercase with 0.0530em tracking, 12px border-radius, 10px vertical and 16px horizontal padding, 2px solid border in #afafaf */
+.duo-nav-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: transparent;
+  color: var(--color-pencil-gray);
+  font-family: var(--font-duolingo-sans);
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1.33;
+  letter-spacing: 0.053em;
+  text-transform: uppercase;
+  border-radius: 12px;
+  padding: 10px 16px;
+  border: 2px solid var(--color-faded-gray);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.duo-nav-pill:hover {
+  color: var(--color-charcoal);
+  border-color: var(--color-charcoal);
+}
+
+.duo-nav-pill-active {
+  background-color: var(--color-storybook-green);
+  color: var(--color-charcoal);
+  border: 2px solid var(--color-eager-green);
+}
+
+/* Sticker Card Surface: Pure white, 2px solid #afafaf, 12px radius, no shadow */
+.duo-card {
+  background-color: var(--color-paper-white);
+  border: 2px solid var(--color-faded-gray);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Print stylesheet: only print the exam sheet cleanly */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only-sheet {
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+}
