@@ -1,0 +1,34 @@
+<svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    @keyframes avatarBlink {
+      0%, 92%, 100% { transform: scaleY(1); }
+      96% { transform: scaleY(0.1); }
+    }
+    @keyframes avatarBounce {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-2px); }
+    }
+    .avatar-wrap { animation: avatarBounce 2.8s ease-in-out infinite; transform-origin: 40px 44px; }
+    .avatar-eyes { animation: avatarBlink 3.9s ease-in-out infinite; transform-origin: 40px 41px; }
+  </style>
+  <rect x="4" y="4" width="72" height="72" rx="22" fill="#58cc02" stroke="#000437" stroke-width="4" />
+  <g class="avatar-wrap">
+    <!-- Mini Mortarboard -->
+    <polygon points="40,11 19,20 40,28 61,20" fill="#ce82ff" stroke="#000437" stroke-width="3.5" stroke-linejoin="round" />
+    <line x1="56" y1="22" x2="60" y2="34" stroke="#ffc800" stroke-width="3.5" stroke-linecap="round" />
+    <!-- Eyes -->
+    <g class="avatar-eyes">
+      <circle cx="29" cy="42" r="11" fill="#ffffff" stroke="#000437" stroke-width="3.5" />
+      <circle cx="51" cy="42" r="11" fill="#ffffff" stroke="#000437" stroke-width="3.5" />
+      <line x1="40" y1="42" x2="40.5" y2="42" stroke="#000437" stroke-width="3.5" />
+      <circle cx="30" cy="42" r="5" fill="#000437" />
+      <circle cx="50" cy="42" r="5" fill="#000437" />
+      <circle cx="32" cy="40" r="2" fill="#ffffff" />
+      <circle cx="52" cy="40" r="2" fill="#ffffff" />
+    </g>
+    <!-- Beak -->
+    <polygon points="35,49 45,49 40,58" fill="#ffc800" stroke="#000437" stroke-width="3" stroke-linejoin="round" />
+    <!-- Belly Curve -->
+    <path d="M24 66C30 59 50 59 56 66" fill="#a5ed6e" stroke="#000437" stroke-width="3" stroke-linecap="round" />
+  </g>
+</svg>

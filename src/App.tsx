@@ -23,7 +23,7 @@ import { ExamView } from './components/ExamView';
 import { GradingView } from './components/GradingView';
 import { GradebookView } from './components/GradebookView';
 import { PricingModal } from './components/PricingModal';
-import { DuoMascot } from './components/DuoMascot';
+import { DuoMascot, DuoCompanionDock } from './components/DuoMascot';
 import {
   Exam,
   ExamGenerationConfig,
@@ -402,9 +402,9 @@ export function App() {
                     </div>
                   </div>
 
-                  {/* Section Feature Illustration floating directly on white canvas */}
+                  {/* Interactive Section Feature Illustration floating directly on white canvas */}
                   <div className="lg:col-span-5 flex justify-center">
-                    <DuoMascot variant="professor" className="w-48 h-48 sm:w-56 sm:h-56" />
+                    <DuoMascot variant="professor" className="w-full max-w-[340px]" />
                   </div>
                 </div>
 
@@ -717,6 +717,13 @@ export function App() {
           </div>
         ))}
       </div>
+
+      {/* Interactive Floating Mascot Companion Dock */}
+      <DuoCompanionDock
+        activeTab={activeTab}
+        pendingReviewsCount={pendingReviewsCount}
+        creditsBalance={billingAccount.creditsBalance}
+      />
 
       {/* Pricing, Subscription & Credit Wallet Modal */}
       <PricingModal

@@ -1,0 +1,105 @@
+<svg viewBox="0 0 380 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    @keyframes duoBob {
+      0%, 100% { transform: translateY(0px) scale(1, 1); }
+      50% { transform: translateY(-6px) scale(0.99, 1.02); }
+    }
+    @keyframes duoShadow {
+      0%, 100% { transform: scaleX(1); opacity: 0.18; }
+      50% { transform: scaleX(0.88); opacity: 0.11; }
+    }
+    @keyframes duoWave {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(-12deg); }
+    }
+    @keyframes duoPencil {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(6deg) translateY(-3px); }
+    }
+    @keyframes duoBlink {
+      0%, 92%, 100% { transform: scaleY(1); }
+      96% { transform: scaleY(0.08); }
+    }
+    @keyframes duoFloat {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-7px) rotate(8deg); }
+    }
+    .mascot-body { animation: duoBob 3.2s ease-in-out infinite; transform-origin: 212px 240px; }
+    .mascot-shadow { animation: duoShadow 3.2s ease-in-out infinite; transform-origin: 212px 268px; }
+    .mascot-wing-l { animation: duoWave 2.4s ease-in-out infinite; transform-origin: 142px 150px; }
+    .mascot-wing-r { animation: duoPencil 2.8s ease-in-out infinite; transform-origin: 282px 156px; }
+    .mascot-eyes { animation: duoBlink 4.2s ease-in-out infinite; transform-origin: 212px 118px; }
+    .sparkle-1 { animation: duoFloat 3.6s ease-in-out infinite; transform-origin: 52px 54px; }
+    .sparkle-2 { animation: duoFloat 4.1s ease-in-out infinite 0.6s; transform-origin: 320px 48px; }
+  </style>
+
+  <!-- Ground Shadow -->
+  <ellipse class="mascot-shadow" cx="212" cy="268" rx="76" ry="12" fill="#000437" fill-opacity="0.16" />
+
+  <!-- Floating Sparkles -->
+  <g class="sparkle-1">
+    <circle cx="52" cy="54" r="10" fill="#ffc800" stroke="#000437" stroke-width="3.5" />
+    <rect x="44" y="96" width="110" height="138" rx="16" transform="rotate(-8 44 96)" fill="#ffffff" stroke="#000437" stroke-width="4" />
+    <rect x="64" y="118" width="68" height="10" rx="5" transform="rotate(-8 64 118)" fill="#1cb0f6" />
+    <rect x="68" y="140" width="54" height="8" rx="4" transform="rotate(-8 68 140)" fill="#afafaf" />
+    <rect x="70" y="158" width="62" height="8" rx="4" transform="rotate(-8 70 158)" fill="#afafaf" />
+    <circle cx="84" cy="194" r="14" fill="#58cc02" stroke="#000437" stroke-width="3.5" />
+    <path d="M78 194L82.5 198.5L91 189.5" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+
+  <g class="sparkle-2">
+    <rect x="312" y="38" width="22" height="22" rx="6" transform="rotate(15 312 38)" fill="#ce82ff" stroke="#000437" stroke-width="3.5" />
+    <circle cx="336" cy="198" r="8" fill="#ff86d0" stroke="#000437" stroke-width="3.5" />
+  </g>
+
+  <!-- Feet -->
+  <rect x="168" y="246" width="32" height="16" rx="8" fill="#ff9600" stroke="#000437" stroke-width="4" />
+  <rect x="224" y="246" width="32" height="16" rx="8" fill="#ff9600" stroke="#000437" stroke-width="4" />
+
+  <!-- Animated Body Group -->
+  <g class="mascot-body">
+    <rect x="140" y="72" width="144" height="182" rx="68" fill="#58cc02" stroke="#000437" stroke-width="4" />
+    <path d="M155 84C144 62 164 52 182 72" fill="#58cc02" stroke="#000437" stroke-width="4" stroke-linecap="round" />
+    <path d="M269 84C280 62 260 52 242 72" fill="#58cc02" stroke="#000437" stroke-width="4" stroke-linecap="round" />
+
+    <!-- Belly Patch -->
+    <rect x="166" y="170" width="92" height="68" rx="44" fill="#a5ed6e" stroke="#000437" stroke-width="3.5" />
+    <path d="M192 192C198 198 204 198 210 192" stroke="#58cc02" stroke-width="4" stroke-linecap="round" />
+    <path d="M216 192C222 198 228 198 234 192" stroke="#58cc02" stroke-width="4" stroke-linecap="round" />
+    <path d="M204 210C210 216 216 216 222 210" stroke="#58cc02" stroke-width="4" stroke-linecap="round" />
+
+    <!-- Left Wing -->
+    <g class="mascot-wing-l">
+      <path d="M142 144C112 134 104 164 126 186L142 192" fill="#58cc02" stroke="#000437" stroke-width="4" stroke-linecap="round" />
+    </g>
+
+    <!-- Eyes & Glasses -->
+    <g class="mascot-eyes">
+      <circle cx="186" cy="126" r="24" fill="#ffffff" stroke="#000437" stroke-width="4" />
+      <circle cx="238" cy="126" r="24" fill="#ffffff" stroke="#000437" stroke-width="4" />
+      <line x1="210" y1="126" x2="214" y2="126" stroke="#000437" stroke-width="4" />
+      <circle cx="188" cy="126" r="10" fill="#000437" />
+      <circle cx="240" cy="126" r="10" fill="#000437" />
+      <circle cx="192" cy="122" r="3.5" fill="#ffffff" />
+      <circle cx="244" cy="122" r="3.5" fill="#ffffff" />
+    </g>
+
+    <!-- Beak -->
+    <path d="M202 142H222L212 158L202 142Z" fill="#ffc800" stroke="#000437" stroke-width="3.5" stroke-linejoin="round" />
+
+    <!-- Mortarboard Hat -->
+    <polygon points="212,32 148,56 212,78 276,56" fill="#ce82ff" stroke="#000437" stroke-width="4" stroke-linejoin="round" />
+    <line x1="264" y1="60" x2="274" y2="90" stroke="#ffc800" stroke-width="4" stroke-linecap="round" />
+    <circle cx="274" cy="92" r="6" fill="#ffc800" stroke="#000437" stroke-width="3" />
+
+    <!-- Right Wing & Giant Pencil -->
+    <g class="mascot-wing-r">
+      <path d="M282 148C314 142 322 172 296 194L280 198" fill="#58cc02" stroke="#000437" stroke-width="4" stroke-linecap="round" />
+      <g transform="rotate(22 308 164)">
+        <rect x="296" y="104" width="20" height="88" rx="4" fill="#ffc800" stroke="#000437" stroke-width="3.5" />
+        <rect x="296" y="90" width="20" height="16" rx="4" fill="#ff86d0" stroke="#000437" stroke-width="3.5" />
+        <polygon points="296,192 316,192 306,212" fill="#ffffff" stroke="#000437" stroke-width="3.5" stroke-linejoin="round" />
+      </g>
+    </g>
+  </g>
+</svg>

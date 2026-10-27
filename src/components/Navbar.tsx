@@ -84,37 +84,12 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => setActiveTab('upload')}
             className="flex items-center gap-2.5 text-left focus:outline-none"
           >
-            {/* Sticker Owl Mascot Badge */}
-            <svg
-              width="40"
-              height="40"
-              viewBox="0 0 100 100"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="shrink-0"
-            >
-              <rect
-                x="4"
-                y="4"
-                width="92"
-                height="92"
-                rx="22"
-                fill="#58cc02"
-                stroke="#000437"
-                strokeWidth="5"
-              />
-              <circle cx="35" cy="46" r="15" fill="#ffffff" stroke="#000437" strokeWidth="4" />
-              <circle cx="65" cy="46" r="15" fill="#ffffff" stroke="#000437" strokeWidth="4" />
-              <circle cx="35" cy="46" r="6.5" fill="#000437" />
-              <circle cx="65" cy="46" r="6.5" fill="#000437" />
-              <polygon
-                points="50,53 41,66 59,66"
-                fill="#ffc800"
-                stroke="#000437"
-                strokeWidth="3.5"
-                strokeLinejoin="round"
-              />
-            </svg>
+            {/* Animated Sticker Owl Mascot Badge */}
+            <img
+              src="/assets/mascot/badge-owl-avatar.svg"
+              alt="Mascota Profe Búho"
+              className="w-10 h-10 shrink-0 transition-transform hover:scale-110"
+            />
             <div>
               <span
                 className="block font-feather font-extrabold text-[28px] leading-none tracking-[-0.02em] text-[#58cc02]"
