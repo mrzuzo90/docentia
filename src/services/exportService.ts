@@ -351,5 +351,54 @@ Materia: ${exam.subject} | Nivel: ${exam.targetLevel}
     });
 
     return ['\ufeff' + headers.join(';'), ...rows.map(r => r.join(';'))].join('\n');
+  },
+
+  /**
+   * Generates standard Moodle XML (<quiz>) based on official Moodle specification.
+   * Includes multichoice questions with fractions and essay questions with graderinfo.
+   */
+  generateMoodleXML(exam: Exam): string {
+    const xmlText = (val: string) =>
+      val.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' }[c] || c));
+    const field = (name: string, val: string) => `<${name} format="plain_text"><text>${xmlText(val)}</text></${name}>`;
+
+    const questions: string[] = [];
+
+    // Multichoice Questions
+    exam.testQuestions.forEach((q, idx) => {
+      const name = xmlText(`${exam.title} · Test ${String(idx + 1).padStart(2, '0')}`);
+      const common = `<name><text>${name}</text></name>${field('questiontext', q.question)}<defaultgrade>${q.points}</defaultgrade><penalty>${exam.testPenalty || 0}</penalty><hidden>0</hidden>`;
+      const choices = (['A', 'B', 'C', 'D'] as const).map(letter => {
+        const fraction = letter === q.correctAnswer ? 100 : 0;
+        return `<answer fraction="${fraction}" format="plain_text"><text>${xmlText(q.options[letter])}</text></answer>`;
+      }).join('');
+      questions.push(`<question type="multichoice">${common}${field('generalfeedback', q.explanation)}<single>true</single><shuffleanswers>1</shuffleanswers><answernumbering>abc</answernumbering>${choices}</question>`);
+    });
+
+    // Essay / Development Questions
+    exam.exercises.forEach((ex, idx) => {
+      const name = xmlText(`${exam.title} · Ejercicio ${String(idx + 1).padStart(2, '0')}: ${ex.title}`);
+      const common = `<name><text>${name}</text></name>${field('questiontext', `${ex.title}\n\n${ex.statement}`)}<defaultgrade>${ex.points}</defaultgrade><penalty>0</penalty><hidden>0</hidden>`;
+      const rubricText = `Solucionario y Rúbrica Oficial (sobre ${ex.points} pts):\n${ex.solutionSteps}\n\nCriterios de evaluación orientativos:\n${ex.rubricCriteria.map(c => `• ${c}`).join('\n')}`;
+      questions.push(`<question type="essay">${common}<responseformat>editor</responseformat><responserequired>1</responserequired><responsefieldlines>15</responsefieldlines><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired>${field('graderinfo', rubricText)}</question>`);
+    });
+
+    return `<?xml version="1.0" encoding="UTF-8"?>\n<quiz>\n${questions.join('\n')}\n</quiz>\n`;
+  },
+
+  /**
+   * Downloads a .xml file ready to import directly into Moodle Question Bank
+   */
+  downloadMoodleXML(exam: Exam): void {
+    const xml = this.generateMoodleXML(exam);
+    const blob = new Blob([xml], { type: 'application/xml;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `Moodle_Banco_Preguntas_${exam.title.replace(/[^a-zA-Z0-9_-]/g, '_')}.xml`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   }
 };

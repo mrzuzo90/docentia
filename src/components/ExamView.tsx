@@ -17,7 +17,9 @@ import {
   Sparkles,
   Type,
   Shuffle,
-  Share2
+  Share2,
+  BookOpen,
+  X
 } from 'lucide-react';
 import { Exam, TestQuestion, OpenExercise } from '../types';
 import { ExportService } from '../services/exportService';
@@ -121,6 +123,53 @@ export const ExamView: React.FC<ExamViewProps> = ({
   const [paperFont, setPaperFont] = useState<'serif' | 'sans' | 'mono'>('serif');
   const [copiedType, setCopiedType] = useState<string | null>(null);
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
+  const [evidenceModalItem, setEvidenceModalItem] = useState<{
+    id: string;
+    title: string;
+    docName?: string;
+    excerpt?: string;
+    isVerified?: boolean;
+    isTest: boolean;
+  } | null>(null);
+
+  const handleToggleVerifySource = (id: string, isTest: boolean) => {
+    SoundService.playSuccess();
+    if (isTest) {
+      const updated = exam.testQuestions.map(q => {
+        if (q.id === id) {
+          const nextVal = !q.isSourceVerified;
+          return { ...q, isSourceVerified: nextVal };
+        }
+        return q;
+      });
+      onUpdateExam({ ...exam, testQuestions: updated });
+      if (evidenceModalItem && evidenceModalItem.id === id) {
+        setEvidenceModalItem(prev => (prev ? { ...prev, isVerified: !prev.isVerified } : null));
+      }
+      onNotify?.(
+        'Evidencia documental verificada',
+        'La pregunta queda marcada como auditada y cotejada con la fuente original.',
+        'success'
+      );
+    } else {
+      const updated = exam.exercises.map(ex => {
+        if (ex.id === id) {
+          const nextVal = !ex.isSourceVerified;
+          return { ...ex, isSourceVerified: nextVal };
+        }
+        return ex;
+      });
+      onUpdateExam({ ...exam, exercises: updated });
+      if (evidenceModalItem && evidenceModalItem.id === id) {
+        setEvidenceModalItem(prev => (prev ? { ...prev, isVerified: !prev.isVerified } : null));
+      }
+      onNotify?.(
+        'Evidencia documental verificada',
+        'El ejercicio queda marcado como auditado y cotejado con la fuente original.',
+        'success'
+      );
+    }
+  };
 
   const modelAExam = useMemo(
     () => ({
@@ -649,7 +698,21 @@ export const ExamView: React.FC<ExamViewProps> = ({
             className="duo-nav-pill py-2 px-3 text-[13px]"
             title="Copiar preguntas test en formato Aiken para Moodle"
           >
-            <span>{copiedType === `aiken-${activeModel}` ? '¡AIKEN!' : 'MOODLE'}</span>
+            <span>{copiedType === `aiken-${activeModel}` ? '¡AIKEN!' : 'MOODLE AIKEN'}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              SoundService.playClick();
+              ExportService.downloadMoodleXML(displayedExam);
+              onNotify?.('Descargando Banco Moodle XML', 'Archivo XML estándar listo para importar en el Banco de Preguntas de Moodle.', 'info');
+            }}
+            className="duo-nav-pill py-2 px-3 text-[13px]"
+            title="Descargar archivo Moodle XML estándar para el Banco de Preguntas"
+          >
+            <Download className="h-4 w-4" />
+            <span>MOODLE XML</span>
           </button>
 
           <button
@@ -1053,6 +1116,38 @@ export const ExamView: React.FC<ExamViewProps> = ({
                       )}
                     </div>
 
+                    {/* Source Evidence & Traceability Badge (docentiaV2 Innovation) */}
+                    <div className="pl-8 flex flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          SoundService.playClick();
+                          setEvidenceModalItem({
+                            id: q.id,
+                            title: `Pregunta ${idx + 1}: ${q.question.slice(0, 60)}...`,
+                            docName: q.sourceDocumentName || (exam.documents[0]?.name || 'Documento base'),
+                            excerpt: q.sourceExcerpt || 'Pregunta formulada y sintetizada a partir del contenido del documento curricular aportado.',
+                            isVerified: q.isSourceVerified,
+                            isTest: true
+                          });
+                        }}
+                        className={`text-[12px] font-bold px-3 py-1 rounded-[12px] border-2 transition flex items-center gap-1.5 ${
+                          q.isSourceVerified
+                            ? 'bg-[#d7ffb8] border-[#58cc02] text-[#000437]'
+                            : 'bg-[#ffffff] border-[#afafaf] text-[#777777] hover:border-[#58cc02]'
+                        }`}
+                        title="Consultar fragmento exacto del documento fuente de donde se extrajo"
+                      >
+                        <BookOpen className="w-3.5 h-3.5 text-[#58cc02]" />
+                        <span>FUENTE: {q.sourceDocumentName ? q.sourceDocumentName.slice(0, 36) : 'Doc. Curricular'}</span>
+                        {q.isSourceVerified ? (
+                          <span className="text-[#58cc02] font-black">✔ AUDITADA</span>
+                        ) : (
+                          <span className="text-[#777777]">· Cotejar</span>
+                        )}
+                      </button>
+                    </div>
+
                   </div>
                 );
               })}
@@ -1248,12 +1343,126 @@ export const ExamView: React.FC<ExamViewProps> = ({
 
                     </div>
 
+                    {/* Source Evidence & Traceability Badge (docentiaV2 Innovation) */}
+                    <div className="flex flex-wrap items-center gap-2 pt-2 border-t-2 border-[#afafaf]/30">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          SoundService.playClick();
+                          setEvidenceModalItem({
+                            id: ex.id,
+                            title: `Ejercicio ${idx + 1}: ${ex.title}`,
+                            docName: ex.sourceDocumentName || (exam.documents[0]?.name || 'Documento base'),
+                            excerpt: ex.sourceExcerpt || 'Problema estructurado a partir de los objetivos de evaluación del documento base.',
+                            isVerified: ex.isSourceVerified,
+                            isTest: false
+                          });
+                        }}
+                        className={`text-[12px] font-bold px-3 py-1 rounded-[12px] border-2 transition flex items-center gap-1.5 ${
+                          ex.isSourceVerified
+                            ? 'bg-[#d7ffb8] border-[#58cc02] text-[#000437]'
+                            : 'bg-[#ffffff] border-[#afafaf] text-[#777777] hover:border-[#58cc02]'
+                        }`}
+                        title="Consultar fragmento exacto del documento fuente de donde se extrajo"
+                      >
+                        <BookOpen className="w-3.5 h-3.5 text-[#58cc02]" />
+                        <span>FUENTE: {ex.sourceDocumentName ? ex.sourceDocumentName.slice(0, 36) : 'Doc. Curricular'}</span>
+                        {ex.isSourceVerified ? (
+                          <span className="text-[#58cc02] font-black">✔ AUDITADA</span>
+                        ) : (
+                          <span className="text-[#777777]">· Cotejar</span>
+                        )}
+                      </button>
+                    </div>
+
                   </div>
                 );
               })}
             </div>
           </div>
 
+        </div>
+      )}
+
+      {/* MODAL MESA DE EVIDENCIAS Y TRAZABILIDAD (DE DOCENTIA V2) */}
+      {evidenceModalItem && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#000437]/60 backdrop-blur-xs animate-fadeIn">
+          <div className="bg-[#ffffff] text-[#4b4b4b] rounded-[12px] border-2 border-[#afafaf] shadow-2xl max-w-xl w-full p-6 space-y-4">
+            <div className="flex items-center justify-between border-b-2 border-[#afafaf]/40 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-[12px] bg-[#d7ffb8] border-2 border-[#58cc02] text-[#58cc02] flex items-center justify-center">
+                  <BookOpen className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-[17px] font-bold text-[#4b4b4b]">
+                    Trazabilidad de Fuente Curricular
+                  </h3>
+                  <p className="text-[12px] text-[#777777]">
+                    Mesa de evidencias para justificar la pertinencia del contenido ante inspección o alumnos.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEvidenceModalItem(null)}
+                className="p-1.5 text-[#777777] hover:text-[#4b4b4b] rounded-[12px] border-2 border-[#afafaf]"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div>
+              <span className="text-[12px] font-bold uppercase tracking-[0.053em] text-[#777777] block mb-1">
+                ELEMENTO EVALUADO
+              </span>
+              <p className="text-[15px] font-bold text-[#4b4b4b] bg-[#f8fafc] p-3 rounded-[12px] border-2 border-[#afafaf]/50">
+                {evidenceModalItem.title}
+              </p>
+            </div>
+
+            <div>
+              <span className="text-[12px] font-bold uppercase tracking-[0.053em] text-[#58cc02] block mb-1">
+                DOCUMENTO ORIGEN COTEJADO
+              </span>
+              <p className="text-[13px] font-mono font-bold text-[#000437]">
+                📄 {evidenceModalItem.docName}
+              </p>
+            </div>
+
+            <div>
+              <span className="text-[12px] font-bold uppercase tracking-[0.053em] text-[#777777] block mb-1">
+                FRAGMENTO TEXTUAL EXACTO EN LA FUENTE
+              </span>
+              <blockquote className="p-3.5 rounded-[12px] bg-[#d7ffb8]/30 border-l-4 border-[#58cc02] text-[14px] text-[#4b4b4b] italic leading-relaxed">
+                "{evidenceModalItem.excerpt}"
+              </blockquote>
+            </div>
+
+            <div className="pt-2 flex items-center justify-between border-t-2 border-[#afafaf]/40">
+              <button
+                type="button"
+                onClick={() => handleToggleVerifySource(evidenceModalItem.id, evidenceModalItem.isTest)}
+                className={`py-2 px-4 rounded-[12px] border-2 text-[13px] font-bold uppercase tracking-[0.053em] flex items-center gap-2 ${
+                  evidenceModalItem.isVerified
+                    ? 'bg-[#d7ffb8] border-[#58cc02] text-[#000437]'
+                    : 'duo-btn-primary'
+                }`}
+              >
+                <CheckCircle2 className="w-4 h-4 text-[#58cc02]" />
+                <span>
+                  {evidenceModalItem.isVerified ? '✔ MARCADA COMO AUDITADA' : 'MARCAR COMO VERIFICADA'}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setEvidenceModalItem(null)}
+                className="duo-btn-neutral py-2 px-4 text-[13px]"
+              >
+                CERRAR
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

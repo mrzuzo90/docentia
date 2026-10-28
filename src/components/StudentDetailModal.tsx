@@ -174,6 +174,20 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
   const prevSub = currentIdx > 0 ? allSubmissions[currentIdx - 1] : null;
   const nextSub = currentIdx >= 0 && currentIdx < allSubmissions.length - 1 ? allSubmissions[currentIdx + 1] : null;
 
+  // Next student needing review (fluent review flow from docentiaV2)
+  const nextPendingStudent = allSubmissions.find(
+    s => s.id !== submission.id && (s.status === 'needs_review' || s.gradeReport?.needsManualReview)
+  );
+
+  const handleSaveAndNextPending = () => {
+    handleSaveAll();
+    if (nextPendingStudent && onSelectSubmission) {
+      setTimeout(() => {
+        onSelectSubmission(nextPendingStudent);
+      }, 300);
+    }
+  };
+
   const displayedCorrections =
     activeTab === 'unclear' ? corrections.filter(c => c.needsManualReview) : corrections;
 
@@ -659,7 +673,7 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
                   )}
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <button
                     type="button"
                     onClick={onClose}
@@ -667,6 +681,18 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
                   >
                     CERRAR
                   </button>
+
+                  {nextPendingStudent && onSelectSubmission && (
+                    <button
+                      type="button"
+                      onClick={handleSaveAndNextPending}
+                      className="duo-btn-outlined border-[#58cc02] text-[#000437] bg-[#d7ffb8] py-2 px-4 text-[13px]"
+                      title="Guardar cambios y saltar al siguiente examen con caligrafía dudosa"
+                    >
+                      <CheckCircle2 className="h-4 w-4 text-[#58cc02]" />
+                      <span>GUARDAR Y SIGUIENTE PENDIENTE</span>
+                    </button>
+                  )}
 
                   <button
                     type="button"

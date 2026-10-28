@@ -13,7 +13,10 @@ import {
   Sparkles,
   QrCode,
   ExternalLink,
-  Lock
+  Lock,
+  Users,
+  List,
+  FileSpreadsheet
 } from 'lucide-react';
 import { Exam, StudentSubmission, StudentGradeReport, QuestionCorrection } from '../types';
 import { SoundService } from '../services/soundService';
@@ -46,8 +49,63 @@ export const OnlineExamPortal: React.FC<OnlineExamPortalProps> = ({
   const [secondsRemaining, setSecondsRemaining] = useState((exam.durationMinutes || 60) * 60);
   const [lastSubmittedScore, setLastSubmittedScore] = useState<{ score: number; test: number; ex: number } | null>(null);
 
+  // Batch Roster Generator State (from docentiaV2)
+  const [shareTab, setShareTab] = useState<'link' | 'roster'>('link');
+  const [rosterText, setRosterText] = useState(
+    'Alonso Martín, Carla\nBlanco Santos, Daniel\nCastro Vega, Lucía\nFernández Ruiz, Hugo\nJiménez Gómez, Sofía'
+  );
+  const [rosterTokens, setRosterTokens] = useState<
+    Array<{ name: string; token: string; model: 'A' | 'B'; url: string }>
+  >([]);
+  const [copiedRosterIdx, setCopiedRosterIdx] = useState<number | null>(null);
+  const [copiedCsv, setCopiedCsv] = useState(false);
+
   const classroomPin = 'DOC-7842';
   const shareableUrl = `https://docentia.es/evaluar/${exam.id.slice(0, 10)}`;
+
+  const handleGenerateRoster = () => {
+    SoundService.playSuccess();
+    const lines = rosterText
+      .split('\n')
+      .map(l => l.trim())
+      .filter(l => l.length > 0);
+
+    const generated = lines.map((name, idx) => {
+      const model: 'A' | 'B' = idx % 2 === 0 ? 'A' : 'B';
+      const token = `EXAM-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+      return {
+        name,
+        token,
+        model,
+        url: `https://docentia.es/evaluar/${exam.id.slice(0, 8)}?token=${token}&m=${model}`
+      };
+    });
+    setRosterTokens(generated);
+    onNotify?.(
+      'Convocatoria individual generada',
+      `Se han creado ${generated.length} enlaces personales alternando Modelo A y B.`,
+      'success'
+    );
+  };
+
+  const handleCopyCsvRoster = () => {
+    SoundService.playSuccess();
+    const csvHeader = 'Alumno,Modelo,Token,EnlaceDirecto\n';
+    const csvRows = rosterTokens
+      .map(r => `"${r.name}","Modelo ${r.model}","${r.token}","${r.url}"`)
+      .join('\n');
+    navigator.clipboard.writeText(csvHeader + csvRows);
+    setCopiedCsv(true);
+    setTimeout(() => setCopiedCsv(false), 2200);
+    onNotify?.('Listado CSV copiado', 'Listo para pegar en Excel o tu hoja de cálculo docente.', 'info');
+  };
+
+  const handleCopyIndividualRoster = (idx: number, url: string) => {
+    SoundService.playSuccess();
+    navigator.clipboard.writeText(url);
+    setCopiedRosterIdx(idx);
+    setTimeout(() => setCopiedRosterIdx(null), 2000);
+  };
 
   // Reset state when opening
   useEffect(() => {
@@ -310,76 +368,211 @@ export const OnlineExamPortal: React.FC<OnlineExamPortalProps> = ({
               </button>
             </div>
 
-            {/* Share Link Card */}
-            <div className="duo-card border-[#58cc02] bg-[#ffffff] p-5 space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div>
-                  <span className="text-[12px] font-bold uppercase tracking-[0.053em] text-[#58cc02]">
-                    ENLACE SEGURO DE EVALUACIÓN
-                  </span>
-                  <div className="text-[17px] font-bold text-[#4b4b4b] font-mono mt-0.5">
-                    {shareableUrl}
+            {/* Tab navigation: Enlace General vs Convocatoria Individual en Lote (from docentiaV2) */}
+            <div className="flex items-center gap-2 border-b-2 border-[#afafaf]/30 pb-2">
+              <button
+                type="button"
+                onClick={() => {
+                  SoundService.playClick();
+                  setShareTab('link');
+                }}
+                className={`duo-nav-pill py-2 px-4 text-[13px] ${
+                  shareTab === 'link' ? 'duo-nav-pill-active' : ''
+                }`}
+              >
+                <Share2 className="w-4 h-4" />
+                <span>ENLACE GENERAL Y PIN</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  SoundService.playClick();
+                  setShareTab('roster');
+                }}
+                className={`duo-nav-pill py-2 px-4 text-[13px] ${
+                  shareTab === 'roster' ? 'duo-nav-pill-active' : ''
+                }`}
+              >
+                <Users className="w-4 h-4" />
+                <span>CONVOCATORIA EN LOTE (ALUMNOS)</span>
+              </button>
+            </div>
+
+            {shareTab === 'link' ? (
+              <>
+                {/* Share Link Card */}
+                <div className="duo-card border-[#58cc02] bg-[#ffffff] p-5 space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <span className="text-[12px] font-bold uppercase tracking-[0.053em] text-[#58cc02]">
+                        ENLACE SEGURO DE EVALUACIÓN
+                      </span>
+                      <div className="text-[17px] font-bold text-[#4b4b4b] font-mono mt-0.5">
+                        {shareableUrl}
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleCopyLink}
+                      className="duo-btn-primary py-2 px-4"
+                    >
+                      {copiedLink ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                      <span>{copiedLink ? '¡ENLACE COPIADO!' : 'COPIAR ENLACE'}</span>
+                    </button>
+                  </div>
+
+                  {/* Classroom PIN Badge */}
+                  <div className="flex items-center gap-4 pt-2 border-t-2 border-[#afafaf]/40">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[13px] font-bold text-[#777777]">PIN DE AULA:</span>
+                      <span className="px-3 py-1 rounded-[12px] bg-[#d7ffb8] border-2 border-[#58cc02] font-mono font-bold text-[15px] text-[#000437]">
+                        {classroomPin}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[13px] font-bold text-[#777777]">TIEMPO LÍMITE:</span>
+                      <span className="px-3 py-1 rounded-[12px] bg-[#ffffff] border-2 border-[#afafaf] text-[13px] font-bold text-[#4b4b4b]">
+                        {exam.durationMinutes || 60} min
+                      </span>
+                    </div>
                   </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={handleCopyLink}
-                  className="duo-btn-primary py-2 px-4"
-                >
-                  {copiedLink ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                  <span>{copiedLink ? '¡ENLACE COPIADO!' : 'COPIAR ENLACE'}</span>
-                </button>
-              </div>
 
-              {/* Classroom PIN Badge */}
-              <div className="flex items-center gap-4 pt-2 border-t-2 border-[#afafaf]/40">
-                <div className="flex items-center gap-2">
-                  <span className="text-[13px] font-bold text-[#777777]">PIN DE AULA:</span>
-                  <span className="px-3 py-1 rounded-[12px] bg-[#d7ffb8] border-2 border-[#58cc02] font-mono font-bold text-[15px] text-[#000437]">
-                    {classroomPin}
-                  </span>
+                {/* Anti-Cheating Protocol Highlights */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="p-3.5 rounded-[12px] border-2 border-[#afafaf] bg-[#ffffff] space-y-1">
+                    <span className="text-[13px] font-bold text-[#58cc02] flex items-center gap-1.5">
+                      <Lock className="w-4 h-4" />
+                      Bloqueo Clic Derecho
+                    </span>
+                    <p className="text-[12px] text-[#777777]">
+                      Menú contextual deshabilitado y selección de texto bloqueada.
+                    </p>
+                  </div>
+
+                  <div className="p-3.5 rounded-[12px] border-2 border-[#afafaf] bg-[#ffffff] space-y-1">
+                    <span className="text-[13px] font-bold text-[#1cb0f6] flex items-center gap-1.5">
+                      <ShieldAlert className="w-4 h-4" />
+                      Detector de Pestañas
+                    </span>
+                    <p className="text-[12px] text-[#777777]">
+                      Registra avisos si el alumno minimiza la ventana o busca en ChatGPT.
+                    </p>
+                  </div>
+
+                  <div className="p-3.5 rounded-[12px] border-2 border-[#afafaf] bg-[#ffffff] space-y-1">
+                    <span className="text-[13px] font-bold text-[#ff9600] flex items-center gap-1.5">
+                      <Sparkles className="w-4 h-4" />
+                      Auto-Calificación
+                    </span>
+                    <p className="text-[12px] text-[#777777]">
+                      Al enviar, la nota de 0 a 10 entra directa a tu acta de clase.
+                    </p>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[13px] font-bold text-[#777777]">TIEMPO LÍMITE:</span>
-                  <span className="px-3 py-1 rounded-[12px] bg-[#ffffff] border-2 border-[#afafaf] text-[13px] font-bold text-[#4b4b4b]">
-                    {exam.durationMinutes || 60} min
-                  </span>
+              </>
+            ) : (
+              /* Convocatoria en lote tab */
+              <div className="space-y-4">
+                <div className="duo-card bg-[#ffffff] border-[#afafaf] p-5 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="text-[17px] font-bold text-[#4b4b4b]">
+                        Listado de Alumnos de la Clase
+                      </h4>
+                      <p className="text-[13px] text-[#777777]">
+                        Pega los nombres (uno por línea). El sistema asignará tokens únicos y alternará los Modelos A y B para alumnos contiguos.
+                      </p>
+                    </div>
+                  </div>
+
+                  <textarea
+                    rows={4}
+                    value={rosterText}
+                    onChange={e => setRosterText(e.target.value)}
+                    placeholder="Pega aquí los alumnos (uno por línea)..."
+                    className="w-full text-[13px] p-3 rounded-[12px] border-2 border-[#afafaf] bg-[#ffffff] text-[#4b4b4b] font-mono focus:outline-none focus:border-[#58cc02]"
+                  />
+
+                  <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+                    <button
+                      type="button"
+                      onClick={handleGenerateRoster}
+                      className="duo-btn-primary py-2 px-5 text-[13px]"
+                    >
+                      <Sparkles className="w-4 h-4" />
+                      <span>GENERAR CONVOCATORIA (MODELO A / B ALTERNADOS)</span>
+                    </button>
+
+                    {rosterTokens.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={handleCopyCsvRoster}
+                        className="duo-btn-outlined border-[#1cb0f6] text-[#1cb0f6] py-2 px-4 text-[13px]"
+                      >
+                        <FileSpreadsheet className="w-4 h-4" />
+                        <span>{copiedCsv ? '¡CSV COPIADO!' : 'COPIAR LISTADO CSV'}</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </div>
 
-            {/* Anti-Cheating Protocol Highlights */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="p-3.5 rounded-[12px] border-2 border-[#afafaf] bg-[#ffffff] space-y-1">
-                <span className="text-[13px] font-bold text-[#58cc02] flex items-center gap-1.5">
-                  <Lock className="w-4 h-4" />
-                  Bloqueo Clic Derecho
-                </span>
-                <p className="text-[12px] text-[#777777]">
-                  Menú contextual deshabilitado y selección de texto bloqueada.
-                </p>
-              </div>
+                {rosterTokens.length > 0 && (
+                  <div className="duo-card p-0 overflow-hidden border-[#afafaf]">
+                    <div className="p-3 bg-[#f8fafc] border-b-2 border-[#afafaf] flex items-center justify-between">
+                      <span className="text-[12px] font-bold uppercase tracking-[0.053em] text-[#777777]">
+                        CONVOCATORIAS ACTIVAS ({rosterTokens.length} ALUMNOS)
+                      </span>
+                      <span className="text-[12px] text-[#58cc02] font-bold">
+                        Alternancia Modelo A (Impares) / Modelo B (Pares)
+                      </span>
+                    </div>
 
-              <div className="p-3.5 rounded-[12px] border-2 border-[#afafaf] bg-[#ffffff] space-y-1">
-                <span className="text-[13px] font-bold text-[#1cb0f6] flex items-center gap-1.5">
-                  <ShieldAlert className="w-4 h-4" />
-                  Detector de Pestañas
-                </span>
-                <p className="text-[12px] text-[#777777]">
-                  Registra avisos si el alumno minimiza la ventana o busca en ChatGPT.
-                </p>
-              </div>
+                    <div className="divide-y divide-[#afafaf]/40 max-h-56 overflow-y-auto">
+                      {rosterTokens.map((item, idx) => (
+                        <div key={idx} className="p-3 flex items-center justify-between gap-3 text-[13px]">
+                          <div className="flex items-center gap-2.5">
+                            <span className="font-mono text-[11px] text-[#777777] w-6">
+                              #{idx + 1}
+                            </span>
+                            <span className="font-bold text-[#4b4b4b]">{item.name}</span>
+                            <span
+                              className={`px-2 py-0.5 rounded-[8px] font-mono font-bold text-[11px] border ${
+                                item.model === 'A'
+                                  ? 'bg-[#d7ffb8] border-[#58cc02] text-[#000437]'
+                                  : 'bg-[#e0f2fe] border-[#1cb0f6] text-[#000437]'
+                              }`}
+                            >
+                              MODELO {item.model}
+                            </span>
+                          </div>
 
-              <div className="p-3.5 rounded-[12px] border-2 border-[#afafaf] bg-[#ffffff] space-y-1">
-                <span className="text-[13px] font-bold text-[#ff9600] flex items-center gap-1.5">
-                  <Sparkles className="w-4 h-4" />
-                  Auto-Calificación
-                </span>
-                <p className="text-[12px] text-[#777777]">
-                  Al enviar, la nota de 0 a 10 entra directa a tu acta de clase.
-                </p>
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono text-[12px] bg-[#f1f5f9] px-2 py-0.5 rounded border border-[#afafaf]">
+                              {item.token}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => handleCopyIndividualRoster(idx, item.url)}
+                              className="duo-nav-pill py-1 px-2.5 text-[11px]"
+                              title="Copiar enlace directo individual"
+                            >
+                              {copiedRosterIdx === idx ? (
+                                <Check className="w-3.5 h-3.5 text-[#58cc02]" />
+                              ) : (
+                                <Copy className="w-3.5 h-3.5" />
+                              )}
+                              <span>{copiedRosterIdx === idx ? 'COPIADO' : 'ENLACE'}</span>
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
+            )}
 
             {/* Test Simulation Prompt */}
             <div className="p-4 rounded-[12px] bg-[#d7ffb8]/30 border-2 border-[#58cc02] flex flex-col sm:flex-row sm:items-center justify-between gap-4">

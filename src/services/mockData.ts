@@ -246,7 +246,10 @@ export const SAMPLE_EXAM: Exam = {
       },
       correctAnswer: 'C',
       explanation: 'El par Citosina-Guanina forma tres puentes de hidrógeno (C≡G), frente a los dos puentes del par Adenina-Timina (A=T), otorgando mayor estabilidad térmica a la molécula.',
-      points: 1.0
+      points: 1.0,
+      sourceDocumentName: 'Tema_7_Genetica_Molecular.pdf (Pág. 1)',
+      sourceExcerpt: 'La Adenina (A) se une con la Timina (T) mediante dos puentes de hidrógeno (A=T), mientras que la Citosina (C) se empareja con la Guanina (G) mediante tres puentes de hidrógeno (C≡G), lo que confiere mayor estabilidad térmica a las regiones ricas en pares GC.',
+      isSourceVerified: true
     },
     {
       id: 'q2',
@@ -259,7 +262,10 @@ export const SAMPLE_EXAM: Exam = {
       },
       correctAnswer: 'B',
       explanation: 'Al ser degenerado (61 codones con sentido para 20 aminoácidos), varios tripletes sinónimos codifican el mismo aminoácido, especialmente cuando el cambio ocurre en la tercera posición del codón.',
-      points: 1.0
+      points: 1.0,
+      sourceDocumentName: 'Tema_7_Genetica_Molecular.pdf (Pág. 3)',
+      sourceExcerpt: 'Es degenerado (redundante): existen 61 codones con sentido para solo 20 aminoácidos, por lo que múltiples codones sinónimos codifican un mismo aminoácido (variando frecuentemente en la tercera base o tambaleo).',
+      isSourceVerified: true
     },
     {
       id: 'q3',
@@ -272,7 +278,10 @@ export const SAMPLE_EXAM: Exam = {
       },
       correctAnswer: 'C',
       explanation: 'El complejo espliceosoma elimina los intrones (secuencias intercaladas no codificantes) y empalma los exones para constituir el ARNm maduro funcional.',
-      points: 1.0
+      points: 1.0,
+      sourceDocumentName: 'Tema_7_Genetica_Molecular.pdf (Pág. 2)',
+      sourceExcerpt: 'Splicing (corte y empalme): Eliminación de las secuencias intrónicas (intrones, no codificantes) y unión precisa de los exones (secuencias codificantes) mediante el espliceosoma.',
+      isSourceVerified: true
     },
     {
       id: 'q4',
@@ -285,7 +294,10 @@ export const SAMPLE_EXAM: Exam = {
       },
       correctAnswer: 'B',
       explanation: 'El triplete 5\'-AUG-3\' en el ARNm es el codón de iniciación universal y codifica el aminoácido Metionina.',
-      points: 1.0
+      points: 1.0,
+      sourceDocumentName: 'Tema_7_Genetica_Molecular.pdf (Pág. 3)',
+      sourceExcerpt: 'Codón de inicio: AUG (codifica Metionina en eucariotas y Formilmetionina en procariotas). Codones de terminación (Stop): UAA, UAG y UGA.',
+      isSourceVerified: true
     }
   ],
   exercises: [
@@ -310,7 +322,10 @@ b) Anticodones de los ARNt correspondientes:
 
 c) Efecto de la mutación 3'-TAC-5' → 3'-TAT-5':
 El primer codón del ARNm pasaría de 5'-AUG-3' a 5'-AUA-3'. Al desaparecer el codón de inicio AUG, la subunidad menor del ribosoma no reconoce el sitio de arranque de la traducción y el péptido no llega a sintetizarse.`,
-      points: 3.0
+      points: 3.0,
+      sourceDocumentName: 'Tema_7_Genetica_Molecular.pdf (Págs. 2-3)',
+      sourceExcerpt: 'La ARN polimerasa II lee la hebra molde de ADN en dirección 3\'→5\' y sintetiza el ARN mensajero en dirección 5\'→3\'. El código genético se lee en codones de 3 nucleótidos...',
+      isSourceVerified: true
     },
     {
       id: 'ex2',
@@ -327,7 +342,10 @@ La universalidad implica que un mismo codón del ARNm codifica el mismo aminoác
 b) Sustitución frente a Deleción de un nucleótido:
 - Una sustitución reemplaza un nucleótido por otro, afectando únicamente a un triplete (puede ser silenciosa por degeneración del código, o cambiar un único aminoácido en la cadena).
 - Una deleción de un nucleótido provoca un corrimiento de la pauta de lectura (frameshift) a partir del punto de mutación: todos los tripletes posteriores cambian su agrupación, alterando toda la secuencia de aminoácidos subsiguiente y generando casi invariablemente un codón de parada prematuro y una proteína truncada no funcional.`,
-      points: 3.0
+      points: 3.0,
+      sourceDocumentName: 'Tema_7_Genetica_Molecular.pdf (Págs. 3-4)',
+      sourceExcerpt: 'Es universal: compartido por todos los organismos conocidos... Esta universalidad es la base de la ingeniería genética. Las inserciones o deleciones provocan un corrimiento en la pauta de lectura (frameshift)...',
+      isSourceVerified: true
     }
   ]
 };

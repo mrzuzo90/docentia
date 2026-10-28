@@ -22,6 +22,9 @@ export interface TestQuestion {
   correctAnswer: 'A' | 'B' | 'C' | 'D';
   explanation: string;
   points: number; // weight in exam
+  sourceDocumentName?: string;
+  sourceExcerpt?: string;
+  isSourceVerified?: boolean;
 }
 
 export interface OpenExercise {
@@ -31,6 +34,9 @@ export interface OpenExercise {
   rubricCriteria: string[]; // key criteria for grading
   solutionSteps: string; // full solution / model answer
   points: number; // weight in exam
+  sourceDocumentName?: string;
+  sourceExcerpt?: string;
+  isSourceVerified?: boolean;
 }
 
 export interface Exam {
