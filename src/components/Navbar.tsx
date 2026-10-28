@@ -95,11 +95,11 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => handleTabSwitch('upload')}
             className="flex items-center gap-2.5 text-left focus:outline-none"
           >
-            {/* Animated Sticker Owl Mascot Badge */}
+            {/* Animated Sticker Owl Mascot Badge (Nanobanana Consistency) */}
             <img
-              src="/assets/mascot/badge-owl-avatar.svg"
+              src="/assets/mascot/badge-owl-avatar.png"
               alt="Mascota Profe Búho"
-              className="w-10 h-10 shrink-0 transition-transform hover:scale-110"
+              className="w-10 h-10 shrink-0 transition-transform hover:scale-110 drop-shadow-xs"
             />
             <div>
               <span
