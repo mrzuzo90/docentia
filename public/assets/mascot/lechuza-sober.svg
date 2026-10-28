@@ -1,0 +1,132 @@
+<svg viewBox="0 0 400 480" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Apple-grade serene gradients -->
+    <linearGradient id="bodyGradient" x1="200" y1="120" x2="200" y2="440" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="45%" stop-color="#fafafc" />
+      <stop offset="100%" stop-color="#f0e4d3" stop-opacity="0.65" />
+    </linearGradient>
+
+    <linearGradient id="mantleGradient" x1="120" y1="100" x2="280" y2="380" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2e3642" />
+      <stop offset="40%" stop-color="#3d4653" />
+      <stop offset="85%" stop-color="#596680" />
+      <stop offset="100%" stop-color="#8e9aaf" />
+    </linearGradient>
+
+    <linearGradient id="wingRightGradient" x1="260" y1="150" x2="330" y2="390" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#242c37" />
+      <stop offset="50%" stop-color="#384353" />
+      <stop offset="100%" stop-color="#4a5568" />
+    </linearGradient>
+
+    <linearGradient id="wingLeftGradient" x1="140" y1="150" x2="70" y2="390" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#242c37" />
+      <stop offset="50%" stop-color="#384353" />
+      <stop offset="100%" stop-color="#4a5568" />
+    </linearGradient>
+
+    <linearGradient id="facialDisc" x1="200" y1="70" x2="200" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="70%" stop-color="#fdfbf7" />
+      <stop offset="100%" stop-color="#f4ede2" />
+    </linearGradient>
+
+    <linearGradient id="goldTrim" x1="150" y1="70" x2="250" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#d4af37" stop-opacity="0.7" />
+      <stop offset="50%" stop-color="#b68d40" stop-opacity="0.4" />
+      <stop offset="100%" stop-color="#8a6d3b" stop-opacity="0.1" />
+    </linearGradient>
+
+    <linearGradient id="appleBlueGlow" x1="200" y1="0" x2="200" y2="400" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0071e3" stop-opacity="0.12" />
+      <stop offset="100%" stop-color="#0071e3" stop-opacity="0" />
+    </linearGradient>
+
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="12" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <style>
+    @keyframes soberBreathe {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-3px); }
+    }
+    @keyframes soberBlink {
+      0%, 94%, 100% { transform: scaleY(1); }
+      97% { transform: scaleY(0.1); }
+    }
+    .sober-body {
+      animation: soberBreathe 6s ease-in-out infinite;
+      transform-origin: center bottom;
+    }
+    .sober-eye {
+      animation: soberBlink 7s ease-in-out infinite;
+      transform-origin: 200px 145px;
+    }
+  </style>
+
+  <!-- Ambient light pedestal (Apple style subtle circle) -->
+  <circle cx="200" cy="240" r="170" fill="url(#appleBlueGlow)" />
+  <ellipse cx="200" cy="442" rx="90" ry="8" fill="#1d1d1f" fill-opacity="0.06" />
+
+  <g class="sober-body">
+    <!-- Back / Mantle & Folded Wings -->
+    <path d="M148 110 C 130 160, 95 240, 90 350 C 88 385, 110 405, 138 410 C 158 370, 172 320, 180 270 Z"
+          fill="url(#wingLeftGradient)" opacity="0.95" />
+    <path d="M252 110 C 270 160, 305 240, 310 350 C 312 385, 290 405, 262 410 C 242 370, 228 320, 220 270 Z"
+          fill="url(#wingRightGradient)" opacity="0.95" />
+
+    <!-- Slender Torso / Breast (Pale Starlight Silk) -->
+    <path d="M152 120 C 152 120, 136 210, 145 320 C 152 385, 178 430, 200 432 C 222 430, 248 385, 255 320 C 264 210, 248 120, 248 120 C 230 135, 170 135, 152 120 Z"
+          fill="url(#bodyGradient)" />
+
+    <!-- Subtle Feather Contour Linework (Hairline precision) -->
+    <path d="M175 220 C 190 235, 210 235, 225 220" stroke="#1d1d1f" stroke-opacity="0.08" stroke-width="1.2" stroke-linecap="round" fill="none" />
+    <path d="M170 260 C 190 278, 210 278, 230 260" stroke="#1d1d1f" stroke-opacity="0.08" stroke-width="1.2" stroke-linecap="round" fill="none" />
+    <path d="M178 300 C 192 315, 208 315, 222 300" stroke="#1d1d1f" stroke-opacity="0.08" stroke-width="1.2" stroke-linecap="round" fill="none" />
+    <path d="M185 340 C 195 350, 205 350, 215 340" stroke="#1d1d1f" stroke-opacity="0.07" stroke-width="1.2" stroke-linecap="round" fill="none" />
+
+    <!-- Mantle Hood / Upper Head Silhouette -->
+    <path d="M136 115 C 136 60, 165 42, 200 42 C 235 42, 264 60, 264 115 C 264 125, 258 135, 252 142 C 248 110, 232 90, 200 90 C 168 90, 152 110, 148 142 C 142 135, 136 125, 136 115 Z"
+          fill="url(#mantleGradient)" />
+
+    <!-- Heart-Shaped Facial Disc (The Definitive Barn Owl Hallmark) -->
+    <!-- Golden delicate hairline boundary -->
+    <path d="M200 96 C 182 72, 144 76, 144 118 C 144 154, 174 186, 200 206 C 226 186, 256 154, 256 118 C 256 76, 218 72, 200 96 Z"
+          fill="url(#goldTrim)" />
+    <!-- Facial Disc Pure Surface -->
+    <path d="M200 98 C 184 75, 147 79, 147 118 C 147 152, 175 183, 200 202 C 225 183, 253 152, 253 118 C 253 79, 216 75, 200 98 Z"
+          fill="url(#facialDisc)" stroke="#ffffff" stroke-width="1" />
+
+    <!-- Facial Disc Division (Central bridge) -->
+    <path d="M200 98 L 200 162" stroke="#d4af37" stroke-opacity="0.35" stroke-width="1" stroke-linecap="round" />
+
+    <!-- Calm, Intelligent Eyes (Apple SF style — serene, deep, observant) -->
+    <g class="sober-eye">
+      <!-- Left Eye -->
+      <circle cx="178" cy="138" r="8.5" fill="#1d1d1f" />
+      <circle cx="178" cy="138" r="9.5" stroke="#d4af37" stroke-opacity="0.5" stroke-width="1" fill="none" />
+      <circle cx="176" cy="136" r="2" fill="#ffffff" />
+      
+      <!-- Right Eye -->
+      <circle cx="222" cy="138" r="8.5" fill="#1d1d1f" />
+      <circle cx="222" cy="138" r="9.5" stroke="#d4af37" stroke-opacity="0.5" stroke-width="1" fill="none" />
+      <circle cx="220" cy="136" r="2" fill="#ffffff" />
+    </g>
+
+    <!-- Slender, Downward-turned Ivory Beak -->
+    <path d="M197 148 C 197 148, 200 168, 200 172 C 200 168, 203 148, 203 148 Z"
+          fill="#f0e4d3" stroke="#b68d40" stroke-opacity="0.4" stroke-width="0.8" />
+
+    <!-- Minimalist Perch / Slate Plinth (Geometric pure Apple aesthetic) -->
+    <rect x="156" y="430" width="88" height="6" rx="3" fill="#2e3642" />
+    <!-- Subtle Golden Academic Accents / Talons -->
+    <path d="M182 428 C 182 432, 186 434, 188 434" stroke="#d4af37" stroke-width="2" stroke-linecap="round" />
+    <path d="M190 428 C 190 432, 194 434, 196 434" stroke="#d4af37" stroke-width="2" stroke-linecap="round" />
+    <path d="M204 428 C 204 432, 208 434, 210 434" stroke="#d4af37" stroke-width="2" stroke-linecap="round" />
+    <path d="M212 428 C 212 432, 216 434, 218 434" stroke="#d4af37" stroke-width="2" stroke-linecap="round" />
+  </g>
+</svg>

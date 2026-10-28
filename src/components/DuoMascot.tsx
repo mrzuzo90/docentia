@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { SoundService } from '../services/soundService';
-import confetti from 'canvas-confetti';
 
 export type MascotVariant = 'professor' | 'exam' | 'scanner' | 'trophy';
 export type MascotExpression = 'focused' | 'happy' | 'wink' | 'star';
@@ -14,37 +13,37 @@ interface DuoMascotProps {
 
 const VARIANT_SPEECHES: Record<MascotVariant, string[]> = {
   professor: [
-    '¡Hola profe! Soy Profe Pachy, tu paquicefalosaurio sabio.',
-    '¡Listo para redactar test y problemas con rúbrica!',
-    '¡Haz clic en mí para celebrar antes de evaluar!',
-    '¡Todo el solucionario saldrá listo para copiar y pegar!'
+    'Generación de evaluaciones con rigor psicométrico y trazabilidad.',
+    'Ponderación y reparto exacto de puntos entre bloques temáticos.',
+    'Formato listo para exportar a Word, PDF y Moodle XML.',
+    'Rúbricas automáticas orientadas a criterios de corrección transparentes.'
   ],
   exam: [
-    '¡Solucionario oficial ponderado sobre 10 puntos listo!',
-    '¡Puedes repartir el peso exacto entre test y ejercicios!',
-    '¡Un clic y copias el examen directo a Word o Moodle!',
-    '¡Cada pregunta incluye su justificación pedagógica!'
+    'Solucionario oficial con justificación pedagógica detallada.',
+    'Ponderación automática sobre 10,00 puntos normalizados.',
+    'Permutación determinista de modelos A y B contra copias.',
+    'Edición inline de cada enunciado, opción y baremo.'
   ],
   scanner: [
-    '¡Lente OCR calibrada para letra manuscrita de alumnos!',
-    '¡Evalúo del 0 al 10 cada sección automáticamente!',
-    '¡Si una caligrafía es dudosa, te avisaré al instante!',
-    '¡Comparo cada respuesta contra el solucionario oficial!'
+    'Lectura óptica OCR adaptada a grafías manuscritas de alumnos.',
+    'Detección inteligente de ambigüedad para revisión docente.',
+    'Comparativa contra solucionario oficial con microajuste de nota.',
+    'Registro de incidencias y trazabilidad de cada respuesta.'
   ],
   trophy: [
-    '¡Acta de evaluación calculada con éxito!',
-    '¡Sobresaliente en rigor psicométrico y didáctico!',
-    '¡Exporta las notas a CSV o Excel cuando quieras!',
-    '¡Gran trabajo corrigiendo esta convocatoria!'
+    'Acta oficial calculada con distribución estadística completa.',
+    'Tasa de aprobados, nota media y desviación estándar de la clase.',
+    'Exportación inmediata a formatos CSV y hojas de cálculo.',
+    'Cierre de convocatoria riguroso y homologable.'
   ]
 };
 
 /**
- * Authentic Chibi Mascot ("Profe Pachy", Paquicefalosaurio sabio) powered by consistent Nanobanana PNG assets:
- * - Continuous discreet idle breathing animation (squash-and-stretch)
- * - 2D cursor parallax tilt (mascot leans towards user pointer)
- * - Interactive click jump + boing sound + confetti burst + +10 XP badge
- * - Live pose celebration on interaction
+ * Sober Barn Owl (Lechuza Académica) — Apple Style Companion:
+ * - Minimalist, dignified silhouette crafted in pure vector SVG
+ * - Serene micro-animations (slow gentle breathing, observant calm gaze)
+ * - Restrained typography and whispering guidance in SF Pro Text
+ * - Zero cartoon bounce or noisy visual clutter
  */
 export const DuoMascot: React.FC<DuoMascotProps> = ({
   variant,
@@ -53,15 +52,12 @@ export const DuoMascot: React.FC<DuoMascotProps> = ({
   customSpeech
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [eyeOffset, setEyeOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [tiltOffset, setTiltOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
-  const [isJumping, setIsJumping] = useState(false);
-  const [tempCelebrating, setTempCelebrating] = useState(false);
   const [speechIndex, setSpeechIndex] = useState(0);
   const [clickCount, setClickCount] = useState(0);
-  const [showBurst, setShowBurst] = useState(false);
 
-  // Parallax tilt tracking mouse position
+  // Subtle 3D tilt tracking cursor position serenely
   useEffect(() => {
     if (!interactive) return;
 
@@ -74,18 +70,18 @@ export const DuoMascot: React.FC<DuoMascotProps> = ({
       const dx = e.clientX - centerX;
       const dy = e.clientY - centerY;
       const distance = Math.hypot(dx, dy);
-      const maxOffset = 5.0;
+      const maxOffset = 3.5;
 
       if (distance < 1) {
-        setEyeOffset({ x: 0, y: 0 });
+        setTiltOffset({ x: 0, y: 0 });
         return;
       }
 
-      const factor = Math.min(distance / 280, 1);
+      const factor = Math.min(distance / 320, 1);
       const nx = (dx / distance) * maxOffset * factor;
       const ny = (dy / distance) * maxOffset * factor;
 
-      setEyeOffset({ x: nx, y: ny });
+      setTiltOffset({ x: nx, y: ny });
     };
 
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
@@ -95,54 +91,24 @@ export const DuoMascot: React.FC<DuoMascotProps> = ({
   const handleMascotClick = useCallback(() => {
     if (!interactive) return;
 
-    SoundService.playMascotBoing();
-
-    // Trigger celebratory confetti burst
-    confetti({
-      particleCount: 28,
-      spread: 60,
-      origin: { y: 0.72 },
-      colors: ['#58cc02', '#1cb0f6', '#ffc800', '#d7ffb8']
-    });
-
-    // Trigger jump animation
-    setIsJumping(false);
-    window.requestAnimationFrame(() => {
-      setIsJumping(true);
-    });
-    window.setTimeout(() => setIsJumping(false), 650);
-
-    // Temporarily switch pose to celebration if idle
-    if (variant === 'professor' || variant === 'exam') {
-      setTempCelebrating(true);
-      window.setTimeout(() => setTempCelebrating(false), 1400);
-    }
-
-    // Trigger celebratory badge burst
-    setShowBurst(true);
-    window.setTimeout(() => setShowBurst(false), 950);
-
+    SoundService.playClick();
     setSpeechIndex(prev => (prev + 1) % VARIANT_SPEECHES[variant].length);
     setClickCount(prev => prev + 1);
   }, [interactive, variant]);
 
-  const getBaseAssetPath = (): string => {
+  const getAssetPath = (): string => {
     switch (variant) {
       case 'professor':
-      case 'exam':
-        return '/assets/mascot/pachy-profe-idle.png';
+        return '/assets/mascot/lechuza-sober.svg';
       case 'scanner':
-        return '/assets/mascot/pachy-profe-scanning.png';
+        return '/assets/mascot/lechuza-scanner.svg';
+      case 'exam':
       case 'trophy':
-        return '/assets/mascot/pachy-profe-celebrating.png';
+        return '/assets/mascot/lechuza-academic.svg';
       default:
-        return '/assets/mascot/pachy-profe-idle.png';
+        return '/assets/mascot/lechuza-sober.svg';
     }
   };
-
-  const activeAsset = tempCelebrating
-    ? '/assets/mascot/pachy-profe-celebrating.png'
-    : getBaseAssetPath();
 
   const activeSpeech = customSpeech || VARIANT_SPEECHES[variant][speechIndex];
 
@@ -153,7 +119,7 @@ export const DuoMascot: React.FC<DuoMascotProps> = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
         setIsHovered(false);
-        setEyeOffset({ x: 0, y: 0 });
+        setTiltOffset({ x: 0, y: 0 });
       }}
       role={interactive ? 'button' : undefined}
       tabIndex={interactive ? 0 : undefined}
@@ -163,62 +129,39 @@ export const DuoMascot: React.FC<DuoMascotProps> = ({
           handleMascotClick();
         }
       }}
-      title={interactive ? '¡Haz clic para interactuar con Profe Pachy!' : undefined}
+      title={interactive ? 'Lechuza Académica · Clic para ver notas metodológicas' : undefined}
       className={`relative inline-flex flex-col items-center justify-center select-none group ${
         interactive ? 'cursor-pointer' : ''
       } ${className}`}
     >
-      {/* Interactive Duolingo Sticker Speech Bubble */}
+      {/* Apple-grade Whispered Speech Pill (Frosted, 20px radius, zero cartoon lip) */}
       {interactive && (isHovered || clickCount > 0) && (
-        <div className="duo-bubble-pop mb-2 z-20 max-w-[260px] bg-[#ffffff] border-2 border-[#afafaf] group-hover:border-[#58cc02] rounded-[12px] px-3.5 py-2 text-center relative transition-colors shadow-sm">
-          <p className="text-[13px] font-bold text-[#4b4b4b] leading-snug">
+        <div className="mb-4 z-20 max-w-[280px] bg-[#ffffff]/95 backdrop-blur-md border border-[#d6d6d6] rounded-[20px] px-4 py-2.5 text-center transition-all duration-300 shadow-[0_4px_16px_rgba(0,0,0,0.04)]">
+          <p className="text-[14px] font-normal text-[#1d1d1f] leading-snug tracking-[-0.015em]">
             {activeSpeech}
           </p>
-          <span className="mt-0.5 block text-[11px] font-bold uppercase tracking-[0.053em] text-[#1cb0f6]">
-            {clickCount > 0 ? `+${clickCount * 10} XP acumulados` : '¡Hazme clic para celebrar!'}
-          </span>
-          {/* Speech Bubble Pointer Triangle */}
-          <div className="w-3 h-3 bg-[#ffffff] border-r-2 border-b-2 border-[#afafaf] group-hover:border-[#58cc02] rotate-45 mx-auto -mb-3.5 mt-1" />
+          <div className="mt-1 flex items-center justify-center gap-1.5 text-[11px] font-medium text-[#707070]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#0071e3]" />
+            <span>Docentia Intelligence</span>
+          </div>
         </div>
       )}
 
-      {/* Celebratory Sticker Burst on Click */}
-      {showBurst && (
-        <div className="pointer-events-none absolute -top-4 inset-x-0 flex items-center justify-between px-3 z-30 animate-bounce">
-          <span className="px-2.5 py-1 rounded-[12px] bg-[#ffc800] border-2 border-[#000437] text-[#000437] text-[12px] font-black shadow-md">
-            +10 XP
-          </span>
-          <span className="px-2.5 py-1 rounded-[12px] bg-[#d7ffb8] border-2 border-[#58cc02] text-[#000437] text-[12px] font-black shadow-md">
-            ¡SOBRESALIENTE!
-          </span>
-        </div>
-      )}
-
-      {/* Mascot Visual Stage with Parallax & Breathing */}
+      {/* Mascot Visual Stage with Serene Tilt */}
       <div
-        className={`relative w-full flex flex-col items-center ${
-          isJumping ? 'duo-mascot-jump' : 'duo-mascot-breathing'
-        }`}
+        className="relative w-full flex flex-col items-center"
         style={{
-          transform: isJumping
-            ? undefined
-            : `perspective(600px) rotateX(${-eyeOffset.y * 1.8}deg) rotateY(${eyeOffset.x * 1.8}deg) scale(${isHovered ? 1.04 : 1})`,
-          transition: isJumping ? undefined : 'transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1)'
+          transform: `perspective(800px) rotateX(${-tiltOffset.y * 1.5}deg) rotateY(${tiltOffset.x * 1.5}deg) scale(${
+            isHovered ? 1.02 : 1
+          })`,
+          transition: 'transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1)'
         }}
       >
         <img
-          src={activeAsset}
-          alt={`Profe Pachy - ${variant}`}
-          className="w-full h-auto object-contain max-h-[300px] select-none filter drop-shadow-md transition-transform"
+          src={getAssetPath()}
+          alt={`Lechuza Académica - ${variant}`}
+          className="w-full h-auto object-contain max-h-[340px] select-none transition-transform"
           draggable={false}
-        />
-
-        {/* Synchronized Tactile Ground Shadow */}
-        <div
-          className="w-3/5 h-3 mx-auto -mt-2 rounded-full bg-[#000437]/15 blur-xs transition-transform duration-300"
-          style={{
-            transform: isJumping ? 'scale(0.55)' : isHovered ? 'scale(1.12)' : 'scale(1)'
-          }}
         />
       </div>
     </div>
@@ -226,9 +169,8 @@ export const DuoMascot: React.FC<DuoMascotProps> = ({
 };
 
 /**
- * Interactive Floating Mascot Companion Dock ("Profe Búho en vivo")
- * Sits discreetly in the bottom-left corner, follows the cursor,
- * reacts to the current workflow tab, and lets the user trigger poses/animations.
+ * Floating Apple-Style Assistant Dock
+ * Sits quietly in bottom-left corner with minimalist mark and whispered status.
  */
 interface DuoCompanionDockProps {
   activeTab: 'upload' | 'exam' | 'grading' | 'gradebook';
@@ -242,124 +184,77 @@ export const DuoCompanionDock: React.FC<DuoCompanionDockProps> = ({
   creditsBalance
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [poseAsset, setPoseAsset] = useState<'idle' | 'celebrating' | 'scanning'>('idle');
-
-  // Automatically sync pose with current section
-  useEffect(() => {
-    if (activeTab === 'grading') {
-      setPoseAsset('scanning');
-    } else if (activeTab === 'gradebook' || activeTab === 'exam') {
-      setPoseAsset('celebrating');
-    } else {
-      setPoseAsset('idle');
-    }
-  }, [activeTab]);
 
   const tabTips: Record<typeof activeTab, string> = {
-    upload: 'Sube tus PDFs en el Paso 1 y elige el número de preguntas en el Paso 2.',
-    exam: 'Ajusta el peso de cada ejercicio y copia el Solucionario con un clic.',
+    upload: 'Carga tus apuntes o temario oficial en el Paso 1 y configura las especificaciones en el Paso 2.',
+    exam: 'Revisa las soluciones justificadas y distribuye los pesos con total exactitud decimal.',
     grading:
       pendingReviewsCount > 0
-        ? `¡Atención! Tienes ${pendingReviewsCount} examen con caligrafía dudosa para revisar.`
-        : 'Sube los exámenes resueltos para evaluarlos del 0 al 10 con OCR.',
-    gradebook: 'Consulta la nota media de la clase y descarga el acta en CSV/Excel.'
-  };
-
-  const assetFileMap = {
-    idle: '/assets/mascot/pachy-profe-idle.png',
-    celebrating: '/assets/mascot/pachy-profe-celebrating.png',
-    scanning: '/assets/mascot/pachy-profe-scanning.png'
+        ? `Se han detectado ${pendingReviewsCount} exámenes con grafía ambigua pendientes de confirmación docente.`
+        : 'Sube las hojas resueltas para aplicar la corrección óptica OCR inmediata.',
+    gradebook: 'Distribución estadística y acta de calificaciones ponderadas del 0,00 al 10,00.'
   };
 
   return (
-    <div className="no-print fixed bottom-5 left-5 z-40 flex flex-col items-start">
+    <div className="no-print fixed bottom-6 left-6 z-40 flex flex-col items-start">
       {isExpanded && (
-        <div className="duo-bubble-pop mb-3 w-72 sm:w-80 bg-[#ffffff] border-2 border-[#000437] rounded-[12px] p-4 shadow-xl">
-          <div className="flex items-center justify-between border-b-2 border-[#afafaf]/40 pb-2.5 mb-3">
-            <div className="flex items-center gap-2">
+        <div className="mb-3 w-80 bg-[#ffffff]/95 backdrop-blur-md border border-[#d6d6d6] rounded-[24px] p-5 shadow-[0_8px_32px_rgba(0,0,0,0.08)]">
+          <div className="flex items-center justify-between border-b border-[#d6d6d6]/60 pb-3 mb-3">
+            <div className="flex items-center gap-2.5">
               <img
-                src="/assets/mascot/badge-pachy-avatar.png"
-                alt="Avatar Profe Pachy"
+                src="/assets/mascot/lechuza-mark.svg"
+                alt="Marca Lechuza"
                 className="w-7 h-7 object-contain"
               />
               <div>
-                <h4 className="text-[14px] font-bold text-[#4b4b4b] leading-none">
-                  Profe Pachy · Asistente
+                <h4 className="text-[14px] font-semibold text-[#1d1d1f] leading-none">
+                  Docentia
                 </h4>
-                <span className="text-[11px] font-bold uppercase tracking-[0.053em] text-[#58cc02]">
-                  Paquicefalosaurio Chibi ({creditsBalance} Cr.)
+                <span className="text-[12px] font-normal text-[#707070]">
+                  Asistente Académico · {creditsBalance} créditos
                 </span>
               </div>
             </div>
             <button
               type="button"
               onClick={() => setIsExpanded(false)}
-              className="text-[12px] font-bold text-[#777777] hover:text-[#000437] px-2 py-0.5 rounded-[12px] border-2 border-[#afafaf]"
+              className="text-[12px] font-normal text-[#707070] hover:text-[#1d1d1f] px-2 py-0.5 rounded-full border border-[#d6d6d6] transition-colors"
             >
               Cerrar
             </button>
           </div>
 
-          {/* Live Mascot Asset Preview & Pose Switcher */}
-          <div className="bg-[#d7ffb8]/30 border-2 border-[#58cc02] rounded-[12px] p-3 flex flex-col items-center">
-            <img
-              src={assetFileMap[poseAsset]}
-              alt={`Profe Pachy - ${poseAsset}`}
-              className="w-36 h-36 object-contain select-none filter drop-shadow-sm duo-mascot-breathing"
-            />
-            <div className="flex items-center gap-1.5 mt-2.5">
-              {(['idle', 'celebrating', 'scanning'] as const).map(pose => (
-                <button
-                  key={pose}
-                  type="button"
-                  onClick={() => {
-                    SoundService.playClick();
-                    setPoseAsset(pose);
-                  }}
-                  className={`px-2.5 py-1 rounded-[12px] text-[11px] font-bold uppercase tracking-[0.053em] border-2 transition ${
-                    poseAsset === pose
-                      ? 'bg-[#58cc02] text-[#ffffff] border-[#000437]'
-                      : 'bg-[#ffffff] text-[#777777] border-[#afafaf] hover:border-[#4b4b4b]'
-                  }`}
-                >
-                  {pose === 'idle' ? 'Docente' : pose === 'celebrating' ? '¡10/10!' : 'Escáner'}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <p className="mt-3 text-[13px] font-bold text-[#4b4b4b] leading-snug">
+          <p className="text-[14px] font-normal text-[#1d1d1f] leading-relaxed">
             {tabTips[activeTab]}
           </p>
         </div>
       )}
 
-      {/* Discreet Floating Mascot Sticker Pill */}
+      {/* Minimalist Frosted Pill Dock Button */}
       <button
         type="button"
         onClick={() => {
           SoundService.playClick();
           setIsExpanded(prev => !prev);
         }}
-        className="group flex items-center gap-2.5 bg-[#ffffff] hover:bg-[#d7ffb8]/40 border-2 border-[#000437] rounded-[12px] px-3 py-2 transition-transform active:translate-y-0.5 shadow-md"
+        className="group flex items-center gap-2.5 bg-[#ffffff]/90 hover:bg-[#ffffff] backdrop-blur-md border border-[#d6d6d6] rounded-full px-3.5 py-2 transition-all shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
       >
         <img
-          src="/assets/mascot/badge-pachy-avatar.png"
-          alt="Profe Pachy"
-          className="w-9 h-9 object-contain transition-transform group-hover:scale-110"
+          src="/assets/mascot/lechuza-mark.svg"
+          alt="Lechuza Académica"
+          className="w-6 h-6 object-contain transition-transform group-hover:scale-105"
         />
         <div className="text-left pr-1">
           <div className="flex items-center gap-1.5">
-            <span className="text-[13px] font-bold uppercase tracking-[0.053em] text-[#4b4b4b]">
-              Profe Pachy
+            <span className="text-[13px] font-medium text-[#1d1d1f]">
+              Asistente Docente
             </span>
-            <span className="inline-block w-2 h-2 rounded-full bg-[#58cc02]" />
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#0071e3]" />
           </div>
-          <p className="text-[11px] font-bold text-[#1cb0f6] leading-none">
-            {isExpanded ? 'Ocultar mascota' : 'Interactuar · Ver poses'}
-          </p>
         </div>
       </button>
     </div>
   );
 };
+
+export const DocentiaCompanion = DuoMascot;

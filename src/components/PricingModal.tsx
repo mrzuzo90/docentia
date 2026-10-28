@@ -27,9 +27,7 @@ import {
 import {
   BillingService,
   CREDIT_PACKS,
-  SUBSCRIPTION_PLANS,
-  ESTIMATED_AI_COST_PER_GENERATION_EUR,
-  ESTIMATED_AI_COST_PER_SUBMISSION_EUR
+  SUBSCRIPTION_PLANS
 } from '../services/billingService';
 import { StorageService } from '../services/storageService';
 
@@ -111,7 +109,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
       name: pack.name,
       credits: pack.credits,
       priceEur: pack.priceEur,
-      periodLabel: 'Pago único · Sin suscripción'
+      periodLabel: 'Pago único · Sin suscripción recurrente'
     });
   };
 
@@ -142,7 +140,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
       if (insufficientCreditsMessage) {
         onClose();
       }
-    }, 550);
+    }, 450);
   };
 
   const handleSaveMasterKey = () => {
@@ -174,234 +172,238 @@ export const PricingModal: React.FC<PricingModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-[#000437]/50 overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/40 backdrop-blur-md overflow-y-auto"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-[1100px] bg-[#ffffff] border-2 border-[#afafaf] rounded-[12px] overflow-hidden my-auto max-h-[92vh] flex flex-col"
+        className="w-full max-w-[1040px] bg-white border border-[#d6d6d6] rounded-[28px] overflow-hidden my-auto max-h-[92vh] flex flex-col shadow-2xl"
         onClick={e => e.stopPropagation()}
       >
-        {/* Top White Header */}
-        <div className="bg-[#ffffff] px-6 py-5 flex flex-wrap items-center justify-between gap-4 border-b-2 border-[#afafaf]">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-[12px] bg-[#d7ffb8] border-2 border-[#58cc02] flex items-center justify-center text-[#58cc02]">
-              <Coins className="w-6 h-6" />
+        {/* Top Header */}
+        <div className="bg-white px-7 py-5 flex flex-wrap items-center justify-between gap-4 border-b border-[#d6d6d6]">
+          <div className="flex items-center gap-3.5">
+            <div className="w-10 h-10 rounded-full bg-[#f5f5f7] border border-[#d6d6d6] flex items-center justify-center text-[#1d1d1f]">
+              <Coins className="w-5 h-5 text-[#1d1d1f]" />
             </div>
             <div>
-              <span className="block text-[13px] font-bold uppercase tracking-[0.053em] text-[#58cc02]">
-                IA 100% INCLUIDA · SIN CONFIGURAR API KEYS
+              <span className="block text-[11px] font-semibold tracking-wider uppercase text-[#707070]">
+                IA Integral Incluida · Sin Configurar API Keys
               </span>
-              <h3 className="font-feather font-extrabold text-[32px] leading-[1.2] tracking-[-0.02em] text-[#4b4b4b]">
-                billetera y planes docentes
+              <h3 className="text-[24px] sm:text-[26px] font-semibold tracking-tight text-[#1d1d1f]">
+                Planes y Billetera Docente
               </h3>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="bg-[#d7ffb8] border-2 border-[#58cc02] rounded-[12px] px-4 py-2 flex items-center gap-3">
-              <div>
-                <span className="block text-[13px] font-bold uppercase tracking-[0.053em] text-[#4b4b4b]">
-                  TU SALDO
-                </span>
-                <span className="text-[19px] font-bold text-[#4b4b4b]">
+            <div className="bg-[#f5f5f7] border border-[#d6d6d6] rounded-full px-4 py-1.5 flex items-center gap-3 text-sm">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[12px] uppercase text-[#707070] font-medium">Saldo:</span>
+                <span className="font-semibold text-[#1d1d1f]">
                   {account.creditsBalance} {account.creditsBalance === 1 ? 'crédito' : 'créditos'}
                 </span>
               </div>
-              <div className="h-7 w-[2px] bg-[#58cc02]" />
-              <div>
-                <span className="block text-[13px] font-bold uppercase tracking-[0.053em] text-[#777777]">
-                  MODALIDAD
-                </span>
-                <span className="text-[15px] font-bold text-[#4b4b4b]">
-                  {account.tierName}
-                </span>
+              <div className="h-4 w-px bg-[#d6d6d6]" />
+              <div className="flex items-center gap-1.5">
+                <span className="text-[12px] uppercase text-[#707070] font-medium">Plan:</span>
+                <span className="font-semibold text-[#1d1d1f]">{account.tierName}</span>
               </div>
             </div>
 
             <button
               onClick={onClose}
-              className="duo-nav-pill p-2.5"
+              className="w-9 h-9 rounded-full bg-[#f5f5f7] hover:bg-[#e8e8ed] text-[#1d1d1f] flex items-center justify-center transition"
               aria-label="Cerrar"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
         </div>
 
         {/* Insufficient Credits Alert Banner */}
         {insufficientCreditsMessage && (
-          <div className="bg-[#d7ffb8] border-b-2 border-[#58cc02] text-[#4b4b4b] px-6 py-3 flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5 text-[15px] font-bold">
-              <AlertCircle className="w-5 h-5 text-[#58cc02] shrink-0" />
-              <span>{insufficientCreditsMessage}</span>
-            </div>
+          <div className="bg-[#b64400]/10 border-b border-[#b64400]/20 text-[#b64400] px-7 py-3 flex items-center gap-2.5 text-sm font-medium">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{insufficientCreditsMessage}</span>
           </div>
         )}
 
-        {/* Value Equivalence Bar & Tabs */}
-        <div className="bg-[#ffffff] border-b-2 border-[#afafaf] px-6 py-3 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-3 text-[15px] font-bold text-[#4b4b4b]">
-            <span className="px-2.5 py-1 rounded-[12px] bg-[#d7ffb8] text-[#4b4b4b] border-2 border-[#58cc02] text-[13px] uppercase tracking-[0.053em]">
-              1 CRÉDITO = 1 EXAMEN CREADO
+        {/* Navigation Tabs & Equivalences */}
+        <div className="bg-[#fafafc] border-b border-[#d6d6d6] px-7 py-3 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-xs text-[#707070]">
+            <span className="px-2.5 py-1 rounded-full bg-white border border-[#d6d6d6] text-[#1d1d1f] font-medium">
+              1 crédito = 1 examen generado
             </span>
-            <span className="px-2.5 py-1 rounded-[12px] bg-[#ffffff] text-[#1cb0f6] border-2 border-[#afafaf] text-[13px] uppercase tracking-[0.053em]">
-              1 CRÉDITO = 5 ALUMNOS CORREGIDOS OCR
+            <span className="px-2.5 py-1 rounded-full bg-white border border-[#d6d6d6] text-[#707070]">
+              1 crédito = 5 alumnos evaluados OCR
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="bg-[#e8e8ed] p-1 rounded-full inline-flex gap-1">
             <button
               onClick={() => {
                 setSelectedCheckoutItem(null);
                 setActiveTab('plans');
               }}
-              className={`duo-nav-pill py-2 px-3.5 ${
-                activeTab === 'plans' ? 'duo-nav-pill-active' : ''
+              className={`px-4 py-1.5 rounded-full text-[13px] font-medium transition-all ${
+                activeTab === 'plans'
+                  ? 'bg-white text-[#1d1d1f] shadow-xs'
+                  : 'text-[#707070] hover:text-[#1d1d1f]'
               }`}
             >
-              <Layers className="w-4 h-4" />
-              <span>SUSCRIPCIONES</span>
+              <span className="flex items-center gap-1.5">
+                <Layers className="w-3.5 h-3.5" />
+                Suscripciones
+              </span>
             </button>
             <button
               onClick={() => {
                 setSelectedCheckoutItem(null);
                 setActiveTab('packs');
               }}
-              className={`duo-nav-pill py-2 px-3.5 ${
-                activeTab === 'packs' ? 'duo-nav-pill-active' : ''
+              className={`px-4 py-1.5 rounded-full text-[13px] font-medium transition-all ${
+                activeTab === 'packs'
+                  ? 'bg-white text-[#1d1d1f] shadow-xs'
+                  : 'text-[#707070] hover:text-[#1d1d1f]'
               }`}
             >
-              <Zap className="w-4 h-4" />
-              <span>POR UNIDAD / PACKS</span>
+              <span className="flex items-center gap-1.5">
+                <Zap className="w-3.5 h-3.5" />
+                Packs por Unidad
+              </span>
             </button>
             <button
               onClick={() => {
                 setSelectedCheckoutItem(null);
                 setActiveTab('ledger');
               }}
-              className={`duo-nav-pill py-2 px-3.5 ${
-                activeTab === 'ledger' ? 'duo-nav-pill-active' : ''
+              className={`px-4 py-1.5 rounded-full text-[13px] font-medium transition-all ${
+                activeTab === 'ledger'
+                  ? 'bg-white text-[#1d1d1f] shadow-xs'
+                  : 'text-[#707070] hover:text-[#1d1d1f]'
               }`}
             >
-              <History className="w-4 h-4" />
-              <span>EXTRACTO ({account.transactions.length})</span>
+              <span className="flex items-center gap-1.5">
+                <History className="w-3.5 h-3.5" />
+                Extracto ({account.transactions.length})
+              </span>
             </button>
           </div>
         </div>
 
-        {/* Main Scrollable Content Area */}
-        <div className="p-6 overflow-y-auto flex-1 space-y-6 bg-[#ffffff]">
+        {/* Main Content Area */}
+        <div className="p-7 overflow-y-auto flex-1 space-y-6 bg-white">
           {selectedCheckoutItem ? (
-            <div className="max-w-2xl mx-auto duo-card border-[#58cc02] space-y-6">
-              <div className="flex items-start justify-between border-b-2 border-[#afafaf] pb-4">
+            <div className="max-w-xl mx-auto rounded-[28px] border border-[#d6d6d6] p-7 space-y-6 bg-[#fafafc]">
+              <div className="flex items-start justify-between border-b border-[#d6d6d6] pb-5">
                 <div>
-                  <span className="text-[13px] font-bold uppercase tracking-[0.053em] text-[#58cc02]">
-                    ACTIVACIÓN INMEDIATA
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-[#0071e3]">
+                    Activación Inmediata
                   </span>
-                  <h4 className="text-[32px] font-bold text-[#4b4b4b] mt-1">
+                  <h4 className="text-[24px] font-semibold text-[#1d1d1f] mt-1">
                     {selectedCheckoutItem.name}
                   </h4>
-                  <p className="duo-body-copy mt-1">
+                  <p className="text-[14px] text-[#707070] mt-1">
                     {selectedCheckoutItem.periodLabel} · Suma{' '}
-                    <strong className="text-[#4b4b4b]">+{selectedCheckoutItem.credits} créditos</strong>
+                    <strong className="text-[#1d1d1f]">+{selectedCheckoutItem.credits} créditos</strong>
                   </p>
                 </div>
                 <div className="text-right">
-                  <span className="font-feather font-extrabold text-[40px] text-[#58cc02]">
+                  <span className="text-[32px] font-bold text-[#1d1d1f]">
                     {selectedCheckoutItem.priceEur.toFixed(2).replace('.', ',')} €
                   </span>
-                  <span className="block text-[13px] font-bold uppercase tracking-[0.053em] text-[#777777]">
-                    IVA INCLUIDO
+                  <span className="block text-[11px] text-[#707070] uppercase">
+                    IVA incluido
                   </span>
                 </div>
               </div>
 
               <div className="space-y-3">
-                <label className="block text-[15px] font-bold uppercase tracking-[0.053em] text-[#777777]">
-                  ELIGE MÉTODO DE PAGO
+                <label className="block text-[12px] font-semibold uppercase tracking-wider text-[#707070]">
+                  Método de Pago
                 </label>
                 <div className="grid grid-cols-3 gap-3">
                   <button
                     type="button"
                     onClick={() => setPaymentMethod('card')}
-                    className={`p-3 rounded-[12px] border-2 text-left transition ${
+                    className={`p-3.5 rounded-[18px] border text-left transition ${
                       paymentMethod === 'card'
-                        ? 'border-[#58cc02] bg-[#d7ffb8] text-[#4b4b4b]'
-                        : 'border-[#afafaf] bg-[#ffffff] text-[#777777]'
+                        ? 'border-[#0071e3] bg-white ring-2 ring-[#0071e3]/20 text-[#1d1d1f]'
+                        : 'border-[#d6d6d6] bg-white text-[#707070] hover:border-[#1d1d1f]/30'
                     }`}
                   >
-                    <CreditCard className="w-5 h-5 mb-1 text-[#4b4b4b]" />
-                    <div className="text-[15px] font-bold text-[#4b4b4b]">Tarjeta / Apple Pay</div>
-                    <div className="text-[13px]">Al instante</div>
+                    <CreditCard className="w-4 h-4 mb-1.5 text-[#1d1d1f]" />
+                    <div className="text-[13px] font-semibold text-[#1d1d1f]">Tarjeta / Apple Pay</div>
+                    <div className="text-[11px] text-[#707070]">Instantáneo</div>
                   </button>
                   <button
                     type="button"
                     onClick={() => setPaymentMethod('bizum')}
-                    className={`p-3 rounded-[12px] border-2 text-left transition ${
+                    className={`p-3.5 rounded-[18px] border text-left transition ${
                       paymentMethod === 'bizum'
-                        ? 'border-[#58cc02] bg-[#d7ffb8] text-[#4b4b4b]'
-                        : 'border-[#afafaf] bg-[#ffffff] text-[#777777]'
+                        ? 'border-[#0071e3] bg-white ring-2 ring-[#0071e3]/20 text-[#1d1d1f]'
+                        : 'border-[#d6d6d6] bg-white text-[#707070] hover:border-[#1d1d1f]/30'
                     }`}
                   >
-                    <Zap className="w-5 h-5 mb-1 text-[#4b4b4b]" />
-                    <div className="text-[15px] font-bold text-[#4b4b4b]">Bizum Docente</div>
-                    <div className="text-[13px]">Sin comisiones</div>
+                    <Zap className="w-4 h-4 mb-1.5 text-[#1d1d1f]" />
+                    <div className="text-[13px] font-semibold text-[#1d1d1f]">Bizum Docente</div>
+                    <div className="text-[11px] text-[#707070]">Sin comisiones</div>
                   </button>
                   <button
                     type="button"
                     onClick={() => setPaymentMethod('invoice')}
-                    className={`p-3 rounded-[12px] border-2 text-left transition ${
+                    className={`p-3.5 rounded-[18px] border text-left transition ${
                       paymentMethod === 'invoice'
-                        ? 'border-[#58cc02] bg-[#d7ffb8] text-[#4b4b4b]'
-                        : 'border-[#afafaf] bg-[#ffffff] text-[#777777]'
+                        ? 'border-[#0071e3] bg-white ring-2 ring-[#0071e3]/20 text-[#1d1d1f]'
+                        : 'border-[#d6d6d6] bg-white text-[#707070] hover:border-[#1d1d1f]/30'
                     }`}
                   >
-                    <Building2 className="w-5 h-5 mb-1 text-[#4b4b4b]" />
-                    <div className="text-[15px] font-bold text-[#4b4b4b]">Factura Centro</div>
-                    <div className="text-[13px]">Secretaría</div>
+                    <Building2 className="w-4 h-4 mb-1.5 text-[#1d1d1f]" />
+                    <div className="text-[13px] font-semibold text-[#1d1d1f]">Factura Centro</div>
+                    <div className="text-[11px] text-[#707070]">Secretaría</div>
                   </button>
                 </div>
               </div>
 
-              <div className="duo-card bg-[#ffffff] space-y-2">
-                <div className="flex justify-between text-[17px] text-[#777777]">
-                  <span>Saldo actual:</span>
-                  <span className="font-bold text-[#4b4b4b]">{account.creditsBalance} créditos</span>
+              <div className="rounded-[20px] bg-white border border-[#d6d6d6] p-4 space-y-2 text-sm">
+                <div className="flex justify-between text-[#707070]">
+                  <span>Saldo actual en billetera:</span>
+                  <span className="font-semibold text-[#1d1d1f]">{account.creditsBalance} créditos</span>
                 </div>
-                <div className="flex justify-between text-[17px] font-bold text-[#58cc02]">
-                  <span>Créditos a sumar hoy:</span>
+                <div className="flex justify-between font-medium text-[#0071e3]">
+                  <span>Créditos a abonar hoy:</span>
                   <span>+{selectedCheckoutItem.credits} créditos</span>
                 </div>
-                <div className="border-t-2 border-[#afafaf] pt-2 flex justify-between font-bold text-[19px] text-[#4b4b4b]">
-                  <span>Nuevo saldo tras confirmar:</span>
+                <div className="border-t border-[#d6d6d6] pt-2 flex justify-between font-semibold text-base text-[#1d1d1f]">
+                  <span>Nuevo saldo disponible:</span>
                   <span>{account.creditsBalance + selectedCheckoutItem.credits} créditos</span>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between gap-4 pt-2">
+              <div className="flex items-center justify-between gap-3 pt-2">
                 <button
                   type="button"
                   onClick={() => setSelectedCheckoutItem(null)}
-                  className="duo-btn-outlined"
+                  className="px-5 py-2.5 rounded-full border border-[#d6d6d6] text-[14px] text-[#1d1d1f] hover:bg-white transition"
                 >
-                  ← VOLVER
+                  Volver
                 </button>
                 <button
                   type="button"
                   disabled={isProcessingPayment}
                   onClick={handleConfirmPayment}
-                  className="duo-btn-primary flex-1 py-3.5"
+                  className="flex-1 py-3 px-6 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-white text-[15px] font-medium flex items-center justify-center gap-2 transition"
                 >
                   {isProcessingPayment ? (
                     <>
                       <RefreshCw className="w-4 h-4 animate-spin" />
-                      <span>PROCESANDO...</span>
+                      <span>Procesando cargo...</span>
                     </>
                   ) : (
                     <>
-                      <ShieldCheck className="w-5 h-5" />
+                      <ShieldCheck className="w-4 h-4" />
                       <span>
-                        CONFIRMAR ({selectedCheckoutItem.priceEur.toFixed(2).replace('.', ',')} €) Y SUMAR CRÉDITOS
+                        Confirmar ({selectedCheckoutItem.priceEur.toFixed(2).replace('.', ',')} €) y abonar créditos
                       </span>
                     </>
                   )}
@@ -415,32 +417,36 @@ export const PricingModal: React.FC<PricingModalProps> = ({
                 <div className="space-y-6">
                   <div className="flex flex-wrap items-center justify-between gap-4">
                     <div>
-                      <h4 className="duo-section-headline text-[36px]">
-                        planes con créditos acumulables.
+                      <h4 className="text-[28px] font-semibold text-[#1d1d1f] tracking-tight">
+                        Planes docentes con créditos acumulables
                       </h4>
-                      <p className="duo-body-copy mt-1 max-w-2xl">
-                        Nosotros asumimos todos los gastos de IA. Los créditos que no uses un mes se guardan para tu semana de exámenes.
+                      <p className="text-[15px] text-[#707070] mt-1 max-w-2xl">
+                        Asumimos íntegramente los costes de inferencia IA. Los créditos no consumidos se reservan para tu periodo de evaluación.
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="bg-[#e8e8ed] p-1 rounded-full inline-flex">
                       <button
                         type="button"
                         onClick={() => setBillingCycle('monthly')}
-                        className={`duo-nav-pill py-2 px-4 ${
-                          billingCycle === 'monthly' ? 'duo-nav-pill-active' : ''
+                        className={`px-4 py-1.5 rounded-full text-[13px] font-medium transition ${
+                          billingCycle === 'monthly'
+                            ? 'bg-white text-[#1d1d1f] shadow-xs'
+                            : 'text-[#707070] hover:text-[#1d1d1f]'
                         }`}
                       >
-                        MENSUAL
+                        Mensual
                       </button>
                       <button
                         type="button"
                         onClick={() => setBillingCycle('annual')}
-                        className={`duo-nav-pill py-2 px-4 ${
-                          billingCycle === 'annual' ? 'duo-nav-pill-active' : ''
+                        className={`px-4 py-1.5 rounded-full text-[13px] font-medium transition ${
+                          billingCycle === 'annual'
+                            ? 'bg-white text-[#1d1d1f] shadow-xs'
+                            : 'text-[#707070] hover:text-[#1d1d1f]'
                         }`}
                       >
-                        CURSO ANUAL (-31%)
+                        Curso Anual (-31%)
                       </button>
                     </div>
                   </div>
@@ -451,60 +457,60 @@ export const PricingModal: React.FC<PricingModalProps> = ({
                       return (
                         <div
                           key={plan.id}
-                          className={`duo-card flex flex-col justify-between ${
-                            plan.highlighted ? 'border-[#58cc02]' : 'border-[#afafaf]'
+                          className={`rounded-[28px] p-6 flex flex-col justify-between transition-all border ${
+                            plan.highlighted
+                              ? 'border-[#1d1d1f] bg-[#fafafc] ring-1 ring-[#1d1d1f]/10'
+                              : 'border-[#d6d6d6] bg-white hover:border-[#1d1d1f]/30'
                           }`}
                         >
                           <div>
                             <div className="flex items-center justify-between gap-2 mb-3">
                               <span
-                                className={`text-[13px] font-bold uppercase tracking-[0.053em] px-2.5 py-1 rounded-[12px] ${
+                                className={`text-[11px] font-semibold uppercase tracking-wider px-3 py-1 rounded-full ${
                                   plan.highlighted
-                                    ? 'bg-[#d7ffb8] text-[#4b4b4b] border-2 border-[#58cc02]'
-                                    : 'bg-[#ffffff] text-[#777777] border-2 border-[#afafaf]'
+                                    ? 'bg-[#1d1d1f] text-white'
+                                    : 'bg-[#f5f5f7] text-[#707070] border border-[#d6d6d6]'
                                 }`}
                               >
                                 {plan.badge}
                               </span>
                               {isCurrentPlan && (
-                                <span className="text-[13px] font-bold uppercase text-[#58cc02]">
-                                  ● ACTIVO
+                                <span className="text-[12px] font-semibold text-[#0071e3]">
+                                  ● Plan Activo
                                 </span>
                               )}
                             </div>
 
-                            <h5 className="text-[32px] font-bold text-[#4b4b4b] leading-[1.2]">
+                            <h5 className="text-[24px] font-semibold text-[#1d1d1f]">
                               {plan.name}
                             </h5>
 
-                            <div className="mt-3 pb-4 border-b-2 border-[#afafaf] flex items-baseline gap-1.5">
-                              <span className="font-feather font-extrabold text-[48px] leading-none text-[#58cc02]">
+                            <div className="mt-3 pb-4 border-b border-[#d6d6d6] flex items-baseline gap-1.5">
+                              <span className="text-[40px] font-bold text-[#1d1d1f] leading-none">
                                 {plan.priceEur === 0 ? '0 €' : `${plan.priceEur} €`}
                               </span>
                               {plan.priceEur > 0 && (
-                                <span className="text-[17px] font-bold text-[#777777]">
+                                <span className="text-[14px] text-[#707070]">
                                   / {plan.billingPeriod}
                                 </span>
                               )}
                             </div>
 
-                            <div className="my-4 p-3 rounded-[12px] bg-[#d7ffb8] border-2 border-[#58cc02] flex items-center justify-between">
-                              <span className="text-[15px] font-bold text-[#4b4b4b]">
-                                {plan.creditsIncluded} CRÉDITOS{' '}
-                                {plan.billingPeriod === 'mes'
-                                  ? '/ MES'
-                                  : plan.billingPeriod === 'año'
-                                  ? '/ AÑO'
-                                  : 'DE PRUEBA'}
-                              </span>
+                            <div className="my-4 p-3 rounded-[16px] bg-[#f5f5f7] border border-[#d6d6d6] text-[13px] font-medium text-[#1d1d1f]">
+                              {plan.creditsIncluded} Créditos{' '}
+                              {plan.billingPeriod === 'mes'
+                                ? '/ mes'
+                                : plan.billingPeriod === 'año'
+                                ? '/ curso anual'
+                                : 'de prueba'}
                             </div>
 
-                            <p className="duo-body-copy mb-4">{plan.description}</p>
+                            <p className="text-[14px] text-[#707070] mb-4 leading-relaxed">{plan.description}</p>
 
                             <ul className="space-y-2.5 mb-6">
                               {plan.features.map((feat, idx) => (
-                                <li key={idx} className="flex items-start gap-2 text-[15px] font-medium text-[#4b4b4b]">
-                                  <Check className="w-5 h-5 text-[#58cc02] shrink-0 mt-0.5" />
+                                <li key={idx} className="flex items-start gap-2.5 text-[14px] text-[#474747]">
+                                  <Check className="w-4 h-4 text-[#0071e3] shrink-0 mt-0.5" />
                                   <span>{feat}</span>
                                 </li>
                               ))}
@@ -514,14 +520,18 @@ export const PricingModal: React.FC<PricingModalProps> = ({
                           <button
                             type="button"
                             onClick={() => handleStartPlanCheckout(plan)}
-                            className={plan.highlighted ? 'duo-btn-primary w-full' : 'duo-btn-outlined w-full'}
+                            className={`w-full py-3 px-5 rounded-full text-[14px] font-medium flex items-center justify-center gap-2 transition ${
+                              plan.highlighted
+                                ? 'bg-[#0071e3] hover:bg-[#0077ed] text-white'
+                                : 'bg-transparent border border-[#d6d6d6] text-[#1d1d1f] hover:bg-[#f5f5f7]'
+                            }`}
                           >
                             <span>
                               {plan.id === 'free'
-                                ? 'USAR PLAN GRATUITO'
+                                ? 'Usar Plan Gratuito'
                                 : isCurrentPlan
-                                ? `AÑADIR +${plan.creditsIncluded} CRÉDITOS`
-                                : `ACTIVAR ${plan.name}`}
+                                ? `Añadir +${plan.creditsIncluded} Créditos`
+                                : `Activar ${plan.name}`}
                             </span>
                             <ArrowRight className="w-4 h-4" />
                           </button>
@@ -532,15 +542,15 @@ export const PricingModal: React.FC<PricingModalProps> = ({
                 </div>
               )}
 
-              {/* TAB 02: SINGLE-UNIT & PREPAID CREDIT PACKS */}
+              {/* TAB 02: PREPAID CREDIT PACKS */}
               {activeTab === 'packs' && (
                 <div className="space-y-6">
                   <div>
-                    <h4 className="duo-section-headline text-[36px]">
-                      pago por unidad sin cuota mensual.
+                    <h4 className="text-[28px] font-semibold text-[#1d1d1f] tracking-tight">
+                      Recargas puntuales sin cuota periódica
                     </h4>
-                    <p className="duo-body-copy mt-1">
-                      Compra solo los créditos que necesites para tus exámenes de hoy. No caducan durante el curso escolar.
+                    <p className="text-[15px] text-[#707070] mt-1">
+                      Adquiere solo los créditos requeridos para tu convocatoria de exámenes. No caducan a lo largo del curso escolar.
                     </p>
                   </div>
 
@@ -548,47 +558,53 @@ export const PricingModal: React.FC<PricingModalProps> = ({
                     {CREDIT_PACKS.map(pack => (
                       <div
                         key={pack.id}
-                        className={`duo-card flex flex-col justify-between ${
-                          pack.popular ? 'border-[#58cc02]' : 'border-[#afafaf]'
+                        className={`rounded-[28px] p-6 flex flex-col justify-between transition-all border ${
+                          pack.popular
+                            ? 'border-[#1d1d1f] bg-[#fafafc] ring-1 ring-[#1d1d1f]/10'
+                            : 'border-[#d6d6d6] bg-white hover:border-[#1d1d1f]/30'
                         }`}
                       >
                         <div>
                           <div className="flex items-center justify-between mb-3">
-                            <span className="text-[13px] font-bold uppercase tracking-[0.053em] px-2.5 py-1 rounded-[12px] bg-[#d7ffb8] text-[#4b4b4b] border-2 border-[#58cc02]">
+                            <span className="text-[11px] font-semibold uppercase tracking-wider px-3 py-1 rounded-full bg-[#f5f5f7] border border-[#d6d6d6] text-[#1d1d1f]">
                               {pack.badge}
                             </span>
-                            <span className="text-[13px] font-bold text-[#777777]">
+                            <span className="text-[12px] text-[#707070]">
                               {pack.pricePerCreditEur.toFixed(2).replace('.', ',')} € / cr.
                             </span>
                           </div>
 
-                          <h5 className="text-[32px] font-bold text-[#4b4b4b] leading-[1.2]">
+                          <h5 className="text-[24px] font-semibold text-[#1d1d1f]">
                             {pack.name}
                           </h5>
 
-                          <div className="mt-3 pb-4 border-b-2 border-[#afafaf] flex items-baseline justify-between">
-                            <span className="font-feather font-extrabold text-[48px] leading-none text-[#58cc02]">
+                          <div className="mt-3 pb-4 border-b border-[#d6d6d6] flex items-baseline justify-between">
+                            <span className="text-[36px] font-bold text-[#1d1d1f] leading-none">
                               {pack.priceEur.toFixed(2).replace('.', ',')} €
                             </span>
-                            <span className="text-[19px] font-bold text-[#1cb0f6]">
-                              +{pack.credits} CRÉDITOS
+                            <span className="text-[15px] font-semibold text-[#0071e3]">
+                              +{pack.credits} Créditos
                             </span>
                           </div>
 
-                          <div className="my-4 p-3 rounded-[12px] border-2 border-[#afafaf] text-[15px] font-bold text-[#4b4b4b]">
+                          <div className="my-4 p-3 rounded-[16px] bg-[#f5f5f7] border border-[#d6d6d6] text-[13px] text-[#474747] font-medium">
                             {pack.equivalentDescription}
                           </div>
 
-                          <p className="duo-body-copy mb-6">{pack.description}</p>
+                          <p className="text-[14px] text-[#707070] mb-6 leading-relaxed">{pack.description}</p>
                         </div>
 
                         <button
                           type="button"
                           onClick={() => handleStartPackCheckout(pack)}
-                          className={pack.popular ? 'duo-btn-primary w-full' : 'duo-btn-outlined w-full'}
+                          className={`w-full py-3 px-5 rounded-full text-[14px] font-medium flex items-center justify-center gap-2 transition ${
+                            pack.popular
+                              ? 'bg-[#0071e3] hover:bg-[#0077ed] text-white'
+                              : 'bg-transparent border border-[#d6d6d6] text-[#1d1d1f] hover:bg-[#f5f5f7]'
+                          }`}
                         >
                           <span>
-                            COMPRAR +{pack.credits} CRÉDITOS ({pack.priceEur.toFixed(2).replace('.', ',')} €)
+                            Comprar +{pack.credits} Créditos ({pack.priceEur.toFixed(2).replace('.', ',')} €)
                           </span>
                           <ArrowRight className="w-4 h-4" />
                         </button>
@@ -597,19 +613,19 @@ export const PricingModal: React.FC<PricingModalProps> = ({
                   </div>
 
                   {/* Interactive Calculator */}
-                  <div className="duo-card border-[#afafaf]">
-                    <div className="flex items-center gap-2 mb-4">
-                      <Calculator className="w-5 h-5 text-[#58cc02]" />
-                      <span className="text-[15px] font-bold uppercase tracking-[0.053em] text-[#4b4b4b]">
-                        CALCULADORA DE CRÉDITOS POR CONVOCATORIA
+                  <div className="rounded-[28px] border border-[#d6d6d6] bg-[#f5f5f7] p-6 space-y-4">
+                    <div className="flex items-center gap-2">
+                      <Calculator className="w-5 h-5 text-[#0071e3]" />
+                      <span className="text-[13px] font-semibold uppercase tracking-wider text-[#1d1d1f]">
+                        Calculadora de Créditos por Convocatoria
                       </span>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
                       <div className="space-y-2">
-                        <div className="flex justify-between text-[15px] font-bold text-[#4b4b4b]">
-                          <span>Exámenes a crear:</span>
-                          <span className="text-[#58cc02]">
+                        <div className="flex justify-between text-sm font-medium text-[#1d1d1f]">
+                          <span>Exámenes a redactar:</span>
+                          <span className="text-[#0071e3] font-semibold">
                             {calcExamsCount} ({neededCreditsForExams} cr.)
                           </span>
                         </div>
@@ -619,14 +635,14 @@ export const PricingModal: React.FC<PricingModalProps> = ({
                           max={15}
                           value={calcExamsCount}
                           onChange={e => setCalcExamsCount(Number(e.target.value))}
-                          className="w-full accent-[#58cc02]"
+                          className="w-full accent-[#0071e3]"
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <div className="flex justify-between text-[15px] font-bold text-[#4b4b4b]">
+                        <div className="flex justify-between text-sm font-medium text-[#1d1d1f]">
                           <span>Alumnos a corregir (OCR):</span>
-                          <span className="text-[#1cb0f6]">
+                          <span className="text-[#0071e3] font-semibold">
                             {calcStudentsCount} al. ({neededCreditsForStudents} cr.)
                           </span>
                         </div>
@@ -637,25 +653,25 @@ export const PricingModal: React.FC<PricingModalProps> = ({
                           step={5}
                           value={calcStudentsCount}
                           onChange={e => setCalcStudentsCount(Number(e.target.value))}
-                          className="w-full accent-[#58cc02]"
+                          className="w-full accent-[#0071e3]"
                         />
                       </div>
 
-                      <div className="p-4 rounded-[12px] bg-[#d7ffb8] border-2 border-[#58cc02] flex items-center justify-between gap-3">
+                      <div className="p-4 rounded-[20px] bg-white border border-[#d6d6d6] flex items-center justify-between gap-3">
                         <div>
-                          <span className="block text-[13px] font-bold uppercase tracking-[0.053em] text-[#4b4b4b]">
-                            NECESITAS
+                          <span className="block text-[11px] font-semibold uppercase tracking-wider text-[#707070]">
+                            Estimación Requerida
                           </span>
-                          <span className="text-[28px] font-bold text-[#4b4b4b]">
+                          <span className="text-[22px] font-bold text-[#1d1d1f]">
                             {totalNeededCredits} Créditos
                           </span>
                         </div>
                         <button
                           type="button"
                           onClick={() => handleStartPackCheckout(recommendedPack)}
-                          className="duo-btn-primary"
+                          className="px-4 py-2 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-white text-[13px] font-medium transition"
                         >
-                          ELEGIR ({recommendedPack.priceEur.toFixed(2).replace('.', ',')} €)
+                          Elegir ({recommendedPack.priceEur.toFixed(2).replace('.', ',')} €)
                         </button>
                       </div>
                     </div>
@@ -663,128 +679,134 @@ export const PricingModal: React.FC<PricingModalProps> = ({
                 </div>
               )}
 
-              {/* TAB 03: WALLET LEDGER & OWNER UNIT ECONOMICS */}
+              {/* TAB 03: WALLET LEDGER & TELEMETRY */}
               {activeTab === 'ledger' && (
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div className="duo-card">
-                      <span className="text-[13px] font-bold uppercase tracking-[0.053em] text-[#777777]">
-                        SALDO ACTUAL
+                    <div className="rounded-[24px] border border-[#d6d6d6] bg-[#f5f5f7] p-5">
+                      <span className="text-[11px] font-semibold uppercase tracking-wider text-[#707070]">
+                        Saldo Disponible
                       </span>
-                      <div className="font-feather font-extrabold text-[36px] text-[#58cc02] mt-1">
+                      <div className="text-[32px] font-bold text-[#1d1d1f] mt-1">
                         {account.creditsBalance} créditos
                       </div>
-                      <span className="text-[15px] text-[#777777]">
-                        Da para corregir {account.creditsBalance * 5} alumnos
+                      <span className="text-[13px] text-[#707070]">
+                        Suficiente para evaluar {account.creditsBalance * 5} alumnos
                       </span>
                     </div>
 
-                    <div className="duo-card">
-                      <span className="text-[13px] font-bold uppercase tracking-[0.053em] text-[#777777]">
-                        EXÁMENES GENERADOS
+                    <div className="rounded-[24px] border border-[#d6d6d6] bg-[#f5f5f7] p-5">
+                      <span className="text-[11px] font-semibold uppercase tracking-wider text-[#707070]">
+                        Exámenes Generados
                       </span>
-                      <div className="font-feather font-extrabold text-[36px] text-[#4b4b4b] mt-1">
+                      <div className="text-[32px] font-bold text-[#1d1d1f] mt-1">
                         {account.totalExamsGenerated}
                       </div>
-                      <span className="text-[15px] text-[#777777]">Con solucionario completo</span>
+                      <span className="text-[13px] text-[#707070]">Con matriz de pesos y solucionario</span>
                     </div>
 
-                    <div className="duo-card">
-                      <span className="text-[13px] font-bold uppercase tracking-[0.053em] text-[#777777]">
-                        ALUMNOS CORREGIDOS
+                    <div className="rounded-[24px] border border-[#d6d6d6] bg-[#f5f5f7] p-5">
+                      <span className="text-[11px] font-semibold uppercase tracking-wider text-[#707070]">
+                        Alumnos Calificados
                       </span>
-                      <div className="font-feather font-extrabold text-[36px] text-[#1cb0f6] mt-1">
+                      <div className="text-[32px] font-bold text-[#1d1d1f] mt-1">
                         {account.totalSubmissionsGraded}
                       </div>
-                      <span className="text-[15px] text-[#777777]">Evaluados de 0 a 10</span>
+                      <span className="text-[13px] text-[#707070]">Evaluados en escala 0 a 10</span>
                     </div>
                   </div>
 
-                  <div className="duo-card p-0 overflow-hidden">
-                    <div className="px-5 py-3 border-b-2 border-[#afafaf] flex items-center justify-between">
-                      <span className="text-[15px] font-bold uppercase tracking-[0.053em] text-[#4b4b4b]">
-                        HISTORIAL DE CRÉDITOS
+                  <div className="rounded-[28px] border border-[#d6d6d6] overflow-hidden bg-white">
+                    <div className="px-6 py-4 border-b border-[#d6d6d6] flex items-center justify-between">
+                      <span className="text-[13px] font-semibold uppercase tracking-wider text-[#1d1d1f]">
+                        Historial de Movimientos
                       </span>
                     </div>
-                    <div className="divide-y-2 divide-[#afafaf]/40 max-h-60 overflow-y-auto">
-                      {account.transactions.map(tx => (
-                        <div
-                          key={tx.id}
-                          className="px-5 py-3 flex items-center justify-between gap-4"
-                        >
-                          <div>
-                            <div className="text-[17px] font-bold text-[#4b4b4b]">{tx.description}</div>
-                            <div className="text-[13px] text-[#777777]">
-                              {new Date(tx.timestamp).toLocaleString('es-ES')}
+                    <div className="divide-y divide-[#d6d6d6]/60 max-h-64 overflow-y-auto">
+                      {account.transactions.length === 0 ? (
+                        <div className="px-6 py-8 text-center text-sm text-[#707070]">
+                          No hay transacciones registradas aún.
+                        </div>
+                      ) : (
+                        account.transactions.map(tx => (
+                          <div
+                            key={tx.id}
+                            className="px-6 py-3.5 flex items-center justify-between gap-4 hover:bg-[#fafafc] transition"
+                          >
+                            <div>
+                              <div className="text-[14px] font-medium text-[#1d1d1f]">{tx.description}</div>
+                              <div className="text-[12px] text-[#707070]">
+                                {new Date(tx.timestamp).toLocaleString('es-ES')}
+                              </div>
+                            </div>
+                            <div className="text-right shrink-0">
+                              <span
+                                className={`text-[13px] font-semibold px-3 py-1 rounded-full border ${
+                                  tx.creditsDelta > 0
+                                    ? 'bg-[#f5f5f7] border-[#0071e3] text-[#0071e3]'
+                                    : 'bg-[#fafafc] border-[#d6d6d6] text-[#707070]'
+                                }`}
+                              >
+                                {tx.creditsDelta > 0 ? `+${tx.creditsDelta}` : tx.creditsDelta} Cr.
+                              </span>
                             </div>
                           </div>
-                          <div className="text-right shrink-0">
-                            <span
-                              className={`text-[15px] font-bold px-3 py-1 rounded-[12px] border-2 ${
-                                tx.creditsDelta > 0
-                                  ? 'bg-[#d7ffb8] border-[#58cc02] text-[#4b4b4b]'
-                                  : 'bg-[#ffffff] border-[#afafaf] text-[#4b4b4b]'
-                              }`}
-                            >
-                              {tx.creditsDelta > 0 ? `+${tx.creditsDelta}` : tx.creditsDelta} Cr.
-                            </span>
-                          </div>
-                        </div>
-                      ))}
+                        ))
+                      )}
                     </div>
                   </div>
 
-                  {/* SaaS Owner Unit Economics & Server AI Key Drawer */}
-                  <div className="duo-card">
+                  {/* SaaS Owner Unit Economics Drawer */}
+                  <div className="rounded-[28px] border border-[#d6d6d6] bg-[#fafafc] p-6">
                     <button
                       type="button"
                       onClick={() => setShowOwnerTelemetry(!showOwnerTelemetry)}
                       className="w-full flex items-center justify-between text-left"
                     >
-                      <div className="flex items-center gap-2">
-                        <TrendingUp className="w-5 h-5 text-[#58cc02]" />
-                        <span className="text-[15px] font-bold uppercase tracking-[0.053em] text-[#4b4b4b]">
-                          PANEL INTERNO PROPIETARIO SAAS · RENTABILIDAD IA Y CLAVE SERVIDOR
+                      <div className="flex items-center gap-2.5">
+                        <TrendingUp className="w-4 h-4 text-[#0071e3]" />
+                        <span className="text-[13px] font-semibold uppercase tracking-wider text-[#1d1d1f]">
+                          Panel de Rentabilidad del Servicio y Clave Servidor
                         </span>
                       </div>
-                      <span className="text-[15px] font-bold text-[#1cb0f6]">
-                        {showOwnerTelemetry ? 'OCULTAR ▲' : 'ABRIR ▼'}
+                      <span className="text-[13px] text-[#0071e3] font-medium">
+                        {showOwnerTelemetry ? 'Ocultar panel' : 'Desplegar panel'}
                       </span>
                     </button>
 
                     {showOwnerTelemetry && (
-                      <div className="pt-4 mt-4 border-t-2 border-[#afafaf] space-y-4">
+                      <div className="pt-5 mt-5 border-t border-[#d6d6d6] space-y-4">
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                          <div className="p-3 rounded-[12px] border-2 border-[#afafaf]">
-                            <span className="text-[13px] font-bold uppercase tracking-[0.053em] text-[#777777]">
-                              INGRESOS COBRADOS
+                          <div className="p-3.5 rounded-[18px] border border-[#d6d6d6] bg-white">
+                            <span className="text-[11px] font-semibold uppercase tracking-wider text-[#707070]">
+                              Ingresos Cobrados
                             </span>
-                            <div className="text-[24px] font-bold text-[#58cc02] mt-0.5">
+                            <div className="text-[20px] font-bold text-[#1d1d1f] mt-0.5">
                               {account.totalSpentEur.toFixed(2).replace('.', ',')} €
                             </div>
                           </div>
-                          <div className="p-3 rounded-[12px] border-2 border-[#afafaf]">
-                            <span className="text-[13px] font-bold uppercase tracking-[0.053em] text-[#777777]">
-                              COSTE REAL IA ASUMIDO
+                          <div className="p-3.5 rounded-[18px] border border-[#d6d6d6] bg-white">
+                            <span className="text-[11px] font-semibold uppercase tracking-wider text-[#707070]">
+                              Coste Real IA Asumido
                             </span>
-                            <div className="text-[24px] font-bold text-[#4b4b4b] mt-0.5">
+                            <div className="text-[20px] font-bold text-[#1d1d1f] mt-0.5">
                               {account.totalEstimatedAiCostEur.toFixed(4).replace('.', ',')} €
                             </div>
                           </div>
-                          <div className="p-3 rounded-[12px] border-2 border-[#afafaf]">
-                            <span className="text-[13px] font-bold uppercase tracking-[0.053em] text-[#777777]">
-                              MARGEN BRUTO SAAS
+                          <div className="p-3.5 rounded-[18px] border border-[#d6d6d6] bg-white">
+                            <span className="text-[11px] font-semibold uppercase tracking-wider text-[#707070]">
+                              Margen Bruto SaaS
                             </span>
-                            <div className="text-[24px] font-bold text-[#1cb0f6] mt-0.5">
+                            <div className="text-[20px] font-bold text-[#0071e3] mt-0.5">
                               {grossMarginPercent}%
                             </div>
                           </div>
                         </div>
 
                         <div className="pt-2">
-                          <label className="block text-[15px] font-bold uppercase tracking-[0.053em] text-[#4b4b4b] mb-1">
-                            <KeyRound className="w-4 h-4 inline mr-1 text-[#58cc02]" />
-                            CLAVE MAESTRA DE IA DEL SERVIDOR (OCULTA AL PROFESOR)
+                          <label className="block text-[12px] font-semibold uppercase tracking-wider text-[#1d1d1f] mb-1.5">
+                            <KeyRound className="w-3.5 h-3.5 inline mr-1 text-[#0071e3]" />
+                            Clave Maestra Gemini del Servidor (opcional · oculta a usuarios)
                           </label>
                           <div className="flex gap-2">
                             <div className="relative flex-1">
@@ -792,13 +814,13 @@ export const PricingModal: React.FC<PricingModalProps> = ({
                                 type={showKeyText ? 'text' : 'password'}
                                 value={masterApiKey}
                                 onChange={e => setMasterApiKey(e.target.value)}
-                                placeholder="AIzaSy... (Clave corporativa de nuestro SaaS)"
-                                className="w-full px-4 py-2.5 bg-[#ffffff] border-2 border-[#afafaf] rounded-[12px] text-[15px] text-[#4b4b4b]"
+                                placeholder="AIzaSy... (Clave corporativa del sistema)"
+                                className="w-full px-4 py-2 bg-white border border-[#d6d6d6] rounded-full text-sm text-[#1d1d1f] focus:outline-none focus:border-[#0071e3]"
                               />
                               <button
                                 type="button"
                                 onClick={() => setShowKeyText(!showKeyText)}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#777777]"
+                                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#707070] hover:text-[#1d1d1f]"
                               >
                                 {showKeyText ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                               </button>
@@ -806,9 +828,9 @@ export const PricingModal: React.FC<PricingModalProps> = ({
                             <button
                               type="button"
                               onClick={handleSaveMasterKey}
-                              className="duo-btn-primary"
+                              className="px-5 py-2 rounded-full bg-[#1d1d1f] hover:bg-[#333336] text-white text-sm font-medium transition"
                             >
-                              GUARDAR CLAVE
+                              Guardar Clave
                             </button>
                           </div>
                         </div>

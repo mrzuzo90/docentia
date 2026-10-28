@@ -1,0 +1,94 @@
+<svg viewBox="0 0 400 480" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bodyGradientAcad" x1="200" y1="120" x2="200" y2="440" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="45%" stop-color="#fafafc" />
+      <stop offset="100%" stop-color="#f0e4d3" stop-opacity="0.65" />
+    </linearGradient>
+
+    <linearGradient id="mantleGradientAcad" x1="120" y1="100" x2="280" y2="380" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1d1d1f" />
+      <stop offset="50%" stop-color="#2e3642" />
+      <stop offset="100%" stop-color="#474747" />
+    </linearGradient>
+
+    <linearGradient id="wingRightGradientAcad" x1="260" y1="150" x2="330" y2="390" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1d1d1f" />
+      <stop offset="100%" stop-color="#384353" />
+    </linearGradient>
+
+    <linearGradient id="wingLeftGradientAcad" x1="140" y1="150" x2="70" y2="390" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1d1d1f" />
+      <stop offset="100%" stop-color="#384353" />
+    </linearGradient>
+
+    <linearGradient id="goldRibbon" x1="180" y1="280" x2="220" y2="360" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#d4af37" />
+      <stop offset="100%" stop-color="#997a15" />
+    </linearGradient>
+
+    <linearGradient id="facialDiscAcad" x1="200" y1="70" x2="200" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="70%" stop-color="#fdfbf7" />
+      <stop offset="100%" stop-color="#f4ede2" />
+    </linearGradient>
+  </defs>
+
+  <style>
+    @keyframes gentleSway {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-3px); }
+    }
+    .sober-academic {
+      animation: gentleSway 5s ease-in-out infinite;
+      transform-origin: center bottom;
+    }
+  </style>
+
+  <!-- Ambient Golden Academic Glow -->
+  <circle cx="200" cy="240" r="170" fill="#d4af37" fill-opacity="0.04" />
+  <ellipse cx="200" cy="442" rx="90" ry="8" fill="#1d1d1f" fill-opacity="0.06" />
+
+  <g class="sober-academic">
+    <!-- Wings -->
+    <path d="M148 110 C 130 160, 95 240, 90 350 C 88 385, 110 405, 138 410 C 158 370, 172 320, 180 270 Z"
+          fill="url(#wingLeftGradientAcad)" opacity="0.95" />
+    <path d="M252 110 C 270 160, 305 240, 310 350 C 312 385, 290 405, 262 410 C 242 370, 228 320, 220 270 Z"
+          fill="url(#wingRightGradientAcad)" opacity="0.95" />
+
+    <!-- Torso -->
+    <path d="M152 120 C 152 120, 136 210, 145 320 C 152 385, 178 430, 200 432 C 222 430, 248 385, 255 320 C 264 210, 248 120, 248 120 C 230 135, 170 135, 152 120 Z"
+          fill="url(#bodyGradientAcad)" />
+
+    <!-- Mantle Hood -->
+    <path d="M136 115 C 136 60, 165 42, 200 42 C 235 42, 264 60, 264 115 C 264 125, 258 135, 252 142 C 248 110, 232 90, 200 90 C 168 90, 152 110, 148 142 C 142 135, 136 125, 136 115 Z"
+          fill="url(#mantleGradientAcad)" />
+
+    <!-- Facial Disc -->
+    <path d="M200 98 C 184 75, 147 79, 147 118 C 147 152, 175 183, 200 202 C 225 183, 253 152, 253 118 C 253 79, 216 75, 200 98 Z"
+          fill="url(#facialDiscAcad)" stroke="#ffffff" stroke-width="1" />
+
+    <!-- Eyes -->
+    <circle cx="178" cy="138" r="8.5" fill="#1d1d1f" />
+    <circle cx="178" cy="138" r="9.5" stroke="#d4af37" stroke-opacity="0.6" stroke-width="1" fill="none" />
+    <circle cx="176" cy="136" r="2" fill="#ffffff" />
+    
+    <circle cx="222" cy="138" r="8.5" fill="#1d1d1f" />
+    <circle cx="222" cy="138" r="9.5" stroke="#d4af37" stroke-opacity="0.6" stroke-width="1" fill="none" />
+    <circle cx="220" cy="136" r="2" fill="#ffffff" />
+
+    <!-- Beak -->
+    <path d="M197 148 C 197 148, 200 168, 200 172 C 200 168, 203 148, 203 148 Z"
+          fill="#f0e4d3" stroke="#b68d40" stroke-opacity="0.4" stroke-width="0.8" />
+
+    <!-- Minimalist Academic Seal / Rolled Parchment (Geometric pure silhouette) -->
+    <g transform="translate(160, 290)">
+      <rect x="0" y="0" width="80" height="20" rx="10" fill="#ffffff" stroke="#1d1d1f" stroke-opacity="0.12" stroke-width="1" />
+      <rect x="34" y="0" width="12" height="20" fill="url(#goldRibbon)" />
+      <circle cx="40" cy="24" r="5" fill="#d4af37" />
+    </g>
+
+    <!-- Perch -->
+    <rect x="156" y="430" width="88" height="6" rx="3" fill="#1d1d1f" />
+  </g>
+</svg>

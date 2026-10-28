@@ -354,6 +354,30 @@ Materia: ${exam.subject} | Nivel: ${exam.targetLevel}
   },
 
   /**
+   * Downloads gradebook report as a CSV file ready for Excel
+   */
+  downloadGradebookCSV(exam: Exam, reports: StudentGradeReport[]): void {
+    const csv = this.exportGradesToCSV(reports);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `Acta_Calificaciones_${exam.title.replace(/[^a-zA-Z0-9_-]/g, '_')}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  },
+
+  /**
+   * Copies gradebook CSV content directly to clipboard
+   */
+  async copyGradebookCSV(_exam: Exam, reports: StudentGradeReport[]): Promise<void> {
+    const csv = this.exportGradesToCSV(reports);
+    await navigator.clipboard.writeText(csv);
+  },
+
+  /**
    * Generates standard Moodle XML (<quiz>) based on official Moodle specification.
    * Includes multichoice questions with fractions and essay questions with graderinfo.
    */

@@ -1,0 +1,92 @@
+<svg viewBox="0 0 400 480" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bodyGradientScan" x1="200" y1="120" x2="200" y2="440" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="45%" stop-color="#fafafc" />
+      <stop offset="100%" stop-color="#f0e4d3" stop-opacity="0.65" />
+    </linearGradient>
+
+    <linearGradient id="mantleGradientScan" x1="120" y1="100" x2="280" y2="380" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1d1d1f" />
+      <stop offset="40%" stop-color="#2e3642" />
+      <stop offset="85%" stop-color="#474747" />
+      <stop offset="100%" stop-color="#707070" />
+    </linearGradient>
+
+    <linearGradient id="wingRightGradientScan" x1="260" y1="150" x2="330" y2="390" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1d1d1f" />
+      <stop offset="100%" stop-color="#384353" />
+    </linearGradient>
+
+    <linearGradient id="wingLeftGradientScan" x1="140" y1="150" x2="70" y2="390" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1d1d1f" />
+      <stop offset="100%" stop-color="#384353" />
+    </linearGradient>
+
+    <linearGradient id="laserBeam" x1="200" y1="200" x2="200" y2="420" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0071e3" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="#0071e3" stop-opacity="0.05" />
+    </linearGradient>
+
+    <linearGradient id="facialDiscScan" x1="200" y1="70" x2="200" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="70%" stop-color="#fdfbf7" />
+      <stop offset="100%" stop-color="#f4ede2" />
+    </linearGradient>
+  </defs>
+
+  <style>
+    @keyframes scanRay {
+      0%, 100% { transform: translateY(0); opacity: 0.7; }
+      50% { transform: translateY(18px); opacity: 0.95; }
+    }
+    .scan-line {
+      animation: scanRay 3s ease-in-out infinite;
+    }
+  </style>
+
+  <!-- Optical Calibration Grid (Apple Vision / OCR aesthetic) -->
+  <circle cx="200" cy="240" r="160" stroke="#0071e3" stroke-opacity="0.1" stroke-width="1" stroke-dasharray="4 4" />
+  <circle cx="200" cy="240" r="120" stroke="#0071e3" stroke-opacity="0.08" stroke-width="1" />
+  
+  <!-- Optical Laser Scanning Fan -->
+  <polygon points="178,140 222,140 310,400 90,400" fill="url(#laserBeam)" opacity="0.4" />
+  <line class="scan-line" x1="110" y1="360" x2="290" y2="360" stroke="#0071e3" stroke-width="2" stroke-linecap="round" />
+
+  <!-- The Sober Barn Owl -->
+  <g id="owl">
+    <!-- Wings -->
+    <path d="M148 110 C 130 160, 95 240, 90 350 C 88 385, 110 405, 138 410 C 158 370, 172 320, 180 270 Z"
+          fill="url(#wingLeftGradientScan)" opacity="0.95" />
+    <path d="M252 110 C 270 160, 305 240, 310 350 C 312 385, 290 405, 262 410 C 242 370, 228 320, 220 270 Z"
+          fill="url(#wingRightGradientScan)" opacity="0.95" />
+
+    <!-- Torso -->
+    <path d="M152 120 C 152 120, 136 210, 145 320 C 152 385, 178 430, 200 432 C 222 430, 248 385, 255 320 C 264 210, 248 120, 248 120 C 230 135, 170 135, 152 120 Z"
+          fill="url(#bodyGradientScan)" />
+
+    <!-- Mantle Hood -->
+    <path d="M136 115 C 136 60, 165 42, 200 42 C 235 42, 264 60, 264 115 C 264 125, 258 135, 252 142 C 248 110, 232 90, 200 90 C 168 90, 152 110, 148 142 C 142 135, 136 125, 136 115 Z"
+          fill="url(#mantleGradientScan)" />
+
+    <!-- Facial Disc -->
+    <path d="M200 98 C 184 75, 147 79, 147 118 C 147 152, 175 183, 200 202 C 225 183, 253 152, 253 118 C 253 79, 216 75, 200 98 Z"
+          fill="url(#facialDiscScan)" stroke="#ffffff" stroke-width="1" />
+
+    <!-- Eyes (Focused with subtle blue optical glint) -->
+    <circle cx="178" cy="138" r="8.5" fill="#1d1d1f" />
+    <circle cx="178" cy="138" r="9.5" stroke="#0071e3" stroke-opacity="0.8" stroke-width="1.2" fill="none" />
+    <circle cx="176" cy="136" r="2" fill="#0071e3" />
+    
+    <circle cx="222" cy="138" r="8.5" fill="#1d1d1f" />
+    <circle cx="222" cy="138" r="9.5" stroke="#0071e3" stroke-opacity="0.8" stroke-width="1.2" fill="none" />
+    <circle cx="220" cy="136" r="2" fill="#0071e3" />
+
+    <!-- Beak -->
+    <path d="M197 148 C 197 148, 200 168, 200 172 C 200 168, 203 148, 203 148 Z"
+          fill="#f0e4d3" stroke="#b68d40" stroke-opacity="0.4" stroke-width="0.8" />
+
+    <!-- Perch -->
+    <rect x="156" y="430" width="88" height="6" rx="3" fill="#1d1d1f" />
+  </g>
+</svg>

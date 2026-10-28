@@ -118,53 +118,61 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
     setShowManualInput(false);
   };
 
-  const handleLoadSample = (sampleDoc: SourceDocument) => {
-    if (!documents.some(d => d.id === sampleDoc.id)) {
-      const updated = [...documents, sampleDoc];
-      onDocumentsChange(updated);
-      setSelectedDocId(sampleDoc.id);
-    } else {
-      setSelectedDocId(sampleDoc.id);
-    }
-  };
-
   const handleRemoveDoc = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    const remaining = documents.filter(d => d.id !== id);
-    onDocumentsChange(remaining);
+    const updated = documents.filter(d => d.id !== id);
+    onDocumentsChange(updated);
     if (selectedDocId === id) {
-      setSelectedDocId(remaining[0]?.id || null);
+      setSelectedDocId(updated[0]?.id || null);
     }
   };
 
-  const handleUpdateOrCreateContent = (newContent: string) => {
+  const handleLoadSample = (sample: SourceDocument) => {
+    const existing = documents.find(d => d.name === sample.name);
+    if (!existing) {
+      const updated = [...documents, sample];
+      onDocumentsChange(updated);
+      setSelectedDocId(sample.id);
+    } else {
+      setSelectedDocId(existing.id);
+    }
+  };
+
+  const handleUpdateOrCreateContent = (text: string) => {
     if (selectedDoc) {
       const updated = documents.map(d =>
-        d.id === selectedDoc.id ? { ...d, content: newContent, size: new Blob([newContent]).size } : d
+        d.id === selectedDoc.id
+          ? {
+              ...d,
+              content: text,
+              pageCount: Math.max(1, Math.ceil(text.trim().split(/\s+/).length / 350))
+            }
+          : d
       );
       onDocumentsChange(updated);
-    } else if (newContent.trim().length > 0) {
-      const newDoc: SourceDocument = {
+    } else if (text.trim()) {
+      const doc: SourceDocument = {
         id: `doc-direct-${Date.now()}`,
-        name: 'Temario_Directo_Docente.txt',
-        size: new Blob([newContent]).size,
-        pageCount: 1,
+        name: 'Apuntes_Directos.txt',
+        size: new Blob([text]).size,
+        pageCount: Math.max(1, Math.ceil(text.trim().split(/\s+/).length / 350)),
         type: 'text/plain',
-        content: newContent,
+        content: text,
         uploadedAt: new Date().toISOString()
       };
-      onDocumentsChange([newDoc]);
-      setSelectedDocId(newDoc.id);
+      onDocumentsChange([doc]);
+      setSelectedDocId(doc.id);
     }
   };
 
   const scrollToGenerator = () => {
     if (onProceedToGenerate) {
       onProceedToGenerate();
-    }
-    const el = document.getElementById('step-2-generator');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      const el = document.getElementById('step-2-generator');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
     }
   };
 
@@ -175,52 +183,52 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
   const totalPages = documents.reduce((acc, d) => acc + (d.pageCount || 1), 0);
 
   return (
-    <div className="duo-card p-0 overflow-hidden">
+    <div className="bg-[#ffffff] border border-[#d6d6d6] rounded-[28px] overflow-hidden">
       {/* Section Header */}
-      <div className="px-6 py-5 bg-[#ffffff] border-b-2 border-[#afafaf] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="px-7 py-6 bg-[#ffffff] border-b border-[#d6d6d6] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2.5">
-            <span className="px-3 py-1 text-[13px] font-bold uppercase tracking-[0.053em] bg-[#d7ffb8] text-[#4b4b4b] border-2 border-[#58cc02] rounded-[12px]">
-              PASO 1
+            <span className="apple-badge-ember">
+              Paso 1
             </span>
-            <h2 className="text-[24px] sm:text-[32px] font-bold text-[#4b4b4b] leading-[1.2]">
+            <h2 className="text-[22px] sm:text-[28px] font-semibold text-[#1d1d1f] tracking-tight">
               Sube tus apuntes o documentos fuente
             </h2>
           </div>
-          <p className="duo-body-copy mt-1">
-            Sube archivos PDF, TXT o pega tus apuntes directamente en el cuadro de la derecha.
+          <p className="text-[15px] text-[#707070] mt-1">
+            Formatos PDF, TXT o redacción directa del temario oficial a evaluar.
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 shrink-0">
-          <span className="duo-nav-pill py-1.5 px-3 text-[13px]">
-            {documents.length} DOC(S) · ~{totalPages} PÁGS ({totalWords.toLocaleString()} PAL.)
+        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+          <span className="inline-flex items-center px-3.5 py-1.5 rounded-full border border-[#d6d6d6] text-[13px] text-[#707070] bg-[#fafafc]">
+            {documents.length} doc(s) · ~{totalPages} págs ({totalWords.toLocaleString()} pal.)
           </span>
           <button
             type="button"
             onClick={scrollToGenerator}
-            className="duo-btn-primary py-2.5 px-4"
+            className="apple-pill-primary text-[14px] py-2 px-5"
           >
-            <span>IR A CONFIGURAR</span>
-            <ArrowDown className="h-4 w-4" />
+            <span>Configurar examen</span>
+            <ArrowDown className="h-3.5 w-3.5" />
           </button>
         </div>
       </div>
 
       {/* Main Two-Column Corpus Area */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 divide-y-2 lg:divide-y-0 lg:divide-x-2 divide-[#afafaf]">
+      <div className="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-[#d6d6d6]">
         
         {/* Left 5 cols: Dropzone + File List */}
-        <div className="lg:col-span-5 p-6 space-y-4 bg-[#ffffff]">
+        <div className="lg:col-span-5 p-7 space-y-5 bg-[#ffffff]">
           <div
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             onClick={() => fileInputRef.current?.click()}
-            className={`border-2 border-dashed rounded-[12px] p-6 text-center cursor-pointer transition-all ${
+            className={`border border-dashed rounded-[20px] p-6 text-center cursor-pointer transition-all ${
               isDragging
-                ? 'border-[#58cc02] bg-[#d7ffb8]'
-                : 'border-[#afafaf] hover:border-[#58cc02] bg-[#ffffff]'
+                ? 'border-[#0071e3] bg-[#0071e3]/5'
+                : 'border-[#d6d6d6] hover:border-[#1d1d1f] bg-[#fafafc]'
             }`}
           >
             <input
@@ -233,22 +241,22 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
             />
             {isParsing ? (
               <div className="py-3 space-y-2">
-                <Loader2 className="h-7 w-7 text-[#58cc02] animate-spin mx-auto" />
-                <p className="text-[17px] font-bold text-[#4b4b4b]">
+                <Loader2 className="h-6 w-6 text-[#0071e3] animate-spin mx-auto" />
+                <p className="text-[15px] font-medium text-[#1d1d1f]">
                   Leyendo {parsingFileName}...
                 </p>
-                <p className="text-[15px] text-[#777777]">Extrayendo el texto del documento</p>
+                <p className="text-[13px] text-[#707070]">Extrayendo el texto del documento</p>
               </div>
             ) : (
               <>
-                <div className="mx-auto w-12 h-12 rounded-[12px] bg-[#d7ffb8] border-2 border-[#58cc02] text-[#58cc02] flex items-center justify-center mb-3">
-                  <Upload className="h-6 w-6" />
+                <div className="mx-auto w-11 h-11 rounded-full bg-[#ffffff] border border-[#d6d6d6] text-[#0071e3] flex items-center justify-center mb-3">
+                  <Upload className="h-5 w-5" />
                 </div>
-                <p className="text-[19px] font-bold text-[#4b4b4b]">
-                  Subir documentos (PDF, TXT, Imágenes)
+                <p className="text-[16px] font-medium text-[#1d1d1f]">
+                  Subir documentos (PDF, TXT, imágenes)
                 </p>
-                <p className="duo-body-copy mt-1">
-                  Arrastra tus archivos aquí o haz clic para elegirlos
+                <p className="text-[13px] text-[#707070] mt-1">
+                  Arrastra tus archivos aquí o haz clic para seleccionarlos
                 </p>
               </>
             )}
@@ -259,63 +267,63 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
             <button
               type="button"
               onClick={() => handleLoadSample(SAMPLE_SOURCE_DOCUMENT)}
-              className="duo-btn-outlined py-1.5 px-3 text-[13px]"
+              className="apple-pill-ghost text-[13px] py-1.5 px-3.5"
             >
-              <BookOpen className="h-4 w-4" />
-              <span>EJEMPLO BIOLOGÍA</span>
+              <BookOpen className="h-3.5 w-3.5 text-[#707070]" />
+              <span>Ejemplo Biología</span>
             </button>
 
             <button
               type="button"
               onClick={() => handleLoadSample(SAMPLE_SOURCE_PHYSICS)}
-              className="duo-btn-outlined py-1.5 px-3 text-[13px]"
+              className="apple-pill-ghost text-[13px] py-1.5 px-3.5"
             >
-              <BookOpen className="h-4 w-4" />
-              <span>EJEMPLO FÍSICA</span>
+              <BookOpen className="h-3.5 w-3.5 text-[#707070]" />
+              <span>Ejemplo Física</span>
             </button>
 
             <button
               type="button"
               onClick={() => setShowManualInput(!showManualInput)}
-              className="duo-nav-pill py-1.5 px-3 text-[13px]"
+              className="apple-pill-wash text-[13px] py-1.5 px-3.5"
             >
-              <Plus className="h-4 w-4" />
-              <span>NUEVO TEXTO</span>
+              <Plus className="h-3.5 w-3.5" />
+              <span>Nuevo texto</span>
             </button>
           </div>
 
           {/* Manual Text Form */}
           {showManualInput && (
-            <div className="p-4 rounded-[12px] bg-[#ffffff] border-2 border-[#afafaf] space-y-3">
+            <div className="p-4 rounded-[20px] bg-[#fafafc] border border-[#d6d6d6] space-y-3">
               <input
                 type="text"
                 placeholder="Título del tema (ej. Tema 5: La Revolución Industrial)"
                 value={manualTitle}
                 onChange={e => setManualTitle(e.target.value)}
-                className="w-full text-[15px] px-3 py-2 bg-[#ffffff] border-2 border-[#afafaf] rounded-[12px] text-[#4b4b4b] focus:outline-none focus:border-[#1cb0f6]"
+                className="w-full text-[14px] px-3.5 py-2 bg-[#ffffff] border border-[#d6d6d6] rounded-[12px] text-[#1d1d1f] focus:outline-none focus:border-[#0071e3]"
               />
               <textarea
                 rows={4}
                 placeholder="Pega aquí el contenido del tema, definiciones o problemas modelo..."
                 value={manualText}
                 onChange={e => setManualText(e.target.value)}
-                className="w-full text-[15px] px-3 py-2 bg-[#ffffff] border-2 border-[#afafaf] rounded-[12px] text-[#4b4b4b] focus:outline-none focus:border-[#1cb0f6]"
+                className="w-full text-[14px] px-3.5 py-2 bg-[#ffffff] border border-[#d6d6d6] rounded-[12px] text-[#1d1d1f] focus:outline-none focus:border-[#0071e3]"
               />
               <div className="flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setShowManualInput(false)}
-                  className="duo-nav-pill py-1.5 px-3 text-[13px]"
+                  className="apple-pill-ghost text-[12px] py-1 px-3"
                 >
-                  CANCELAR
+                  Cancelar
                 </button>
                 <button
                   type="button"
                   onClick={handleAddManualText}
                   disabled={!manualText.trim()}
-                  className="duo-btn-primary py-1.5 px-4 text-[13px]"
+                  className="apple-pill-primary text-[12px] py-1 px-3.5"
                 >
-                  GUARDAR APUNTES
+                  Guardar apuntes
                 </button>
               </div>
             </div>
@@ -323,16 +331,16 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
 
           {/* Uploaded Documents List */}
           <div className="space-y-2">
-            <span className="text-[13px] font-bold uppercase tracking-[0.053em] text-[#777777] block">
-              DOCUMENTOS ACTIVOS ({documents.length})
+            <span className="text-[12px] font-semibold uppercase tracking-wider text-[#707070] block">
+              Documentos cargados ({documents.length})
             </span>
 
             {documents.length === 0 ? (
-              <div className="p-4 text-center border-2 border-dashed border-[#afafaf] rounded-[12px] text-[15px] text-[#777777]">
-                Sube un PDF a la izquierda o escribe tu temario directamente a la derecha.
+              <div className="p-4 text-center border border-dashed border-[#d6d6d6] rounded-[16px] text-[14px] text-[#707070]">
+                Sube un archivo PDF o añade un texto para comenzar.
               </div>
             ) : (
-              <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+              <div className="space-y-1.5 max-h-56 overflow-y-auto pr-1">
                 {documents.map(doc => {
                   const isSelected = selectedDoc?.id === doc.id;
                   const wordCount = doc.content ? doc.content.trim().split(/\s+/).length : 0;
@@ -340,25 +348,25 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
                     <div
                       key={doc.id}
                       onClick={() => setSelectedDocId(doc.id)}
-                      className={`p-3 rounded-[12px] border-2 cursor-pointer transition flex items-center justify-between gap-2 ${
+                      className={`p-3 rounded-[16px] border cursor-pointer transition flex items-center justify-between gap-2 ${
                         isSelected
-                          ? 'bg-[#d7ffb8] text-[#4b4b4b] border-[#58cc02]'
-                          : 'bg-[#ffffff] border-[#afafaf] hover:border-[#4b4b4b] text-[#4b4b4b]'
+                          ? 'bg-[#f5f5f7] border-[#1d1d1f] text-[#1d1d1f]'
+                          : 'bg-[#ffffff] border-[#d6d6d6] hover:border-[#707070] text-[#1d1d1f]'
                       }`}
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         <div
-                          className={`p-2 rounded-[12px] border-2 ${
+                          className={`p-2 rounded-full ${
                             isSelected
-                              ? 'bg-[#58cc02] border-[#58cc02] text-[#ffffff]'
-                              : 'bg-[#ffffff] border-[#afafaf] text-[#777777]'
+                              ? 'bg-[#1d1d1f] text-[#ffffff]'
+                              : 'bg-[#f5f5f7] text-[#707070]'
                           }`}
                         >
                           <FileText className="h-4 w-4" />
                         </div>
                         <div className="min-w-0">
-                          <p className="text-[15px] font-bold truncate">{doc.name}</p>
-                          <p className="text-[13px] text-[#777777]">
+                          <p className="text-[14px] font-medium truncate">{doc.name}</p>
+                          <p className="text-[12px] text-[#707070]">
                             {(doc.size / 1024).toFixed(0)} KB · {doc.pageCount || 1} pág(s) · {wordCount} pal.
                           </p>
                         </div>
@@ -367,7 +375,7 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
                       <button
                         type="button"
                         onClick={e => handleRemoveDoc(doc.id, e)}
-                        className="p-1.5 rounded-[12px] text-[#777777] hover:text-[#4b4b4b] shrink-0"
+                        className="p-1.5 rounded-full text-[#707070] hover:text-[#1d1d1f] hover:bg-[#e8e8ed] shrink-0 transition"
                         title="Quitar documento"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -381,18 +389,18 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
         </div>
 
         {/* Right 7 cols: Live Document Inspector & Direct Editor */}
-        <div className="lg:col-span-7 p-6 flex flex-col bg-[#ffffff]">
+        <div className="lg:col-span-7 p-7 flex flex-col bg-[#fafafc]">
           <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
             <div className="flex items-center gap-2">
-              <FileCode className="h-5 w-5 text-[#58cc02]" />
-              <span className="text-[17px] font-bold text-[#4b4b4b]">
+              <FileCode className="h-4 w-4 text-[#0071e3]" />
+              <span className="text-[15px] font-medium text-[#1d1d1f]">
                 {selectedDoc
-                  ? `Temario activo: ${selectedDoc.name}`
-                  : 'Editor directo de apuntes'}
+                  ? `Temario: ${selectedDoc.name}`
+                  : 'Editor de texto docente'}
               </span>
             </div>
-            <span className="text-[13px] font-bold uppercase tracking-[0.053em] text-[#4b4b4b] bg-[#d7ffb8] border-2 border-[#58cc02] px-3 py-1 rounded-[12px]">
-              {selectedDoc ? '✔ LISTO PARA GENERAR' : 'ESCRIBE O PEGA AQUÍ'}
+            <span className="text-[12px] font-medium text-[#707070] bg-[#ffffff] border border-[#d6d6d6] px-3 py-1 rounded-full">
+              {selectedDoc ? 'Listo para el generador' : 'Escribe o pega aquí'}
             </span>
           </div>
 
@@ -400,8 +408,8 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
             value={selectedDoc ? selectedDoc.content : ''}
             onChange={e => handleUpdateOrCreateContent(e.target.value)}
             rows={11}
-            className="flex-1 w-full p-4 rounded-[12px] bg-[#ffffff] border-2 border-[#afafaf] text-[15px] text-[#4b4b4b] leading-relaxed focus:outline-none focus:border-[#58cc02] resize-y"
-            placeholder="Sube un documento PDF a la izquierda o pega directamente aquí el texto del tema, apuntes o contenidos que deseas evaluar en el examen..."
+            className="flex-1 w-full p-4 rounded-[18px] bg-[#ffffff] border border-[#d6d6d6] text-[14px] text-[#1d1d1f] leading-relaxed focus:outline-none focus:border-[#0071e3] resize-y"
+            placeholder="Pega aquí tus apuntes, definiciones o preguntas modelo para generar la prueba..."
           />
         </div>
       </div>

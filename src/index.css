@@ -3,297 +3,415 @@
 @tailwind utilities;
 
 :root {
+  /* ==========================================================================
+     APPLE (ESPAÑA) DESIGN TOKENS
+     "Cathedral of white space with whispered headlines"
+     ========================================================================== */
+
   /* Colors */
-  --color-eager-green: #58cc02;
-  --color-storybook-green: #d7ffb8;
-  --color-spark-blue: #1cb0f6;
-  --color-fresh-leaf: #a5ed6e;
-  --color-night-ink: #000437;
-  --color-paper-white: #ffffff;
-  --color-charcoal: #4b4b4b;
-  --color-pencil-gray: #777777;
-  --color-faded-gray: #afafaf;
+  --color-primary-ink: #1d1d1f;
+  --color-mid-gray: #707070;
+  --color-deep-gray: #474747;
+  --color-hairline: #d6d6d6;
+  --color-canvas: #f5f5f7;
+  --color-paper: #ffffff;
+  --color-cool-wash: #e8e8ed;
+  --color-faded-surface: #fafafc;
+  --color-quiet-dot: #777779;
+  --color-electric-blue: #0071e3;
+  --color-link-blue: #0066cc;
+  --color-ember: #b64400;
 
-  /* Typography — Font Families */
-  --font-feather: 'Nunito', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-duolingo-sans: 'Nunito Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  /* Product Finish Swatches (Accents) */
+  --color-sky: #c8d8e0;
+  --color-citrus: #dddc8c;
+  --color-starlight: #f0e4d3;
+  --color-silver: #e3e4e5;
+  --color-blush: #e8d0d0;
+  --color-indigo: #596680;
+  --color-midnight: #2e3642;
 
-  /* Typography — Scale */
-  --text-caption: 13px;
-  --leading-caption: 1.23;
-  --text-nav-label: 15px;
-  --leading-nav-label: 1.33;
-  --tracking-nav-label: 0.795px;
-  --text-body: 17px;
-  --leading-body: 1.18;
-  --text-subheading: 19px;
-  --leading-subheading: 1.4;
-  --text-heading-sm: 32px;
-  --leading-heading-sm: 1.2;
-  --text-heading: 48px;
-  --leading-heading: 1.2;
-  --tracking-heading: -0.96px;
-  --text-display: 64px;
-  --leading-display: 1.2;
-  --tracking-display: -1.28px;
+  /* Typography — SF Pro Substitutes (Inter / System-UI) */
+  --font-sf-pro-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-sf-pro-text: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
-  /* Typography — Weights */
-  --font-weight-medium: 500;
-  --font-weight-bold: 700;
+  /* Type Scale */
+  --text-micro: 12px;
+  --text-caption: 14px;
+  --text-body-sm: 17px;
+  --text-body: 21px;
+  --text-body-lg: 28px;
+  --text-subheading: 32px;
+  --text-heading-sm: 40px;
+  --text-heading: 56px;
+  --text-heading-lg: 80px;
+  --text-display: 96px;
 
-  /* Spacing */
-  --spacing-unit: 4px;
-  --spacing-8: 8px;
-  --spacing-12: 12px;
-  --spacing-16: 16px;
-  --spacing-24: 24px;
-  --spacing-32: 32px;
-  --spacing-40: 40px;
-  --spacing-48: 48px;
-  --spacing-64: 64px;
-  --spacing-80: 80px;
-  --spacing-96: 96px;
+  /* Radii */
+  --radius-cards: 28px;
+  --radius-links: 10px;
+  --radius-badges: 36px;
+  --radius-buttons: 980px;
+  --radius-small-buttons: 999px;
 
   /* Layout */
   --page-max-width: 1200px;
-  --section-gap: 80px;
-  --card-padding: 24px;
-  --element-gap: 12px;
-
-  /* Border Radius */
-  --radius-xl: 12px;
-  --radius-links: 12px;
-  --radius-buttons: 12px;
-  --radius-nav-items: 12px;
-
-  /* Surfaces */
-  --surface-paper-white: #ffffff;
-  --surface-storybook-green: #d7ffb8;
-  --surface-eager-green: #58cc02;
-  --surface-night-ink: #000437;
+  --section-gap: 100px;
+  --card-padding: 28px;
+  --element-gap: 8px;
 }
 
 @layer base {
   body {
-    background-color: var(--color-paper-white);
-    color: var(--color-charcoal);
-    font-family: var(--font-duolingo-sans);
-    font-size: var(--text-body);
-    font-weight: var(--font-weight-medium);
-    line-height: var(--leading-body);
+    background-color: var(--color-paper);
+    color: var(--color-primary-ink);
+    font-family: var(--font-sf-pro-text);
+    font-size: 17px;
+    line-height: 1.47;
+    letter-spacing: -0.022em;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-duolingo-sans);
-    font-weight: 700;
-    color: var(--color-charcoal);
+    font-family: var(--font-sf-pro-display);
+    color: var(--color-primary-ink);
+    letter-spacing: -0.02em;
   }
 
   button, a, input, select, textarea {
+    font-family: inherit;
     border-radius: 12px;
   }
 }
 
-/* Duolingo Typography & Component Archetypes */
-.duo-section-headline {
-  font-family: var(--font-feather);
-  font-weight: 800;
-  font-size: clamp(36px, 4.5vw, 48px);
-  line-height: 1.2;
-  letter-spacing: -0.02em;
-  color: var(--color-eager-green);
-}
+/* ==========================================================================
+   APPLE TYPOGRAPHY CLASSES
+   ========================================================================== */
 
-.duo-display-headline {
-  font-family: var(--font-feather);
-  font-weight: 800;
-  font-size: clamp(42px, 5.5vw, 64px);
-  line-height: 1.2;
-  letter-spacing: -0.02em;
-  color: var(--color-eager-green);
-}
-
-.duo-hero-headline {
-  font-family: var(--font-duolingo-sans);
+.apple-display {
+  font-family: var(--font-sf-pro-display);
   font-weight: 700;
-  font-size: 32px;
-  line-height: 1.2;
-  color: var(--color-charcoal);
+  font-size: clamp(48px, 6vw, 80px);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: var(--color-primary-ink);
 }
 
-.duo-subheading {
-  font-family: var(--font-duolingo-sans);
+.apple-heading {
+  font-family: var(--font-sf-pro-display);
   font-weight: 700;
-  font-size: 19px;
-  line-height: 1.4;
-  color: var(--color-charcoal);
+  font-size: clamp(36px, 4.5vw, 56px);
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  color: var(--color-primary-ink);
 }
 
-.duo-body-copy {
-  font-family: var(--font-duolingo-sans);
-  font-weight: 500;
+.apple-headline {
+  font-family: var(--font-sf-pro-display);
+  font-weight: 600;
+  font-size: clamp(24px, 3vw, 32px);
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  color: var(--color-primary-ink);
+}
+
+.apple-subheading {
+  font-family: var(--font-sf-pro-display);
+  font-weight: 600;
+  font-size: 21px;
+  line-height: 1.25;
+  letter-spacing: 0.005em;
+  color: var(--color-primary-ink);
+}
+
+.apple-body {
+  font-family: var(--font-sf-pro-text);
+  font-weight: 400;
   font-size: 17px;
-  line-height: 1.18;
-  color: var(--color-pencil-gray);
+  line-height: 1.47;
+  letter-spacing: -0.022em;
+  color: var(--color-mid-gray);
 }
 
-.duo-nav-label {
-  font-family: var(--font-duolingo-sans);
-  font-weight: 700;
-  font-size: 15px;
-  line-height: 1.33;
-  letter-spacing: 0.053em;
+.apple-caption {
+  font-family: var(--font-sf-pro-text);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.35;
+  letter-spacing: -0.015em;
+  color: var(--color-mid-gray);
+}
+
+.apple-badge-ember {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background-color: rgba(182, 68, 0, 0.08);
+  color: var(--color-ember);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border-radius: var(--radius-badges);
   text-transform: uppercase;
 }
 
-/* Primary CTA Button: Fill #58cc02, white text, duolingo-sans 700 at 15px uppercase with 0.0530em tracking, 12px border-radius, 16px horizontal padding + 3D tactile sticker lip */
+/* ==========================================================================
+   APPLE BUTTONS & INTERACTIVE TOKENS
+   ========================================================================== */
+
+/* 1. Filled Pill Button (Primary CTA — #0071e3 Electric Blue) */
+.apple-pill-primary,
 .duo-btn-primary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background-color: var(--color-eager-green);
-  color: var(--color-paper-white);
-  font-family: var(--font-duolingo-sans);
-  font-weight: 700;
-  font-size: 15px;
-  line-height: 1.33;
-  letter-spacing: 0.053em;
-  text-transform: uppercase;
-  border-radius: 12px;
-  padding: 12px 16px;
+  background-color: var(--color-electric-blue);
+  color: #ffffff !important;
+  font-family: var(--font-sf-pro-text);
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 1.25;
+  letter-spacing: -0.022em;
+  text-transform: none;
+  border-radius: var(--radius-buttons);
+  padding: 11px 20px;
   border: none;
-  box-shadow: 0 4px 0 #46a302;
+  box-shadow: none;
   cursor: pointer;
-  transition: filter 0.12s ease, transform 0.08s ease, box-shadow 0.08s ease;
+  transition: background-color 0.16s ease, transform 0.12s ease;
 }
 
+.apple-pill-primary:hover:not(:disabled),
 .duo-btn-primary:hover:not(:disabled) {
-  filter: brightness(1.05);
+  background-color: #0077ed;
+  filter: none;
+  transform: translateY(-1px);
 }
 
+.apple-pill-primary:active:not(:disabled),
 .duo-btn-primary:active:not(:disabled) {
-  transform: translateY(3px);
-  box-shadow: 0 1px 0 #46a302;
+  transform: translateY(0px) scale(0.99);
+  box-shadow: none;
 }
 
+.apple-pill-primary:disabled,
 .duo-btn-primary:disabled {
-  background-color: var(--color-faded-gray);
-  color: var(--color-paper-white);
-  box-shadow: 0 4px 0 #8f8f8f;
+  background-color: var(--color-cool-wash);
+  color: var(--color-mid-gray) !important;
+  box-shadow: none;
   cursor: not-allowed;
 }
 
-/* Outlined Account / Secondary Button: Transparent fill, text in #1cb0f6, duolingo-sans 700 at 14-15px uppercase, 12px border-radius, 16px horizontal padding, 2px solid border in #afafaf + 3D sticker lip */
+/* 2. Ghost Pill Button / Secondary Button (Transparent fill, subtle hairline border) */
+.apple-pill-ghost,
 .duo-btn-outlined {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background-color: #ffffff;
-  color: var(--color-spark-blue);
-  font-family: var(--font-duolingo-sans);
-  font-weight: 700;
-  font-size: 14px;
-  line-height: 1.33;
-  letter-spacing: 0.053em;
-  text-transform: uppercase;
-  border-radius: 12px;
-  padding: 10px 16px;
-  border: 2px solid var(--color-faded-gray);
-  box-shadow: 0 4px 0 var(--color-faded-gray);
+  background-color: transparent;
+  color: var(--color-primary-ink);
+  font-family: var(--font-sf-pro-text);
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 1.25;
+  letter-spacing: -0.022em;
+  text-transform: none;
+  border-radius: var(--radius-small-buttons);
+  padding: 10px 18px;
+  border: 1px solid var(--color-hairline);
+  box-shadow: none;
   cursor: pointer;
-  transition: border-color 0.12s ease, transform 0.08s ease, box-shadow 0.08s ease;
+  transition: all 0.16s ease;
 }
 
+.apple-pill-ghost:hover:not(:disabled),
 .duo-btn-outlined:hover:not(:disabled) {
-  border-color: var(--color-spark-blue);
-  box-shadow: 0 4px 0 var(--color-spark-blue);
+  border-color: var(--color-primary-ink);
+  background-color: rgba(0, 0, 0, 0.02);
+  box-shadow: none;
 }
 
+.apple-pill-ghost:active:not(:disabled),
 .duo-btn-outlined:active:not(:disabled) {
-  transform: translateY(3px);
-  box-shadow: 0 1px 0 var(--color-spark-blue);
+  transform: translateY(0px) scale(0.99);
+  box-shadow: none;
 }
 
-/* Neutral Outlined Sticker Button */
+/* 3. Cool Wash Pill Button / Neutral */
+.apple-pill-wash,
 .duo-btn-neutral {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background-color: #ffffff;
-  color: var(--color-charcoal);
-  font-family: var(--font-duolingo-sans);
-  font-weight: 700;
-  font-size: 14px;
-  line-height: 1.33;
-  letter-spacing: 0.053em;
-  text-transform: uppercase;
-  border-radius: 12px;
-  padding: 10px 16px;
-  border: 2px solid var(--color-faded-gray);
-  box-shadow: 0 4px 0 var(--color-faded-gray);
+  background-color: var(--color-cool-wash);
+  color: var(--color-primary-ink);
+  font-family: var(--font-sf-pro-text);
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 1.25;
+  letter-spacing: -0.022em;
+  text-transform: none;
+  border-radius: var(--radius-small-buttons);
+  padding: 10px 18px;
+  border: none;
+  box-shadow: none;
   cursor: pointer;
-  transition: border-color 0.12s ease, transform 0.08s ease, box-shadow 0.08s ease;
+  transition: background-color 0.16s ease, transform 0.12s ease;
 }
 
+.apple-pill-wash:hover:not(:disabled),
 .duo-btn-neutral:hover:not(:disabled) {
-  border-color: var(--color-charcoal);
-  box-shadow: 0 4px 0 var(--color-charcoal);
+  background-color: #dedee3;
+  box-shadow: none;
 }
 
-.duo-btn-neutral:active:not(:disabled) {
-  transform: translateY(3px);
-  box-shadow: 0 1px 0 var(--color-charcoal);
+/* 4. Text Link with Arrow (›) */
+.apple-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-link-blue);
+  font-family: var(--font-sf-pro-text);
+  font-size: 17px;
+  font-weight: 400;
+  letter-spacing: -0.022em;
+  text-decoration: none;
+  transition: opacity 0.15s ease;
 }
 
-/* Nav Language Pill: Transparent fill, text in #777777 at 15px uppercase with 0.0530em tracking, 12px border-radius, 10px vertical and 16px horizontal padding, 2px solid border in #afafaf + 3D sticker lip */
+.apple-link:hover {
+  text-decoration: underline;
+  opacity: 0.85;
+}
+
+/* 5. Nav Segment Pill */
+.apple-nav-pill,
 .duo-nav-pill {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background-color: #ffffff;
-  color: var(--color-pencil-gray);
-  font-family: var(--font-duolingo-sans);
-  font-weight: 700;
-  font-size: 15px;
-  line-height: 1.33;
-  letter-spacing: 0.053em;
-  text-transform: uppercase;
-  border-radius: 12px;
-  padding: 10px 16px;
-  border: 2px solid var(--color-faded-gray);
-  box-shadow: 0 3px 0 var(--color-faded-gray);
+  background-color: transparent;
+  color: var(--color-deep-gray);
+  font-family: var(--font-sf-pro-text);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  text-transform: none;
+  border-radius: var(--radius-small-buttons);
+  padding: 8px 16px;
+  border: 1px solid transparent;
+  box-shadow: none;
   cursor: pointer;
-  transition: all 0.12s ease;
+  transition: all 0.15s ease;
 }
 
+.apple-nav-pill:hover,
 .duo-nav-pill:hover {
-  color: var(--color-charcoal);
-  border-color: var(--color-charcoal);
-  box-shadow: 0 3px 0 var(--color-charcoal);
+  color: var(--color-primary-ink);
+  background-color: var(--color-cool-wash);
+  box-shadow: none;
 }
 
-.duo-nav-pill:active {
-  transform: translateY(2px);
-  box-shadow: 0 1px 0 var(--color-charcoal);
-}
-
+.apple-nav-pill-active,
 .duo-nav-pill-active {
-  background-color: var(--color-storybook-green);
-  color: var(--color-charcoal);
-  border: 2px solid var(--color-eager-green);
-  box-shadow: 0 3px 0 var(--color-eager-green);
+  background-color: var(--color-paper) !important;
+  color: var(--color-primary-ink) !important;
+  font-weight: 500 !important;
+  border: 1px solid var(--color-hairline) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
 }
 
-/* Sticker Card Surface: Pure white, 2px solid #afafaf, 12px radius, no shadow */
+/* ==========================================================================
+   APPLE CARDS & SECTION CONTAINERS (28px Radius, Zero Shadow)
+   ========================================================================== */
+
+.apple-card,
 .duo-card {
-  background-color: var(--color-paper-white);
-  border: 2px solid var(--color-faded-gray);
-  border-radius: 12px;
-  padding: 24px;
+  background-color: var(--color-paper);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: var(--radius-cards);
+  padding: 28px;
+  box-shadow: none;
+  transition: border-color 0.2s ease;
+}
+
+.apple-card-canvas {
+  background-color: var(--color-canvas);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  border-radius: var(--radius-cards);
+  padding: 28px;
+  box-shadow: none;
+}
+
+/* Section Background Alternations */
+.apple-band-white {
+  background-color: var(--color-paper);
+}
+
+.apple-band-gray {
+  background-color: var(--color-canvas);
+}
+
+/* Aliases for backwards compatibility with existing component code */
+.duo-section-headline {
+  font-family: var(--font-sf-pro-display);
+  font-weight: 700;
+  font-size: clamp(34px, 4.2vw, 56px);
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  color: var(--color-primary-ink);
+}
+
+.duo-display-headline {
+  font-family: var(--font-sf-pro-display);
+  font-weight: 700;
+  font-size: clamp(44px, 5.5vw, 76px);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: var(--color-primary-ink);
+}
+
+.duo-hero-headline {
+  font-family: var(--font-sf-pro-display);
+  font-weight: 600;
+  font-size: clamp(22px, 2.5vw, 30px);
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  color: var(--color-primary-ink);
+}
+
+.duo-subheading {
+  font-family: var(--font-sf-pro-display);
+  font-weight: 600;
+  font-size: 21px;
+  line-height: 1.3;
+  letter-spacing: 0.005em;
+  color: var(--color-primary-ink);
+}
+
+.duo-body-copy {
+  font-family: var(--font-sf-pro-text);
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 1.47;
+  letter-spacing: -0.022em;
+  color: var(--color-mid-gray);
+}
+
+.duo-nav-label {
+  font-family: var(--font-sf-pro-text);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 1.33;
+  letter-spacing: -0.01em;
+  text-transform: none;
+  color: var(--color-deep-gray);
 }
 
 .tabular-nums {
@@ -301,226 +419,44 @@
 }
 
 /* ==========================================================================
-   DUOLINGO MASCOT RIGGED ANIMATION ENGINE (IDLE + INTERACTIVE REACTIONS)
+   SERENE SUBTLE ANIMATIONS (APPLE GRADE — NO CARTOON BOUNCE)
    ========================================================================== */
 
-@keyframes duoMascotBreathe {
+@keyframes appleSubtleFloat {
   0%, 100% {
-    transform: translateY(0px) scale(1, 1);
+    transform: translateY(0px);
   }
   50% {
-    transform: translateY(-6px) scale(0.985, 1.022);
+    transform: translateY(-4px);
   }
 }
 
-@keyframes duoMascotShadowPulse {
+@keyframes applePulseQuiet {
   0%, 100% {
-    transform: scaleX(1);
-    opacity: 0.16;
+    opacity: 0.95;
   }
   50% {
-    transform: scaleX(0.86);
-    opacity: 0.09;
-  }
-}
-
-@keyframes duoMascotWingWave {
-  0%, 100% {
-    transform: rotate(0deg);
-  }
-  45% {
-    transform: rotate(-14deg) translateY(-2px);
-  }
-  75% {
-    transform: rotate(4deg);
-  }
-}
-
-@keyframes duoMascotWingWaveFast {
-  0%, 100% {
-    transform: rotate(-4deg);
-  }
-  50% {
-    transform: rotate(-28deg) translateY(-5px);
-  }
-}
-
-@keyframes duoMascotPropBob {
-  0%, 100% {
-    transform: rotate(0deg) translateY(0px);
-  }
-  50% {
-    transform: rotate(7deg) translateY(-4px);
-  }
-}
-
-@keyframes duoMascotHatSway {
-  0%, 100% {
-    transform: rotate(0deg) translateY(0px);
-  }
-  35% {
-    transform: rotate(-2.5deg) translateY(-1.5px);
-  }
-  70% {
-    transform: rotate(2.5deg) translateY(-1px);
-  }
-}
-
-@keyframes duoMascotSparkleFloat {
-  0%, 100% {
-    transform: translateY(0px) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-8px) rotate(9deg);
-  }
-}
-
-@keyframes duoMascotJump {
-  0% {
-    transform: translateY(0px) scale(1.08, 0.92);
-  }
-  35% {
-    transform: translateY(-24px) scale(0.95, 1.06) rotate(-3deg);
-  }
-  55% {
-    transform: translateY(-28px) scale(1.02, 0.98) rotate(3deg);
-  }
-  80% {
-    transform: translateY(2px) scale(1.05, 0.95);
-  }
-  100% {
-    transform: translateY(0px) scale(1, 1);
-  }
-}
-
-@keyframes duoMascotScanBeam {
-  0%, 100% {
-    transform: translateY(-34px);
-  }
-  50% {
-    transform: translateY(44px);
-  }
-}
-
-@keyframes duoBubblePop {
-  0% {
-    opacity: 0;
-    transform: translateY(8px) scale(0.92);
-  }
-  100% {
     opacity: 1;
-    transform: translateY(0px) scale(1);
   }
 }
 
-.duo-anim-breathe {
-  animation: duoMascotBreathe 3.2s ease-in-out infinite;
-  transform-box: fill-box;
-  transform-origin: center bottom;
+.apple-subtle-float {
+  animation: appleSubtleFloat 5s ease-in-out infinite;
 }
 
-.duo-anim-jump {
-  animation: duoMascotJump 0.68s cubic-bezier(0.34, 1.56, 0.64, 1);
-  transform-box: fill-box;
-  transform-origin: center bottom;
-}
-
-.duo-anim-shadow {
-  animation: duoMascotShadowPulse 3.2s ease-in-out infinite;
-  transform-box: fill-box;
-  transform-origin: center;
-}
-
-.duo-anim-wing-l {
-  animation: duoMascotWingWave 2.6s ease-in-out infinite;
-  transform-box: fill-box;
-  transform-origin: right center;
-}
-
-.duo-anim-wing-l-excited {
-  animation: duoMascotWingWaveFast 0.48s ease-in-out infinite;
-  transform-box: fill-box;
-  transform-origin: right center;
-}
-
-.duo-anim-prop-r {
-  animation: duoMascotPropBob 2.9s ease-in-out infinite;
-  transform-box: fill-box;
-  transform-origin: left center;
-}
-
-.duo-anim-hat {
-  animation: duoMascotHatSway 3.2s ease-in-out infinite 0.18s;
-  transform-box: fill-box;
-  transform-origin: center bottom;
-}
-
-.duo-anim-float-slow {
-  animation: duoMascotSparkleFloat 3.8s ease-in-out infinite;
-  transform-box: fill-box;
-  transform-origin: center;
-}
-
-.duo-anim-float-delayed {
-  animation: duoMascotSparkleFloat 4.3s ease-in-out infinite 0.7s;
-  transform-box: fill-box;
-  transform-origin: center;
-}
-
-.duo-anim-scan-beam {
-  animation: duoMascotScanBeam 2.5s ease-in-out infinite;
-  transform-box: fill-box;
-  transform-origin: center;
-}
-
-.duo-bubble-pop {
-  animation: duoBubblePop 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-}
-
-@keyframes duoMascotBreathing {
-  0%, 100% {
-    transform: translateY(0) scale(1, 1);
-  }
-  35% {
-    transform: translateY(-5px) scale(0.985, 1.02);
-  }
-  70% {
-    transform: translateY(-1px) scale(1.015, 0.99);
-  }
-}
-
-@keyframes duoMascotJump {
-  0% {
-    transform: translateY(0) scale(1, 1);
-  }
-  20% {
-    transform: translateY(6px) scale(1.08, 0.92);
-  }
-  45% {
-    transform: translateY(-26px) scale(0.94, 1.06) rotate(-3deg);
-  }
-  70% {
-    transform: translateY(-12px) scale(1.02, 0.98) rotate(2deg);
-  }
-  85% {
-    transform: translateY(3px) scale(1.04, 0.96);
-  }
-  100% {
-    transform: translateY(0) scale(1, 1) rotate(0deg);
-  }
-}
-
+/* Legacy companion classes remapped serenely */
+.duo-anim-breathe,
 .duo-mascot-breathing {
-  animation: duoMascotBreathing 3.6s ease-in-out infinite;
-  transform-origin: bottom center;
+  animation: appleSubtleFloat 6s ease-in-out infinite;
+  transform-origin: center bottom;
 }
 
+.duo-anim-jump,
 .duo-mascot-jump {
-  animation: duoMascotJump 0.65s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-  transform-origin: bottom center;
+  animation: appleSubtleFloat 0.8s ease-in-out;
 }
 
-/* Print stylesheet: only print the exam sheet cleanly */
+/* Print stylesheet */
 @media print {
   body {
     background: #ffffff !important;

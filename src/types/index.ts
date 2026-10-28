@@ -73,6 +73,8 @@ export interface QuestionCorrection {
   reviewResolvedByTeacher?: boolean;
   teacherOverrideScore?: number;
   teacherComment?: string;
+  expectedAnswer?: string;
+  studentAnswerRaw?: string;
 }
 
 export interface StudentSubmission {

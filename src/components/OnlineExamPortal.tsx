@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   X,
   Share2,
@@ -7,21 +7,16 @@ import {
   ShieldAlert,
   Clock,
   Send,
-  Eye,
   AlertTriangle,
-  Award,
   Sparkles,
-  QrCode,
   ExternalLink,
   Lock,
   Users,
-  List,
   FileSpreadsheet
 } from 'lucide-react';
 import { Exam, StudentSubmission, StudentGradeReport, QuestionCorrection } from '../types';
 import { SoundService } from '../services/soundService';
 import { DuoMascot } from './DuoMascot';
-import confetti from 'canvas-confetti';
 
 interface OnlineExamPortalProps {
   isOpen: boolean;
@@ -49,7 +44,7 @@ export const OnlineExamPortal: React.FC<OnlineExamPortalProps> = ({
   const [secondsRemaining, setSecondsRemaining] = useState((exam.durationMinutes || 60) * 60);
   const [lastSubmittedScore, setLastSubmittedScore] = useState<{ score: number; test: number; ex: number } | null>(null);
 
-  // Batch Roster Generator State (from docentiaV2)
+  // Batch Roster Generator State
   const [shareTab, setShareTab] = useState<'link' | 'roster'>('link');
   const [rosterText, setRosterText] = useState(
     'Alonso Martín, Carla\nBlanco Santos, Daniel\nCastro Vega, Lucía\nFernández Ruiz, Hugo\nJiménez Gómez, Sofía'
@@ -213,16 +208,6 @@ export const OnlineExamPortal: React.FC<OnlineExamPortalProps> = ({
   const handleSubmitExam = () => {
     SoundService.playSuccess();
 
-    try {
-      confetti({
-        particleCount: 80,
-        spread: 60,
-        origin: { y: 0.6 }
-      });
-    } catch {
-      // ignore
-    }
-
     // Grade Test Section Automatically
     let testPointsEarned = 0;
     const testMax = exam.testQuestions.reduce((a, b) => a + b.points, 0) || 4.0;
@@ -257,7 +242,6 @@ export const OnlineExamPortal: React.FC<OnlineExamPortalProps> = ({
     exam.exercises.forEach((ex, idx) => {
       const text = exerciseAnswers[ex.id]?.trim() || '';
       const isProvided = text.length > 20;
-      // Award ~85% points if well answered
       const points = isProvided ? Number((ex.points * 0.85).toFixed(2)) : 0;
       exPointsEarned += points;
 
@@ -336,52 +320,57 @@ export const OnlineExamPortal: React.FC<OnlineExamPortalProps> = ({
           e.preventDefault();
         }
       }}
-      className={`fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-[#000437]/60 backdrop-blur-xs animate-fadeIn ${
+      className={`fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/40 backdrop-blur-md ${
         viewState === 'taking_exam' ? 'select-none' : ''
       }`}
     >
-      <div className="bg-[#ffffff] text-[#4b4b4b] rounded-[12px] border-2 border-[#afafaf] shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden">
+      <div className="bg-white text-[#1d1d1f] rounded-[28px] border border-[#d6d6d6] shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden">
         
         {/* VIEW 1: TEACHER SHARE & DISPATCH DOCK */}
         {viewState === 'share_modal' && (
           <div className="p-6 sm:p-8 space-y-6 overflow-y-auto">
-            <div className="flex items-center justify-between border-b-2 border-[#afafaf]/40 pb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-[12px] bg-[#d7ffb8] border-2 border-[#58cc02] text-[#58cc02] flex items-center justify-center">
-                  <Share2 className="h-6 w-6" />
+            <div className="flex items-center justify-between border-b border-[#d6d6d6] pb-5">
+              <div className="flex items-center gap-3.5">
+                <div className="w-10 h-10 rounded-full bg-[#f5f5f7] border border-[#d6d6d6] text-[#1d1d1f] flex items-center justify-center">
+                  <Share2 className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="text-[22px] font-bold text-[#4b4b4b]">
-                    Enviar Examen Online por Enlace
+                  <h3 className="text-[22px] font-semibold text-[#1d1d1f] tracking-tight">
+                    Convocatoria y Examen Online
                   </h3>
-                  <p className="text-[13px] text-[#777777]">
-                    Tus alumnos responden desde el navegador con protección anti-copia activa y corrección inmediata.
+                  <p className="text-[14px] text-[#707070]">
+                    Distribución web segura con sensor anti-copia activo y calificación automática directa al acta.
                   </p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={onClose}
-                className="p-2 text-[#777777] hover:text-[#4b4b4b] rounded-[12px] border-2 border-[#afafaf]"
+                className="w-9 h-9 rounded-full bg-[#f5f5f7] hover:bg-[#e8e8ed] text-[#1d1d1f] flex items-center justify-center transition"
+                aria-label="Cerrar"
               >
-                <X className="h-5 w-5" />
+                <X className="h-4 w-4" />
               </button>
             </div>
 
-            {/* Tab navigation: Enlace General vs Convocatoria Individual en Lote (from docentiaV2) */}
-            <div className="flex items-center gap-2 border-b-2 border-[#afafaf]/30 pb-2">
+            {/* Segmented control tabs */}
+            <div className="bg-[#e8e8ed] p-1 rounded-full inline-flex gap-1">
               <button
                 type="button"
                 onClick={() => {
                   SoundService.playClick();
                   setShareTab('link');
                 }}
-                className={`duo-nav-pill py-2 px-4 text-[13px] ${
-                  shareTab === 'link' ? 'duo-nav-pill-active' : ''
+                className={`px-4 py-1.5 rounded-full text-[13px] font-medium transition ${
+                  shareTab === 'link'
+                    ? 'bg-white text-[#1d1d1f] shadow-xs'
+                    : 'text-[#707070] hover:text-[#1d1d1f]'
                 }`}
               >
-                <Share2 className="w-4 h-4" />
-                <span>ENLACE GENERAL Y PIN</span>
+                <span className="flex items-center gap-1.5">
+                  <Share2 className="w-3.5 h-3.5" />
+                  Enlace General y PIN
+                </span>
               </button>
 
               <button
@@ -390,49 +379,53 @@ export const OnlineExamPortal: React.FC<OnlineExamPortalProps> = ({
                   SoundService.playClick();
                   setShareTab('roster');
                 }}
-                className={`duo-nav-pill py-2 px-4 text-[13px] ${
-                  shareTab === 'roster' ? 'duo-nav-pill-active' : ''
+                className={`px-4 py-1.5 rounded-full text-[13px] font-medium transition ${
+                  shareTab === 'roster'
+                    ? 'bg-white text-[#1d1d1f] shadow-xs'
+                    : 'text-[#707070] hover:text-[#1d1d1f]'
                 }`}
               >
-                <Users className="w-4 h-4" />
-                <span>CONVOCATORIA EN LOTE (ALUMNOS)</span>
+                <span className="flex items-center gap-1.5">
+                  <Users className="w-3.5 h-3.5" />
+                  Convocatoria en Lote (Alumnos)
+                </span>
               </button>
             </div>
 
             {shareTab === 'link' ? (
               <>
                 {/* Share Link Card */}
-                <div className="duo-card border-[#58cc02] bg-[#ffffff] p-5 space-y-4">
+                <div className="rounded-[24px] border border-[#d6d6d6] bg-[#fafafc] p-6 space-y-4">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
-                      <span className="text-[12px] font-bold uppercase tracking-[0.053em] text-[#58cc02]">
-                        ENLACE SEGURO DE EVALUACIÓN
+                      <span className="text-[11px] font-semibold uppercase tracking-wider text-[#0071e3]">
+                        Enlace Seguro de Evaluación
                       </span>
-                      <div className="text-[17px] font-bold text-[#4b4b4b] font-mono mt-0.5">
+                      <div className="text-[16px] font-medium text-[#1d1d1f] font-mono mt-1 select-all">
                         {shareableUrl}
                       </div>
                     </div>
                     <button
                       type="button"
                       onClick={handleCopyLink}
-                      className="duo-btn-primary py-2 px-4"
+                      className="px-5 py-2.5 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-white text-[14px] font-medium flex items-center justify-center gap-2 transition"
                     >
                       {copiedLink ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                      <span>{copiedLink ? '¡ENLACE COPIADO!' : 'COPIAR ENLACE'}</span>
+                      <span>{copiedLink ? 'Enlace Copiado' : 'Copiar Enlace'}</span>
                     </button>
                   </div>
 
                   {/* Classroom PIN Badge */}
-                  <div className="flex items-center gap-4 pt-2 border-t-2 border-[#afafaf]/40">
+                  <div className="flex items-center gap-4 pt-3 border-t border-[#d6d6d6]">
                     <div className="flex items-center gap-2">
-                      <span className="text-[13px] font-bold text-[#777777]">PIN DE AULA:</span>
-                      <span className="px-3 py-1 rounded-[12px] bg-[#d7ffb8] border-2 border-[#58cc02] font-mono font-bold text-[15px] text-[#000437]">
+                      <span className="text-[12px] uppercase text-[#707070] font-medium">PIN de Aula:</span>
+                      <span className="px-3 py-1 rounded-full bg-white border border-[#d6d6d6] font-mono font-semibold text-[13px] text-[#1d1d1f]">
                         {classroomPin}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[13px] font-bold text-[#777777]">TIEMPO LÍMITE:</span>
-                      <span className="px-3 py-1 rounded-[12px] bg-[#ffffff] border-2 border-[#afafaf] text-[13px] font-bold text-[#4b4b4b]">
+                      <span className="text-[12px] uppercase text-[#707070] font-medium">Tiempo Límite:</span>
+                      <span className="px-3 py-1 rounded-full bg-white border border-[#d6d6d6] text-[13px] text-[#1d1d1f]">
                         {exam.durationMinutes || 60} min
                       </span>
                     </div>
@@ -441,33 +434,33 @@ export const OnlineExamPortal: React.FC<OnlineExamPortalProps> = ({
 
                 {/* Anti-Cheating Protocol Highlights */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div className="p-3.5 rounded-[12px] border-2 border-[#afafaf] bg-[#ffffff] space-y-1">
-                    <span className="text-[13px] font-bold text-[#58cc02] flex items-center gap-1.5">
-                      <Lock className="w-4 h-4" />
+                  <div className="p-4 rounded-[20px] border border-[#d6d6d6] bg-white space-y-1">
+                    <span className="text-[13px] font-semibold text-[#1d1d1f] flex items-center gap-1.5">
+                      <Lock className="w-3.5 h-3.5 text-[#0071e3]" />
                       Bloqueo Clic Derecho
                     </span>
-                    <p className="text-[12px] text-[#777777]">
-                      Menú contextual deshabilitado y selección de texto bloqueada.
+                    <p className="text-[12px] text-[#707070] leading-relaxed">
+                      Menú contextual neutralizado y selección de texto deshabilitada.
                     </p>
                   </div>
 
-                  <div className="p-3.5 rounded-[12px] border-2 border-[#afafaf] bg-[#ffffff] space-y-1">
-                    <span className="text-[13px] font-bold text-[#1cb0f6] flex items-center gap-1.5">
-                      <ShieldAlert className="w-4 h-4" />
+                  <div className="p-4 rounded-[20px] border border-[#d6d6d6] bg-white space-y-1">
+                    <span className="text-[13px] font-semibold text-[#1d1d1f] flex items-center gap-1.5">
+                      <ShieldAlert className="w-3.5 h-3.5 text-[#0071e3]" />
                       Detector de Pestañas
                     </span>
-                    <p className="text-[12px] text-[#777777]">
-                      Registra avisos si el alumno minimiza la ventana o busca en ChatGPT.
+                    <p className="text-[12px] text-[#707070] leading-relaxed">
+                      Audita el cambio de foco de ventana registrando cada salida en el acta.
                     </p>
                   </div>
 
-                  <div className="p-3.5 rounded-[12px] border-2 border-[#afafaf] bg-[#ffffff] space-y-1">
-                    <span className="text-[13px] font-bold text-[#ff9600] flex items-center gap-1.5">
-                      <Sparkles className="w-4 h-4" />
+                  <div className="p-4 rounded-[20px] border border-[#d6d6d6] bg-white space-y-1">
+                    <span className="text-[13px] font-semibold text-[#1d1d1f] flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-[#0071e3]" />
                       Auto-Calificación
                     </span>
-                    <p className="text-[12px] text-[#777777]">
-                      Al enviar, la nota de 0 a 10 entra directa a tu acta de clase.
+                    <p className="text-[12px] text-[#707070] leading-relaxed">
+                      Al pulsar entregar, la nota 0-10 se computa y asocia al expediente.
                     </p>
                   </div>
                 </div>
@@ -475,16 +468,14 @@ export const OnlineExamPortal: React.FC<OnlineExamPortalProps> = ({
             ) : (
               /* Convocatoria en lote tab */
               <div className="space-y-4">
-                <div className="duo-card bg-[#ffffff] border-[#afafaf] p-5 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="text-[17px] font-bold text-[#4b4b4b]">
-                        Listado de Alumnos de la Clase
-                      </h4>
-                      <p className="text-[13px] text-[#777777]">
-                        Pega los nombres (uno por línea). El sistema asignará tokens únicos y alternará los Modelos A y B para alumnos contiguos.
-                      </p>
-                    </div>
+                <div className="rounded-[24px] bg-white border border-[#d6d6d6] p-5 space-y-3">
+                  <div>
+                    <h4 className="text-[16px] font-semibold text-[#1d1d1f]">
+                      Listado de Alumnos del Grupo
+                    </h4>
+                    <p className="text-[13px] text-[#707070] mt-0.5">
+                      Pega los nombres (uno por línea). El sistema asignará tokens únicos y alternará los Modelos A y B para evitar copias entre pupitres contiguos.
+                    </p>
                   </div>
 
                   <textarea
@@ -492,78 +483,76 @@ export const OnlineExamPortal: React.FC<OnlineExamPortalProps> = ({
                     value={rosterText}
                     onChange={e => setRosterText(e.target.value)}
                     placeholder="Pega aquí los alumnos (uno por línea)..."
-                    className="w-full text-[13px] p-3 rounded-[12px] border-2 border-[#afafaf] bg-[#ffffff] text-[#4b4b4b] font-mono focus:outline-none focus:border-[#58cc02]"
+                    className="w-full text-xs p-3.5 rounded-[16px] border border-[#d6d6d6] bg-white text-[#1d1d1f] font-mono focus:outline-none focus:border-[#0071e3]"
                   />
 
                   <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
                     <button
                       type="button"
                       onClick={handleGenerateRoster}
-                      className="duo-btn-primary py-2 px-5 text-[13px]"
+                      className="px-5 py-2.5 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-white text-[13px] font-medium flex items-center gap-2 transition"
                     >
-                      <Sparkles className="w-4 h-4" />
-                      <span>GENERAR CONVOCATORIA (MODELO A / B ALTERNADOS)</span>
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>Generar Convocatoria (Modelos A / B Alternados)</span>
                     </button>
 
                     {rosterTokens.length > 0 && (
                       <button
                         type="button"
                         onClick={handleCopyCsvRoster}
-                        className="duo-btn-outlined border-[#1cb0f6] text-[#1cb0f6] py-2 px-4 text-[13px]"
+                        className="px-4 py-2 rounded-full border border-[#d6d6d6] text-[#1d1d1f] text-[13px] font-medium hover:bg-[#f5f5f7] flex items-center gap-2 transition"
                       >
-                        <FileSpreadsheet className="w-4 h-4" />
-                        <span>{copiedCsv ? '¡CSV COPIADO!' : 'COPIAR LISTADO CSV'}</span>
+                        <FileSpreadsheet className="w-3.5 h-3.5 text-[#0071e3]" />
+                        <span>{copiedCsv ? 'CSV Copiado' : 'Copiar Listado CSV'}</span>
                       </button>
                     )}
                   </div>
                 </div>
 
                 {rosterTokens.length > 0 && (
-                  <div className="duo-card p-0 overflow-hidden border-[#afafaf]">
-                    <div className="p-3 bg-[#f8fafc] border-b-2 border-[#afafaf] flex items-center justify-between">
-                      <span className="text-[12px] font-bold uppercase tracking-[0.053em] text-[#777777]">
-                        CONVOCATORIAS ACTIVAS ({rosterTokens.length} ALUMNOS)
+                  <div className="rounded-[24px] border border-[#d6d6d6] overflow-hidden bg-white">
+                    <div className="px-5 py-3 bg-[#fafafc] border-b border-[#d6d6d6] flex items-center justify-between text-xs">
+                      <span className="font-semibold uppercase tracking-wider text-[#707070]">
+                        Convocatorias Activas ({rosterTokens.length} alumnos)
                       </span>
-                      <span className="text-[12px] text-[#58cc02] font-bold">
+                      <span className="text-[#0071e3] font-medium">
                         Alternancia Modelo A (Impares) / Modelo B (Pares)
                       </span>
                     </div>
 
-                    <div className="divide-y divide-[#afafaf]/40 max-h-56 overflow-y-auto">
+                    <div className="divide-y divide-[#d6d6d6]/60 max-h-56 overflow-y-auto">
                       {rosterTokens.map((item, idx) => (
-                        <div key={idx} className="p-3 flex items-center justify-between gap-3 text-[13px]">
+                        <div key={idx} className="px-5 py-2.5 flex items-center justify-between gap-3 text-xs hover:bg-[#fafafc] transition">
                           <div className="flex items-center gap-2.5">
-                            <span className="font-mono text-[11px] text-[#777777] w-6">
-                              #{idx + 1}
-                            </span>
-                            <span className="font-bold text-[#4b4b4b]">{item.name}</span>
+                            <span className="font-mono text-[#707070] w-6">#{idx + 1}</span>
+                            <span className="font-medium text-[#1d1d1f]">{item.name}</span>
                             <span
-                              className={`px-2 py-0.5 rounded-[8px] font-mono font-bold text-[11px] border ${
+                              className={`px-2 py-0.5 rounded-full font-mono text-[11px] font-medium border ${
                                 item.model === 'A'
-                                  ? 'bg-[#d7ffb8] border-[#58cc02] text-[#000437]'
-                                  : 'bg-[#e0f2fe] border-[#1cb0f6] text-[#000437]'
+                                  ? 'bg-[#f5f5f7] border-[#0071e3] text-[#0071e3]'
+                                  : 'bg-[#fafafc] border-[#d6d6d6] text-[#707070]'
                               }`}
                             >
-                              MODELO {item.model}
+                              Modelo {item.model}
                             </span>
                           </div>
 
                           <div className="flex items-center gap-2">
-                            <span className="font-mono text-[12px] bg-[#f1f5f9] px-2 py-0.5 rounded border border-[#afafaf]">
+                            <span className="font-mono text-[11px] bg-[#f5f5f7] px-2 py-0.5 rounded border border-[#d6d6d6] text-[#707070]">
                               {item.token}
                             </span>
                             <button
                               type="button"
                               onClick={() => handleCopyIndividualRoster(idx, item.url)}
-                              className="duo-nav-pill py-1 px-2.5 text-[11px]"
+                              className="px-2.5 py-1 rounded-full border border-[#d6d6d6] text-[11px] text-[#1d1d1f] hover:bg-white flex items-center gap-1 transition"
                               title="Copiar enlace directo individual"
                             >
                               {copiedRosterIdx === idx ? (
-                                <Check className="w-3.5 h-3.5 text-[#58cc02]" />
+                                <Check className="w-3 h-3 text-[#0071e3]" />
                               ) : (
-                                <Copy className="w-3.5 h-3.5" />
+                                <Copy className="w-3 h-3" />
                               )}
-                              <span>{copiedRosterIdx === idx ? 'COPIADO' : 'ENLACE'}</span>
+                              <span>{copiedRosterIdx === idx ? 'Copiado' : 'Enlace'}</span>
                             </button>
                           </div>
                         </div>
@@ -575,28 +564,28 @@ export const OnlineExamPortal: React.FC<OnlineExamPortalProps> = ({
             )}
 
             {/* Test Simulation Prompt */}
-            <div className="p-4 rounded-[12px] bg-[#d7ffb8]/30 border-2 border-[#58cc02] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="p-5 rounded-[24px] bg-[#f5f5f7] border border-[#d6d6d6] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="space-y-1">
-                <h4 className="text-[16px] font-bold text-[#4b4b4b]">
-                  ¿Quieres probar cómo ve el examen el alumno?
+                <h4 className="text-[15px] font-semibold text-[#1d1d1f]">
+                  ¿Deseas simular la experiencia del alumno?
                 </h4>
-                <p className="text-[13px] text-[#777777]">
-                  Simula la experiencia de respuesta en vivo con el temporizador y el detector anti-copia.
+                <p className="text-[13px] text-[#707070]">
+                  Comprueba el visor en vivo, el sensor de cambio de pestaña y el cronómetro seguro.
                 </p>
-                <div className="flex gap-2 pt-1">
+                <div className="flex gap-2 pt-2">
                   <input
                     type="text"
                     placeholder="Nombre del alumno..."
                     value={studentName}
                     onChange={e => setStudentName(e.target.value)}
-                    className="text-[13px] px-3 py-1.5 rounded-[12px] border-2 border-[#afafaf] bg-white w-48 text-[#4b4b4b]"
+                    className="text-xs px-3.5 py-2 rounded-full border border-[#d6d6d6] bg-white w-48 text-[#1d1d1f] focus:outline-none focus:border-[#0071e3]"
                   />
                   <input
                     type="text"
                     placeholder="DNI / EXP..."
                     value={studentCode}
                     onChange={e => setStudentCode(e.target.value)}
-                    className="text-[13px] px-3 py-1.5 rounded-[12px] border-2 border-[#afafaf] bg-white w-32 text-[#4b4b4b]"
+                    className="text-xs px-3.5 py-2 rounded-full border border-[#d6d6d6] bg-white w-32 text-[#1d1d1f] focus:outline-none focus:border-[#0071e3]"
                   />
                 </div>
               </div>
@@ -604,9 +593,9 @@ export const OnlineExamPortal: React.FC<OnlineExamPortalProps> = ({
               <button
                 type="button"
                 onClick={handleStartExamSimulation}
-                className="duo-btn-primary py-2.5 px-5 self-start sm:self-auto"
+                className="px-5 py-2.5 rounded-full bg-[#1d1d1f] hover:bg-[#333336] text-white text-[14px] font-medium flex items-center justify-center gap-2 transition self-start sm:self-auto shrink-0"
               >
-                <span>PROBAR EXAMEN ALUMNO</span>
+                <span>Probar Examen Alumno</span>
                 <ExternalLink className="w-4 h-4" />
               </button>
             </div>
@@ -616,13 +605,13 @@ export const OnlineExamPortal: React.FC<OnlineExamPortalProps> = ({
         {/* VIEW 2: SECURE STUDENT EXAM VIEW (ANTI-CHEAT ACTIVE) */}
         {viewState === 'taking_exam' && (
           <div className="flex-1 flex flex-col min-h-0">
-            {/* Top Student Header with Live Timer & Anti-Cheat Badge */}
-            <div className="p-4 bg-[#ffffff] border-b-2 border-[#afafaf] flex items-center justify-between gap-3 shrink-0">
+            {/* Top Student Header */}
+            <div className="px-6 py-4 bg-white/80 backdrop-blur-md border-b border-[#d6d6d6] flex items-center justify-between gap-3 shrink-0">
               <div className="flex items-center gap-3">
-                <span className="font-feather font-extrabold text-[22px] text-[#58cc02]">
+                <span className="font-semibold text-[17px] text-[#1d1d1f] tracking-tight">
                   docentia
                 </span>
-                <span className="hidden sm:inline-block text-[13px] font-bold text-[#777777] border-l-2 border-[#afafaf] pl-3">
+                <span className="hidden sm:inline-block text-[13px] text-[#707070] border-l border-[#d6d6d6] pl-3">
                   {exam.title}
                 </span>
               </div>
@@ -630,90 +619,90 @@ export const OnlineExamPortal: React.FC<OnlineExamPortalProps> = ({
               <div className="flex items-center gap-3">
                 {/* Anti-Cheat Sensor Indicator */}
                 <div
-                  className={`flex items-center gap-1.5 px-3 py-1 rounded-[12px] border-2 text-[12px] font-bold uppercase tracking-[0.053em] ${
+                  className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-medium uppercase tracking-wider ${
                     tabSwitchCount > 0
-                      ? 'bg-[#ffffff] border-[#ff9600] text-[#ff9600]'
-                      : 'bg-[#d7ffb8] border-[#58cc02] text-[#000437]'
+                      ? 'bg-[#b64400]/10 border-[#b64400]/30 text-[#b64400]'
+                      : 'bg-[#f5f5f7] border-[#d6d6d6] text-[#707070]'
                   }`}
                 >
                   <ShieldAlert className="w-3.5 h-3.5" />
                   <span>
-                    ANTI-COPIA ACTIVO {tabSwitchCount > 0 ? `(${tabSwitchCount} SALIDAS)` : ''}
+                    Anti-copia activo {tabSwitchCount > 0 ? `(${tabSwitchCount} avisos)` : ''}
                   </span>
                 </div>
 
-                {/* Live Countdown */}
-                <div className="flex items-center gap-1.5 px-3 py-1 rounded-[12px] bg-[#ffffff] border-2 border-[#afafaf] text-[13px] font-bold text-[#4b4b4b]">
-                  <Clock className="w-4 h-4 text-[#1cb0f6]" />
+                {/* Countdown */}
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#f5f5f7] border border-[#d6d6d6] text-xs font-mono font-medium text-[#1d1d1f]">
+                  <Clock className="w-3.5 h-3.5 text-[#0071e3]" />
                   <span>{formatTimer(secondsRemaining)}</span>
                 </div>
 
                 <button
                   type="button"
                   onClick={handleSubmitExam}
-                  className="duo-btn-primary py-2 px-4 text-[13px]"
+                  className="px-4 py-1.5 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-medium flex items-center gap-1.5 transition"
                 >
-                  <Send className="w-4 h-4" />
-                  <span>ENTREGAR</span>
+                  <Send className="w-3 h-3" />
+                  <span>Entregar</span>
                 </button>
               </div>
             </div>
 
-            {/* Anti-Cheat Floating Banner if triggered */}
+            {/* Anti-Cheat Warning Banner if triggered */}
             {showCheatWarning && (
-              <div className="bg-[#ffffff] border-b-2 border-[#ff9600] px-4 py-2 flex items-center justify-between text-[13px] font-bold text-[#ff9600] shrink-0">
+              <div className="bg-[#b64400]/10 border-b border-[#b64400]/20 px-6 py-2.5 flex items-center justify-between text-xs text-[#b64400] shrink-0 font-medium">
                 <div className="flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4" />
+                  <AlertTriangle className="w-4 h-4 shrink-0" />
                   <span>
-                    Aviso Anti-Copia: Se ha detectado una salida de ventana o captura de pantalla. Incidencia #{tabSwitchCount} anotada en tu pliego.
+                    Aviso de Integridad: Se ha detectado una salida del foco del examen o intento de captura. Incidencia #{tabSwitchCount} registrada en el informe docente.
                   </span>
                 </div>
                 <button
                   type="button"
                   onClick={() => setShowCheatWarning(false)}
-                  className="text-[12px] underline font-bold"
+                  className="underline hover:opacity-80 transition ml-3"
                 >
-                  Entendido
+                  Comprendido
                 </button>
               </div>
             )}
 
             {/* Student Exam Sheet Scrollable Content */}
-            <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-8 bg-[#ffffff]">
+            <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-8 bg-[#fafafc]">
               
               {/* Instructions Callout */}
-              <div className="p-4 rounded-[12px] border-2 border-[#afafaf] bg-[#ffffff] space-y-1">
-                <h4 className="text-[15px] font-bold text-[#4b4b4b]">
+              <div className="p-5 rounded-[24px] border border-[#d6d6d6] bg-white space-y-1">
+                <h4 className="text-[15px] font-semibold text-[#1d1d1f]">
                   Alumno: {studentName} ({studentCode})
                 </h4>
-                <p className="text-[13px] text-[#777777]">
-                  {exam.instructions || 'Responde a todas las preguntas con rigor y claridad. Al finalizar, pulsa Entregar.'}
+                <p className="text-[13px] text-[#707070] leading-relaxed">
+                  {exam.instructions || 'Responde a todas las preguntas con claridad y rigor. Al finalizar, pulsa Entregar para procesar tu calificación.'}
                 </p>
               </div>
 
               {/* Part I: Multiple Choice Questions */}
               {exam.testQuestions.length > 0 && (
-                <div className="space-y-6">
-                  <div className="border-b-2 border-[#afafaf] pb-2">
-                    <h3 className="text-[18px] font-bold text-[#4b4b4b]">
-                      Parte I · Cuestionario Tipo Test ({exam.testQuestions.length} preguntas)
+                <div className="space-y-5">
+                  <div className="border-b border-[#d6d6d6] pb-2">
+                    <h3 className="text-[17px] font-semibold text-[#1d1d1f]">
+                      Parte I · Preguntas Tipo Test ({exam.testQuestions.length} cuestiones)
                     </h3>
                   </div>
 
-                  <div className="space-y-6">
+                  <div className="space-y-4">
                     {exam.testQuestions.map((q, idx) => (
-                      <div key={q.id} className="p-4 rounded-[12px] border-2 border-[#afafaf] space-y-3">
+                      <div key={q.id} className="p-5 rounded-[24px] border border-[#d6d6d6] bg-white space-y-3.5">
                         <div className="flex items-start justify-between gap-3">
-                          <p className="text-[16px] font-bold text-[#4b4b4b]">
-                            <span className="text-[#58cc02] mr-2">{idx + 1}.</span>
+                          <p className="text-[15px] font-semibold text-[#1d1d1f]">
+                            <span className="text-[#0071e3] mr-2">{idx + 1}.</span>
                             {q.question}
                           </p>
-                          <span className="text-[12px] font-bold text-[#777777] shrink-0">
+                          <span className="text-[12px] text-[#707070] shrink-0 font-medium">
                             {q.points} pt
                           </span>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
                           {(['A', 'B', 'C', 'D'] as const).map(letter => {
                             const isSelected = testAnswers[q.id] === letter;
                             return (
@@ -724,22 +713,22 @@ export const OnlineExamPortal: React.FC<OnlineExamPortalProps> = ({
                                   SoundService.playClick();
                                   setTestAnswers(prev => ({ ...prev, [q.id]: letter }));
                                 }}
-                                className={`flex items-start gap-2.5 p-3 rounded-[12px] border-2 text-left transition ${
+                                className={`flex items-start gap-3 p-3.5 rounded-[18px] border text-left transition ${
                                   isSelected
-                                    ? 'bg-[#d7ffb8] border-[#58cc02] text-[#000437]'
-                                    : 'bg-[#ffffff] border-[#afafaf] hover:border-[#4b4b4b] text-[#4b4b4b]'
+                                    ? 'bg-white border-[#0071e3] ring-2 ring-[#0071e3]/20 text-[#1d1d1f]'
+                                    : 'bg-[#fafafc] border-[#d6d6d6] hover:border-[#1d1d1f]/40 text-[#474747]'
                                 }`}
                               >
                                 <span
-                                  className={`w-6 h-6 rounded-[8px] border-2 flex items-center justify-center text-[12px] font-bold shrink-0 mt-0.5 ${
+                                  className={`w-5 h-5 rounded-full border flex items-center justify-center text-[11px] font-semibold shrink-0 mt-0.5 ${
                                     isSelected
-                                      ? 'bg-[#58cc02] border-[#58cc02] text-white'
-                                      : 'bg-[#ffffff] border-[#afafaf] text-[#777777]'
+                                      ? 'bg-[#0071e3] border-[#0071e3] text-white'
+                                      : 'bg-white border-[#d6d6d6] text-[#707070]'
                                   }`}
                                 >
                                   {letter}
                                 </span>
-                                <span className="text-[14px] font-medium leading-snug">
+                                <span className="text-[13px] leading-snug">
                                   {q.options[letter]}
                                 </span>
                               </button>
@@ -754,35 +743,35 @@ export const OnlineExamPortal: React.FC<OnlineExamPortalProps> = ({
 
               {/* Part II: Open Development Exercises */}
               {exam.exercises.length > 0 && (
-                <div className="space-y-6">
-                  <div className="border-b-2 border-[#afafaf] pb-2">
-                    <h3 className="text-[18px] font-bold text-[#4b4b4b]">
-                      Parte II · Ejercicios y Problemas de Desarrollo ({exam.exercises.length} ejercicios)
+                <div className="space-y-5">
+                  <div className="border-b border-[#d6d6d6] pb-2">
+                    <h3 className="text-[17px] font-semibold text-[#1d1d1f]">
+                      Parte II · Ejercicios de Desarrollo ({exam.exercises.length} problemas)
                     </h3>
                   </div>
 
-                  <div className="space-y-6">
+                  <div className="space-y-4">
                     {exam.exercises.map((ex, idx) => (
-                      <div key={ex.id} className="p-4 rounded-[12px] border-2 border-[#afafaf] space-y-3">
+                      <div key={ex.id} className="p-5 rounded-[24px] border border-[#d6d6d6] bg-white space-y-3.5">
                         <div className="flex items-start justify-between gap-3">
-                          <h4 className="text-[16px] font-bold text-[#4b4b4b]">
+                          <h4 className="text-[15px] font-semibold text-[#1d1d1f]">
                             Ejercicio {idx + 1}: {ex.title}
                           </h4>
-                          <span className="text-[12px] font-bold text-[#777777] shrink-0">
+                          <span className="text-[12px] text-[#707070] shrink-0 font-medium">
                             {ex.points} pts
                           </span>
                         </div>
-                        <p className="text-[14px] text-[#4b4b4b] whitespace-pre-line leading-relaxed">
+                        <p className="text-[13px] text-[#474747] whitespace-pre-line leading-relaxed">
                           {ex.statement}
                         </p>
                         <textarea
                           rows={4}
-                          placeholder="Escribe aquí tu desarrollo, fórmulas y conclusiones razonadas..."
+                          placeholder="Redacta aquí tu resolución, fórmulas y razonamiento..."
                           value={exerciseAnswers[ex.id] || ''}
                           onChange={e =>
                             setExerciseAnswers(prev => ({ ...prev, [ex.id]: e.target.value }))
                           }
-                          className="w-full text-[14px] p-3 rounded-[12px] border-2 border-[#afafaf] bg-white text-[#4b4b4b] focus:outline-none focus:border-[#58cc02]"
+                          className="w-full text-xs p-3.5 rounded-[16px] border border-[#d6d6d6] bg-white text-[#1d1d1f] focus:outline-none focus:border-[#0071e3]"
                         />
                       </div>
                     ))}
@@ -791,54 +780,54 @@ export const OnlineExamPortal: React.FC<OnlineExamPortalProps> = ({
               )}
 
               {/* Bottom Submit Button */}
-              <div className="pt-4 flex justify-end">
+              <div className="pt-2 flex justify-end">
                 <button
                   type="button"
                   onClick={handleSubmitExam}
-                  className="duo-btn-primary py-3 px-8 text-[15px]"
+                  className="px-8 py-3 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-white text-[15px] font-medium flex items-center gap-2 transition"
                 >
-                  <Send className="w-5 h-5" />
-                  <span>FINALIZAR Y ENVIAR AL PROFESOR</span>
+                  <Send className="w-4 h-4" />
+                  <span>Finalizar y Enviar al Docente</span>
                 </button>
               </div>
             </div>
           </div>
         )}
 
-        {/* VIEW 3: CELEBRATORY SUBMISSION CONFIRMATION */}
+        {/* VIEW 3: SUBMISSION CONFIRMATION */}
         {viewState === 'submitted' && (
           <div className="p-8 sm:p-12 text-center space-y-6 overflow-y-auto">
             <div className="flex justify-center">
-              <DuoMascot variant="trophy" className="w-48 h-48" />
+              <DuoMascot variant="trophy" className="w-36 h-36" />
             </div>
 
-            <div className="space-y-2 max-w-lg mx-auto">
-              <span className="px-3 py-1 rounded-[12px] bg-[#d7ffb8] text-[#58cc02] text-[13px] font-bold uppercase tracking-[0.053em]">
-                ¡EXAMEN ENTREGADO CON ÉXITO!
+            <div className="space-y-2 max-w-md mx-auto">
+              <span className="px-3 py-1 rounded-full bg-[#f5f5f7] border border-[#d6d6d6] text-[#707070] text-[11px] font-semibold uppercase tracking-wider">
+                Examen Entregado
               </span>
-              <h3 className="duo-section-headline text-[32px]">
-                buen trabajo, {studentName}.
+              <h3 className="text-[28px] font-semibold text-[#1d1d1f] tracking-tight">
+                Evaluación completada, {studentName}.
               </h3>
-              <p className="duo-body-copy">
-                Tus respuestas se han registrado y consolidado en el acta del docente con corrección automática.
+              <p className="text-[14px] text-[#707070] leading-relaxed">
+                Tus respuestas han sido transferidas y registradas de forma segura en el acta del docente con corrección automática.
               </p>
             </div>
 
             {lastSubmittedScore && (
-              <div className="inline-flex items-center gap-6 p-4 rounded-[12px] bg-[#ffffff] border-2 border-[#58cc02] shadow-sm">
+              <div className="inline-flex items-center gap-6 p-5 rounded-[24px] bg-[#f5f5f7] border border-[#d6d6d6]">
                 <div>
-                  <span className="text-[11px] font-bold text-[#777777] uppercase block">TEST (0–10)</span>
-                  <span className="text-[20px] font-bold text-[#58cc02]">{lastSubmittedScore.test.toFixed(1)}/10</span>
+                  <span className="text-[11px] text-[#707070] uppercase font-semibold block">Test</span>
+                  <span className="text-[18px] font-semibold text-[#1d1d1f]">{lastSubmittedScore.test.toFixed(1)}/10</span>
                 </div>
-                <div className="w-px h-8 bg-[#afafaf]" />
+                <div className="w-px h-8 bg-[#d6d6d6]" />
                 <div>
-                  <span className="text-[11px] font-bold text-[#777777] uppercase block">EJERCICIOS (0–10)</span>
-                  <span className="text-[20px] font-bold text-[#1cb0f6]">{lastSubmittedScore.ex.toFixed(1)}/10</span>
+                  <span className="text-[11px] text-[#707070] uppercase font-semibold block">Ejercicios</span>
+                  <span className="text-[18px] font-semibold text-[#1d1d1f]">{lastSubmittedScore.ex.toFixed(1)}/10</span>
                 </div>
-                <div className="w-px h-8 bg-[#afafaf]" />
+                <div className="w-px h-8 bg-[#d6d6d6]" />
                 <div>
-                  <span className="text-[11px] font-bold text-[#4b4b4b] uppercase block">CALIFICACIÓN</span>
-                  <span className="font-feather font-extrabold text-[28px] text-[#58cc02]">
+                  <span className="text-[11px] text-[#707070] uppercase font-semibold block">Nota Final</span>
+                  <span className="text-[26px] font-bold text-[#0071e3]">
                     {lastSubmittedScore.score.toFixed(2)}/10
                   </span>
                 </div>
@@ -849,9 +838,9 @@ export const OnlineExamPortal: React.FC<OnlineExamPortalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="duo-btn-primary py-3 px-8 text-[15px]"
+                className="px-8 py-3 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-white text-[15px] font-medium transition"
               >
-                <span>VOLVER AL PANEL DOCENTE</span>
+                <span>Cerrar Portal</span>
               </button>
             </div>
           </div>

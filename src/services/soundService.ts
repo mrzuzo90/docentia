@@ -135,6 +135,14 @@ class SoundServiceClass {
     }
   }
 
+  public playCorrect(): void {
+    this.playSuccess();
+  }
+
+  public playSave(): void {
+    this.playClick();
+  }
+
   /**
    * Playful mascot jump / XP burst sound
    */

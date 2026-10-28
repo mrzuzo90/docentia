@@ -183,12 +183,12 @@ export const GradingView: React.FC<GradingViewProps> = ({
         if (report.needsManualReview) {
           onNotify(
             `Alerta OCR en examen de ${submission.studentName}`,
-            'Se ha detectado un ejercicio con lectura dudosa que requiere revisión manual.',
+            'Se ha detectado un ejercicio con lectura dudosa que requiere confirmación docente.',
             'warning'
           );
         } else {
           onNotify(
-            `Examen de ${submission.studentName} corregido`,
+            `Examen de ${submission.studentName} calificado`,
             `Calificación final: ${report.finalScore.toFixed(2)} / 10`,
             'success'
           );
@@ -223,8 +223,8 @@ export const GradingView: React.FC<GradingViewProps> = ({
 
     onSubmissionsChange(updated);
     onNotify?.(
-      `Calificación de ${updatedReport.studentName} actualizada`,
-      `Nota definitiva registrada: ${updatedReport.finalScore.toFixed(2)} / 10`,
+      `Calificación de ${updatedReport.studentName} guardada`,
+      `Nota definitiva: ${updatedReport.finalScore.toFixed(2)} / 10`,
       'success'
     );
   };
@@ -247,40 +247,39 @@ export const GradingView: React.FC<GradingViewProps> = ({
   return (
     <div className="space-y-8 animate-fadeIn">
       
-      {/* Duolingo Storybook Hero Section: Text Left + Floating Scanner Mascot Right */}
-      <div className="py-4 grid grid-cols-1 lg:grid-cols-12 items-center gap-8">
+      {/* Apple España Hero Section: Sober typography + Lechuza OCR Scanner */}
+      <div className="py-6 grid grid-cols-1 lg:grid-cols-12 items-center gap-8">
         <div className="lg:col-span-7 space-y-4">
-          <span className="inline-block text-[15px] font-bold uppercase tracking-[0.053em] text-[#1cb0f6]">
-            PASO 3 · CORRECCIÓN CON RECONOCIMIENTO DE TEXTO
+          <span className="apple-badge-ember">
+            Paso 3 · Corrección óptica OCR y triaje
           </span>
-          <h2 className="duo-section-headline">
-            corrección inteligente de 0 a 10.
+          <h2 className="text-[36px] sm:text-[48px] font-bold tracking-tight text-[#1d1d1f] leading-[1.08]">
+            Corrección precisa de 0 a 10.
           </h2>
-          <h3 className="duo-hero-headline text-[24px] sm:text-[32px]">
-            Sube los exámenes resueltos de tus alumnos
-          </h3>
-          <p className="duo-body-copy max-w-[480px]">
-            La app lee las respuestas manuscritas, evalúa de 0 a 10 cada sección comparando con el solucionario y te avisa si algún ejercicio es dudoso o merece revisión manual.
+          <p className="text-[17px] text-[#707070] max-w-xl leading-relaxed">
+            La cámara u escáner lee las respuestas manuscritas, calibra cada apartado contra el solucionario oficial y detecta cualquier ambigüedad para revisión docente.
           </p>
 
-          <div className="pt-2 flex flex-wrap items-center gap-3">
-            <div className="duo-nav-pill py-2 px-4">
-              <span>SALDO OCR:</span>
-              <span className="text-[#58cc02]">{creditsBalance} CR. ({creditsBalance * 5} ALUMNOS)</span>
+          <div className="pt-2 flex flex-wrap items-center gap-2.5">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#d6d6d6] text-[13px] text-[#1d1d1f] bg-[#fafafc]">
+              <span className="text-[#707070]">Saldo OCR:</span>
+              <span className="font-semibold">{creditsBalance} cr. ({creditsBalance * 5} alumnos)</span>
             </div>
-            <div className="duo-nav-pill py-2 px-4">
-              <span>CORREGIDOS:</span>
-              <span className="text-[#4b4b4b]">{submissions.length}</span>
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#d6d6d6] text-[13px] text-[#1d1d1f] bg-[#fafafc]">
+              <span className="text-[#707070]">Corregidos:</span>
+              <span className="font-semibold">{submissions.length}</span>
             </div>
-            <div className={`duo-nav-pill py-2 px-4 ${needsReviewCount > 0 ? 'duo-nav-pill-active' : ''}`}>
-              <span>REVISIÓN MANUAL:</span>
-              <span className="text-[#58cc02]">{needsReviewCount}</span>
-            </div>
+            {needsReviewCount > 0 && (
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#b64400] text-[13px] text-[#b64400] bg-[#b64400]/5 font-medium">
+                <span>Por revisar:</span>
+                <span>{needsReviewCount}</span>
+              </div>
+            )}
           </div>
         </div>
 
         <div className="lg:col-span-5 flex justify-center">
-          <DuoMascot variant="scanner" />
+          <DuoMascot variant="scanner" className="max-w-[280px]" />
         </div>
       </div>
 
@@ -288,10 +287,10 @@ export const GradingView: React.FC<GradingViewProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         
         {/* Left 8 cols: Dropzone + Quick Simulation Triggers */}
-        <div className="lg:col-span-8 duo-card space-y-4">
+        <div className="lg:col-span-8 bg-[#ffffff] border border-[#d6d6d6] rounded-[28px] p-7 space-y-5">
           <div
             onClick={() => fileInputRef.current?.click()}
-            className="border-2 border-dashed border-[#afafaf] hover:border-[#58cc02] bg-[#ffffff] rounded-[12px] p-6 text-center cursor-pointer transition group"
+            className="border border-dashed border-[#d6d6d6] hover:border-[#1d1d1f] bg-[#fafafc] rounded-[20px] p-7 text-center cursor-pointer transition group"
           >
             <input
               type="file"
@@ -302,25 +301,25 @@ export const GradingView: React.FC<GradingViewProps> = ({
               className="hidden"
             />
             {isProcessing ? (
-              <div className="py-2 space-y-2">
-                <Loader2 className="h-8 w-8 text-[#58cc02] animate-spin mx-auto" />
-                <p className="text-[19px] font-bold text-[#4b4b4b]">
-                  Leyendo con OCR y evaluando a {currentProcessingName}...
+              <div className="py-3 space-y-2">
+                <Loader2 className="h-6 w-6 text-[#0071e3] animate-spin mx-auto" />
+                <p className="text-[16px] font-medium text-[#1d1d1f]">
+                  Evaluando con visión OCR a {currentProcessingName}...
                 </p>
-                <p className="duo-body-copy">
-                  Comparando respuestas con el solucionario y verificando legibilidad
+                <p className="text-[13px] text-[#707070]">
+                  Cotejando grafía con el solucionario y verificando legibilidad
                 </p>
               </div>
             ) : (
               <>
-                <div className="mx-auto w-12 h-12 rounded-[12px] bg-[#d7ffb8] border-2 border-[#58cc02] text-[#58cc02] flex items-center justify-center mb-3 transition">
-                  <Upload className="h-6 w-6" />
+                <div className="mx-auto w-11 h-11 rounded-full bg-[#ffffff] border border-[#d6d6d6] text-[#0071e3] flex items-center justify-center mb-3">
+                  <Upload className="h-5 w-5" />
                 </div>
-                <h3 className="text-[19px] font-bold text-[#4b4b4b]">
-                  Sube aquí los exámenes resueltos por los alumnos (Imagen, PDF o Texto)
+                <h3 className="text-[16px] font-medium text-[#1d1d1f]">
+                  Sube aquí los exámenes de los alumnos (imagen, PDF o texto)
                 </h3>
-                <p className="duo-body-copy mt-1">
-                  1 crédito permite corregir hasta 5 exámenes de alumnos
+                <p className="text-[13px] text-[#707070] mt-1">
+                  1 crédito incluye la corrección detallada de hasta 5 exámenes
                 </p>
               </>
             )}
@@ -332,152 +331,160 @@ export const GradingView: React.FC<GradingViewProps> = ({
                 type="button"
                 disabled={isProcessing}
                 onClick={() => handleSimulateNewStudent('clean')}
-                className="duo-btn-outlined py-2 px-3.5 text-[13px]"
+                className="apple-pill-ghost text-[13px] py-1.5 px-3.5"
               >
-                <CheckCircle2 className="h-4 w-4 text-[#58cc02]" />
-                <span>+ SIMULAR EXAMEN NÍTIDO (SOFÍA)</span>
+                <CheckCircle2 className="h-3.5 w-3.5 text-[#0071e3]" />
+                <span>+ Simular examen nítido (Sofía)</span>
               </button>
 
               <button
                 type="button"
                 disabled={isProcessing}
                 onClick={() => handleSimulateNewStudent('unclear')}
-                className="duo-nav-pill duo-nav-pill-active py-2 px-3.5 text-[13px]"
+                className="apple-pill-wash text-[13px] py-1.5 px-3.5"
               >
-                <AlertTriangle className="h-4 w-4 text-[#58cc02]" />
-                <span>+ SIMULAR LETRA DUDOSA / TACHÓN (MARCOS)</span>
+                <AlertTriangle className="h-3.5 w-3.5 text-[#b64400]" />
+                <span>+ Simular letra dudosa / tachón (Marcos)</span>
               </button>
             </div>
 
             <button
               type="button"
               onClick={() => setShowTextInput(!showTextInput)}
-              className="duo-nav-pill py-2 px-3.5 text-[13px]"
+              className="apple-pill-ghost text-[13px] py-1.5 px-3"
             >
-              <FileText className="h-4 w-4" />
-              <span>PEGAR RESPUESTAS</span>
+              <FileText className="h-3.5 w-3.5 text-[#707070]" />
+              <span>Pegar respuestas</span>
             </button>
           </div>
 
           {showTextInput && (
-            <div className="p-4 rounded-[12px] bg-[#ffffff] border-2 border-[#afafaf] space-y-3">
+            <div className="p-4 rounded-[18px] bg-[#fafafc] border border-[#d6d6d6] space-y-3">
               <input
                 type="text"
-                placeholder="Nombre y Apellidos del Alumno (ej. Alejandro Vega)"
+                placeholder="Nombre completo del alumno..."
                 value={studentNameInput}
                 onChange={e => setStudentNameInput(e.target.value)}
-                className="w-full text-[15px] px-3.5 py-2.5 bg-[#ffffff] border-2 border-[#afafaf] rounded-[12px] text-[#4b4b4b] focus:outline-none focus:border-[#58cc02]"
+                className="w-full text-[14px] px-3.5 py-2 bg-[#ffffff] border border-[#d6d6d6] rounded-[12px] text-[#1d1d1f] focus:outline-none focus:border-[#0071e3]"
               />
               <textarea
-                rows={4}
-                placeholder="Introduce las respuestas del alumno (si incluyes 'tachón' o 'ilegible', se activará el aviso de revisión manual)..."
+                rows={5}
+                placeholder="Pega las respuestas del alumno o la transcripción OCR..."
                 value={studentTextInput}
                 onChange={e => setStudentTextInput(e.target.value)}
-                className="w-full text-[15px] px-3.5 py-2.5 bg-[#ffffff] border-2 border-[#afafaf] rounded-[12px] text-[#4b4b4b] focus:outline-none focus:border-[#58cc02]"
+                className="w-full text-[14px] px-3.5 py-2 bg-[#ffffff] border border-[#d6d6d6] rounded-[12px] text-[#1d1d1f] focus:outline-none focus:border-[#0071e3]"
               />
               <div className="flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setShowTextInput(false)}
-                  className="duo-nav-pill py-2 px-4 text-[13px]"
+                  className="apple-pill-ghost text-[12px] py-1 px-3"
                 >
-                  CANCELAR
+                  Cancelar
                 </button>
                 <button
                   type="button"
                   onClick={handleManualTextSubmit}
-                  disabled={!studentNameInput.trim() || !studentTextInput.trim()}
-                  className="duo-btn-primary py-2 px-5 text-[13px]"
+                  disabled={!studentNameInput.trim() || !studentTextInput.trim() || isProcessing}
+                  className="apple-pill-primary text-[12px] py-1 px-3.5"
                 >
-                  CORREGIR AHORA
+                  Corregir examen
                 </button>
               </div>
             </div>
           )}
         </div>
 
-        {/* Right 4 cols: Protocol Summary & Next Step */}
-        <div className="lg:col-span-4 duo-card flex flex-col justify-between space-y-4">
+        {/* Right 4 cols: OCR Diagnostic Card */}
+        <div className="lg:col-span-4 bg-[#fafafc] border border-[#d6d6d6] rounded-[28px] p-7 flex flex-col justify-between space-y-4">
           <div className="space-y-3">
-            <span className="text-[13px] font-bold uppercase tracking-[0.053em] text-[#58cc02] block">
-              EVALUACIÓN 0 A 10 POR SECCIÓN
+            <span className="text-[12px] font-semibold uppercase tracking-wider text-[#707070] block">
+              Auditoría óptica de caligrafía
             </span>
-            <p className="duo-body-copy">
-              Cada examen recibe una <strong className="text-[#4b4b4b]">nota del 0 al 10 en la Sección Test</strong>, una <strong className="text-[#4b4b4b]">nota del 0 al 10 en la Sección de Ejercicios</strong> y su nota final ponderada.
+            <p className="text-[14px] text-[#707070] leading-relaxed">
+              El motor OCR clasifica la legibilidad de cada casilla y detecta correcciones manuales con doble aspa o tachaduras.
             </p>
-            <div className="p-3.5 rounded-[12px] bg-[#ffffff] border-2 border-[#afafaf] text-[15px] space-y-1.5">
-              <div className="flex justify-between">
-                <span className="text-[#777777]">Peso Sección Test:</span>
-                <span className="font-bold text-[#4b4b4b]">
-                  {exam.testQuestions.reduce((a, b) => a + b.points, 0).toFixed(2)} pts
-                </span>
+            <div className="p-3.5 rounded-[16px] bg-[#ffffff] border border-[#d6d6d6] text-[13px] text-[#1d1d1f] space-y-1">
+              <div className="flex items-center justify-between">
+                <span>Alumnos calificados:</span>
+                <span className="font-semibold">{submissions.length}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-[#777777]">Peso Sección Ejercicios:</span>
-                <span className="font-bold text-[#4b4b4b]">
-                  {exam.exercises.reduce((a, b) => a + b.points, 0).toFixed(2)} pts
-                </span>
+              <div className="flex items-center justify-between">
+                <span>Avisos de revisión manual:</span>
+                <span className="font-semibold text-[#b64400]">{needsReviewCount}</span>
               </div>
             </div>
           </div>
 
           <button
+            type="button"
             onClick={onProceedToGradebook}
-            disabled={submissions.length === 0}
-            className="duo-btn-primary w-full py-3"
+            className="apple-pill-primary w-full py-2.5 px-4 text-[14px]"
           >
-            <span>VER ACTA DE NOTAS 0–10</span>
-            <ArrowRight className="h-4 w-4" />
+            <span>Ver acta final de notas</span>
+            <ArrowRight className="h-3.5 w-3.5" />
           </button>
         </div>
-
       </div>
 
-      {/* Filter Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-2 border-[#afafaf] pb-4 pt-2">
-        <div className="flex items-center gap-2.5">
-          <ScanLine className="h-5 w-5 text-[#58cc02]" />
-          <h3 className="text-[24px] font-bold text-[#4b4b4b]">
-            Exámenes Corregidos ({submissions.length})
+      {/* Filter Tabs Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#d6d6d6] pb-4 pt-2">
+        <div className="flex items-center gap-2">
+          <ScanLine className="h-4 w-4 text-[#0071e3]" />
+          <h3 className="text-[18px] font-semibold text-[#1d1d1f]">
+            Exámenes evaluados ({filteredSubmissions.length})
           </h3>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex items-center gap-1.5 bg-[#f5f5f7] p-1 rounded-full">
           <button
+            type="button"
             onClick={() => setFilterMode('all')}
-            className={`duo-nav-pill py-2 px-4 text-[13px] ${
-              filterMode === 'all' ? 'duo-nav-pill-active' : ''
+            className={`px-3.5 py-1 text-[13px] rounded-full transition ${
+              filterMode === 'all'
+                ? 'bg-[#ffffff] text-[#1d1d1f] font-medium shadow-[0_1px_2px_rgba(0,0,0,0.06)]'
+                : 'text-[#707070] hover:text-[#1d1d1f]'
             }`}
           >
-            TODOS ({submissions.length})
+            Todos ({submissions.length})
           </button>
+
           <button
+            type="button"
             onClick={() => setFilterMode('needs_review')}
-            className={`duo-nav-pill py-2 px-4 text-[13px] ${
-              filterMode === 'needs_review' ? 'duo-nav-pill-active' : ''
+            className={`px-3.5 py-1 text-[13px] rounded-full transition flex items-center gap-1.5 ${
+              filterMode === 'needs_review'
+                ? 'bg-[#ffffff] text-[#b64400] font-medium shadow-[0_1px_2px_rgba(0,0,0,0.06)]'
+                : 'text-[#707070] hover:text-[#1d1d1f]'
             }`}
           >
-            <AlertTriangle className="h-4 w-4 text-[#58cc02]" />
-            <span>REVISIÓN MANUAL ({needsReviewCount})</span>
+            <AlertTriangle className="h-3.5 w-3.5" />
+            <span>Por revisar ({needsReviewCount})</span>
           </button>
+
           <button
+            type="button"
             onClick={() => setFilterMode('graded')}
-            className={`duo-nav-pill py-2 px-4 text-[13px] ${
-              filterMode === 'graded' ? 'duo-nav-pill-active' : ''
+            className={`px-3.5 py-1 text-[13px] rounded-full transition ${
+              filterMode === 'graded'
+                ? 'bg-[#ffffff] text-[#1d1d1f] font-medium shadow-[0_1px_2px_rgba(0,0,0,0.06)]'
+                : 'text-[#707070] hover:text-[#1d1d1f]'
             }`}
           >
-            VALIDADOS ({submissions.length - needsReviewCount})
+            Nítidos ({submissions.length - needsReviewCount})
           </button>
         </div>
       </div>
 
-      {/* Student Dossier Cards Grid */}
+      {/* Submissions Grid */}
       {filteredSubmissions.length === 0 ? (
-        <div className="duo-card p-12 text-center">
-          <FileCheck2 className="h-12 w-12 mx-auto text-[#afafaf] mb-3" />
-          <p className="text-[19px] font-bold text-[#4b4b4b]">No hay exámenes en esta vista</p>
-          <p className="duo-body-copy mt-1">
-            Sube un archivo o pulsa los botones de simulación superior.
+        <div className="bg-[#ffffff] border border-[#d6d6d6] rounded-[28px] p-12 text-center">
+          <FileCheck2 className="h-10 w-10 mx-auto text-[#707070] mb-3" />
+          <h4 className="text-[17px] font-semibold text-[#1d1d1f]">
+            No hay exámenes en esta categoría
+          </h4>
+          <p className="text-[14px] text-[#707070] mt-1">
+            Sube un pliego con la cámara o utiliza los botones de simulación arriba.
           </p>
         </div>
       ) : (
@@ -487,93 +494,90 @@ export const GradingView: React.FC<GradingViewProps> = ({
             const hasReviewAlert = sub.status === 'needs_review' || report?.needsManualReview;
 
             const testOut10 =
-              report?.testSectionScoreOutOf10 ??
-              (report && report.testSectionMax > 0
-                ? (report.testSectionScore / report.testSectionMax) * 10
-                : 0);
+              report && exam.testSectionWeight > 0
+                ? (report.testSectionScore / exam.testSectionWeight) * 10
+                : 0;
+
             const exOut10 =
-              report?.exerciseSectionScoreOutOf10 ??
-              (report && report.exerciseSectionMax > 0
-                ? (report.exerciseSectionScore / report.exerciseSectionMax) * 10
-                : 0);
+              report && exam.exerciseSectionWeight > 0
+                ? (report.exerciseSectionScore / exam.exerciseSectionWeight) * 10
+                : 0;
 
             return (
               <div
                 key={sub.id}
                 onClick={() => setSelectedSubmission(sub)}
-                className={`duo-card p-0 overflow-hidden cursor-pointer flex flex-col justify-between transition ${
-                  hasReviewAlert
-                    ? 'border-[#58cc02]'
-                    : 'border-[#afafaf] hover:border-[#1cb0f6]'
+                className={`bg-[#ffffff] border rounded-[24px] overflow-hidden cursor-pointer flex flex-col justify-between transition hover:border-[#1d1d1f] ${
+                  hasReviewAlert ? 'border-[#b64400]/40' : 'border-[#d6d6d6]'
                 }`}
               >
                 {/* Top Status Strip */}
                 {hasReviewAlert ? (
-                  <div className="bg-[#d7ffb8] border-b-2 border-[#58cc02] text-[#4b4b4b] px-4 py-2 flex items-center justify-between text-[13px] font-bold uppercase tracking-[0.053em]">
+                  <div className="bg-[#b64400]/5 border-b border-[#b64400]/20 text-[#b64400] px-4 py-2 flex items-center justify-between text-[12px] font-medium">
                     <span className="flex items-center gap-1.5">
-                      <AlertTriangle className="h-4 w-4 text-[#58cc02]" />
-                      <span>REVISIÓN MANUAL DOCENTE</span>
+                      <AlertTriangle className="h-3.5 w-3.5 text-[#b64400]" />
+                      <span>Revisión docente sugerida</span>
                     </span>
-                    <span>AVISO OCR</span>
+                    <span>Aviso OCR</span>
                   </div>
                 ) : (
-                  <div className="bg-[#ffffff] border-b-2 border-[#afafaf] text-[#777777] px-4 py-2 flex items-center justify-between text-[13px] font-bold uppercase tracking-[0.053em]">
+                  <div className="bg-[#fafafc] border-b border-[#d6d6d6] text-[#707070] px-4 py-2 flex items-center justify-between text-[12px]">
                     <span>{sub.studentIdCode || 'EXP-2026'}</span>
-                    <span className="text-[#58cc02]">✔ LECTURA CORRECTA</span>
+                    <span className="text-[#0071e3] font-medium">✔ Lectura nítida</span>
                   </div>
                 )}
 
-                <div className="p-5 space-y-4 flex-1 flex flex-col justify-between">
+                <div className="p-6 space-y-4 flex-1 flex flex-col justify-between">
                   <div className="space-y-4">
                     {/* Student Name & Final Score */}
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <h4 className="text-[22px] font-bold text-[#4b4b4b] leading-tight truncate">
+                        <h4 className="text-[18px] font-semibold text-[#1d1d1f] leading-snug truncate">
                           {sub.studentName}
                         </h4>
-                        <p className="text-[13px] text-[#777777] mt-0.5 truncate">
+                        <p className="text-[12px] text-[#707070] mt-0.5 truncate">
                           {sub.scanPdfName || 'Pliego_Examen.pdf'}
                         </p>
                       </div>
 
                       {report && (
                         <div className="text-right shrink-0">
-                          <span className="font-feather font-extrabold text-[32px] text-[#58cc02] tabular-nums leading-none block">
+                          <span className="text-[28px] font-bold text-[#1d1d1f] tabular-nums leading-none block">
                             {report.finalScore.toFixed(2)}
                           </span>
-                          <span className="text-[13px] text-[#777777] uppercase font-bold">
-                            DE 10
+                          <span className="text-[11px] text-[#707070]">
+                            de 10,00
                           </span>
                         </div>
                       )}
                     </div>
 
-                    {/* Explicit 0-10 Evaluation per Section */}
+                    {/* 0-10 Evaluation per Section */}
                     {report && (
                       <div className="grid grid-cols-2 gap-2.5 pt-1">
-                        <div className="p-3 rounded-[12px] bg-[#ffffff] border-2 border-[#afafaf]">
-                          <span className="text-[13px] font-bold text-[#777777] uppercase tracking-[0.053em] block">
-                            TEST (0–10)
+                        <div className="p-3 rounded-[16px] bg-[#fafafc] border border-[#d6d6d6]">
+                          <span className="text-[11px] text-[#707070] uppercase block">
+                            Test (0–10)
                           </span>
-                          <div className="flex items-baseline justify-between mt-1">
-                            <span className="text-[19px] font-bold text-[#58cc02] tabular-nums">
-                              {testOut10.toFixed(1)}<span className="text-[13px] text-[#777777]">/10</span>
+                          <div className="flex items-baseline justify-between mt-0.5">
+                            <span className="text-[16px] font-semibold text-[#1d1d1f] tabular-nums">
+                              {testOut10.toFixed(1)}<span className="text-[11px] text-[#707070]">/10</span>
                             </span>
-                            <span className="text-[13px] text-[#777777] tabular-nums">
+                            <span className="text-[11px] text-[#707070] tabular-nums">
                               ({report.testSectionScore.toFixed(1)}p)
                             </span>
                           </div>
                         </div>
 
-                        <div className="p-3 rounded-[12px] bg-[#ffffff] border-2 border-[#afafaf]">
-                          <span className="text-[13px] font-bold text-[#777777] uppercase tracking-[0.053em] block">
-                            EJERCICIOS (0–10)
+                        <div className="p-3 rounded-[16px] bg-[#fafafc] border border-[#d6d6d6]">
+                          <span className="text-[11px] text-[#707070] uppercase block">
+                            Ejercicios (0–10)
                           </span>
-                          <div className="flex items-baseline justify-between mt-1">
-                            <span className="text-[19px] font-bold text-[#1cb0f6] tabular-nums">
-                              {exOut10.toFixed(1)}<span className="text-[13px] text-[#777777]">/10</span>
+                          <div className="flex items-baseline justify-between mt-0.5">
+                            <span className="text-[16px] font-semibold text-[#0071e3] tabular-nums">
+                              {exOut10.toFixed(1)}<span className="text-[11px] text-[#707070]">/10</span>
                             </span>
-                            <span className="text-[13px] text-[#777777] tabular-nums">
+                            <span className="text-[11px] text-[#707070] tabular-nums">
                               ({report.exerciseSectionScore.toFixed(1)}p)
                             </span>
                           </div>
@@ -583,38 +587,38 @@ export const GradingView: React.FC<GradingViewProps> = ({
 
                     {/* Manual Review Reason Box if Flagged */}
                     {hasReviewAlert && report && (
-                      <div className="p-3.5 rounded-[12px] bg-[#d7ffb8] border-2 border-[#58cc02] text-[15px] text-[#4b4b4b] space-y-1">
-                        <span className="text-[13px] uppercase tracking-[0.053em] font-bold text-[#4b4b4b] block">
-                          REQUIERE REVISIÓN MANUAL:
+                      <div className="p-3.5 rounded-[16px] bg-[#b64400]/5 border border-[#b64400]/20 text-[13px] text-[#1d1d1f] space-y-1">
+                        <span className="text-[11px] uppercase font-semibold text-[#b64400] block">
+                          Incidencia detectada:
                         </span>
-                        <p className="font-medium leading-snug">
+                        <p className="leading-snug">
                           {report.manualReviewReasons[0] ||
-                            'Letra dudosa o tachón detectado en el examen.'}
+                            'Letra dudosa o tachadura observada en el pliego.'}
                         </p>
                       </div>
                     )}
 
                     {!hasReviewAlert && report && (
-                      <p className="text-[15px] text-[#777777] line-clamp-2">
+                      <p className="text-[13px] text-[#707070] line-clamp-2">
                         "{report.overallFeedback}"
                       </p>
                     )}
                   </div>
 
                   {/* Card Footer */}
-                  <div className="pt-3 mt-4 border-t-2 border-[#afafaf]/40 flex items-center justify-between">
-                    <span className="text-[14px] font-bold uppercase tracking-[0.053em] text-[#1cb0f6] flex items-center gap-1.5">
-                      <Eye className="h-4 w-4" />
+                  <div className="pt-3 mt-4 border-t border-[#d6d6d6] flex items-center justify-between">
+                    <span className="text-[13px] text-[#0066cc] hover:underline flex items-center gap-1">
+                      <Eye className="h-3.5 w-3.5" />
                       <span>
-                        {hasReviewAlert ? 'REVISAR Y CALIFICAR' : 'VER CORRECCIÓN'}
+                        {hasReviewAlert ? 'Revisar y calificar' : 'Ver detalle'}
                       </span>
                     </span>
                     <button
                       onClick={e => handleDelete(sub.id, e)}
                       title="Eliminar examen"
-                      className="text-[#777777] hover:text-[#4b4b4b] p-1.5 rounded-[12px] transition"
+                      className="text-[#707070] hover:text-[#1d1d1f] p-1.5 rounded-full transition"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-3.5 w-3.5" />
                     </button>
                   </div>
                 </div>

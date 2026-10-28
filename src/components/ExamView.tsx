@@ -404,40 +404,37 @@ export const ExamView: React.FC<ExamViewProps> = ({
   return (
     <div className="space-y-8 animate-fadeIn">
       
-      {/* Duolingo Storybook Hero Section: Text Left + Floating Mascot Right on Pure White */}
-      <div className="no-print py-4 grid grid-cols-1 lg:grid-cols-12 items-center gap-8">
+      {/* Apple España Hero Section: Whispered typography + Sober Barn Owl */}
+      <div className="no-print py-6 grid grid-cols-1 lg:grid-cols-12 items-center gap-8">
         <div className="lg:col-span-7 space-y-4">
-          <span className="inline-block text-[15px] font-bold uppercase tracking-[0.053em] text-[#1cb0f6]">
-            PASO 2 · MATRIZ, MODELOS ANTI-COPIA Y SOLUCIONARIO
+          <span className="apple-badge-ember">
+            Paso 2 · Matriz de evaluación y modelos anti-copia
           </span>
-          <h2 className="duo-section-headline">
-            listo para copiar, pegar e imprimir.
-          </h2>
-          <h3 className="duo-hero-headline text-[24px] sm:text-[32px]">
+          <h2 className="text-[36px] sm:text-[48px] font-bold tracking-tight text-[#1d1d1f] leading-[1.08]">
             {displayedExam.title}
-          </h3>
-          <p className="duo-body-copy max-w-[480px]">
-            Elige el peso de cada pregunta sobre 10 puntos, genera al instante los <strong>Modelos A y B Anti-Copia</strong> con sus solucionarios independientes, y cópialos con un clic en Word o Google Docs.
+          </h2>
+          <p className="text-[17px] text-[#707070] max-w-xl leading-relaxed">
+            Ponderación exacta sobre 10,00 puntos, generación instantánea de <strong>Modelos A y B Anti-Copia</strong> con doble solucionario y exportación a Word, Moodle XML y hoja A4.
           </p>
 
-          {/* Live Weight Sticker Pill Box */}
-          <div className="pt-2 flex flex-wrap items-center gap-3">
-            <div className="duo-nav-pill py-2 px-4">
-              <span>TEST ({exam.testQuestions.length}):</span>
-              <span className="text-[#58cc02]">{totalTestPoints.toFixed(2)} PTS</span>
+          {/* Live Weight Capsule Bar */}
+          <div className="pt-2 flex flex-wrap items-center gap-2.5">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#d6d6d6] text-[13px] text-[#1d1d1f] bg-[#fafafc]">
+              <span className="text-[#707070]">Test ({exam.testQuestions.length}):</span>
+              <span className="font-semibold">{totalTestPoints.toFixed(2)} pts</span>
             </div>
-            <div className="duo-nav-pill py-2 px-4">
-              <span>EJERCICIOS ({exam.exercises.length}):</span>
-              <span className="text-[#1cb0f6]">{totalExercisePoints.toFixed(2)} PTS</span>
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#d6d6d6] text-[13px] text-[#0071e3] bg-[#fafafc]">
+              <span className="text-[#707070]">Ejercicios ({exam.exercises.length}):</span>
+              <span className="font-semibold">{totalExercisePoints.toFixed(2)} pts</span>
             </div>
-            <div className="duo-nav-pill duo-nav-pill-active py-2 px-4">
-              <span>TOTAL: {totalPoints.toFixed(2)} / 10 PTS</span>
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#1d1d1f] text-[13px] text-[#1d1d1f] bg-[#ffffff] font-medium">
+              <span>Total: {totalPoints.toFixed(2)} / 10,00 pts</span>
               {totalPoints !== 10 && (
                 <button
                   onClick={handleNormalizeTo10}
-                  className="ml-2 px-2.5 py-0.5 rounded-[12px] bg-[#58cc02] text-[#ffffff] text-[13px] font-bold"
+                  className="ml-1 px-2.5 py-0.5 rounded-full bg-[#1d1d1f] text-[#ffffff] text-[11px] font-normal hover:bg-[#384353] transition"
                 >
-                  AJUSTAR A 10
+                  Ajustar a 10
                 </button>
               )}
             </div>
@@ -445,25 +442,25 @@ export const ExamView: React.FC<ExamViewProps> = ({
         </div>
 
         <div className="lg:col-span-5 flex justify-center">
-          <DuoMascot variant="exam" />
+          <DuoMascot variant="exam" className="max-w-[280px]" />
         </div>
       </div>
 
       {/* ANTI-CHEATING MODEL A & MODEL B GENERATOR & DUAL ANSWER KEY MATRIX */}
       {exam.testQuestions.length > 0 && (
-        <div className="no-print duo-card border-[#58cc02] bg-[#ffffff] p-5 space-y-4">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b-2 border-[#afafaf]/40 pb-4">
+        <div className="no-print bg-[#ffffff] border border-[#d6d6d6] rounded-[24px] p-6 space-y-4">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-[#d6d6d6]/60 pb-4">
             <div>
-              <div className="flex items-center gap-2">
-                <span className="px-3 py-1 rounded-[12px] bg-[#d7ffb8] border-2 border-[#58cc02] text-[#000437] text-[12px] font-bold uppercase tracking-[0.053em]">
-                  SISTEMA ANTI-COPIA EN AULA · 0 CRÉDITOS IA
+              <div className="flex items-center gap-2.5">
+                <span className="apple-badge-ember">
+                  Anti-Copia en aula
                 </span>
-                <h4 className="text-[19px] font-bold text-[#4b4b4b]">
-                  Generador de Modelos A y B con Doble Solucionario
+                <h4 className="text-[17px] font-semibold text-[#1d1d1f]">
+                  Generador de Modelos A y B con doble solucionario
                 </h4>
               </div>
-              <p className="text-[15px] font-medium text-[#777777] mt-1">
-                Baraja automáticamente el orden de las preguntas y las opciones (A, B, C, D) para filas pares e impares, recalculando la clave de respuestas al instante.
+              <p className="text-[14px] text-[#707070] mt-1">
+                Permuta el orden de preguntas y opciones (A, B, C, D) para filas pares e impares, recalculando la clave automáticamente.
               </p>
             </div>
 
@@ -474,11 +471,13 @@ export const ExamView: React.FC<ExamViewProps> = ({
                   SoundService.playClick();
                   setActiveModel('A');
                 }}
-                className={`duo-nav-pill py-2 px-4 ${
-                  activeModel === 'A' ? 'duo-nav-pill-active' : ''
+                className={`px-3.5 py-1.5 rounded-full text-[13px] border transition ${
+                  activeModel === 'A'
+                    ? 'bg-[#1d1d1f] text-[#ffffff] border-[#1d1d1f]'
+                    : 'bg-[#fafafc] text-[#707070] border-[#d6d6d6] hover:text-[#1d1d1f]'
                 }`}
               >
-                <span>VIENDO: MODELO A (ORIGINAL)</span>
+                <span>Modelo A (Original)</span>
               </button>
               <button
                 type="button"
@@ -486,20 +485,22 @@ export const ExamView: React.FC<ExamViewProps> = ({
                   SoundService.playClick();
                   setActiveModel('B');
                 }}
-                className={`duo-nav-pill py-2 px-4 ${
-                  activeModel === 'B' ? 'duo-nav-pill-active' : ''
+                className={`px-3.5 py-1.5 rounded-full text-[13px] border transition ${
+                  activeModel === 'B'
+                    ? 'bg-[#1d1d1f] text-[#ffffff] border-[#1d1d1f]'
+                    : 'bg-[#fafafc] text-[#707070] border-[#d6d6d6] hover:text-[#1d1d1f]'
                 }`}
               >
-                <span>VIENDO: MODELO B (BARAJADO)</span>
+                <span>Modelo B (Barajado)</span>
               </button>
               <button
                 type="button"
                 onClick={handleReshuffleModelB}
-                className="duo-btn-outlined py-2 px-3.5"
+                className="apple-pill-ghost text-[13px] py-1.5 px-3.5"
                 title="Generar una nueva permutación aleatoria para el Modelo B"
               >
-                <Shuffle className="w-4 h-4" />
-                <span>RE-BARAJAR B (#{modelBSeed})</span>
+                <Shuffle className="w-3.5 h-3.5" />
+                <span>Re-barajar B (#{modelBSeed})</span>
               </button>
             </div>
           </div>
@@ -508,41 +509,41 @@ export const ExamView: React.FC<ExamViewProps> = ({
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Modelo A Card */}
             <div
-              className={`rounded-[12px] border-2 p-4 transition ${
+              className={`rounded-[20px] border p-4 transition ${
                 activeModel === 'A'
-                  ? 'border-[#58cc02] bg-[#d7ffb8]/25'
-                  : 'border-[#afafaf] bg-[#ffffff]'
+                  ? 'border-[#1d1d1f] bg-[#fafafc]'
+                  : 'border-[#d6d6d6] bg-[#ffffff]'
               }`}
             >
               <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-                <span className="text-[15px] font-bold uppercase tracking-[0.053em] text-[#4b4b4b]">
-                  CLAVE RÁPIDA · MODELO A (FILA IMPAR)
+                <span className="text-[13px] font-semibold text-[#1d1d1f]">
+                  Clave Modelo A (Fila Impar)
                 </span>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
                   <button
                     type="button"
                     onClick={() => handleCopy('student', 'A')}
-                    className="px-2.5 py-1 rounded-[12px] border-2 border-[#afafaf] hover:border-[#1cb0f6] bg-[#ffffff] text-[#1cb0f6] text-[12px] font-bold uppercase tracking-[0.053em]"
+                    className="apple-pill-ghost text-[12px] py-1 px-3"
                   >
-                    {copiedType === 'student-A' ? '✓ EXAMEN A COPIADO' : 'COPIAR EXAMEN A'}
+                    {copiedType === 'student-A' ? '✓ Copiado' : 'Copiar A'}
                   </button>
                   <button
                     type="button"
                     onClick={() => handleCopy('solucionario', 'A')}
-                    className="px-2.5 py-1 rounded-[12px] bg-[#58cc02] text-[#ffffff] text-[12px] font-bold uppercase tracking-[0.053em]"
+                    className="apple-pill-primary text-[12px] py-1 px-3"
                   >
-                    {copiedType === 'solucionario-A' ? '✓ SOLUCIONARIO A' : 'SOLUCIONARIO A'}
+                    {copiedType === 'solucionario-A' ? '✓ Solución A' : 'Solución A'}
                   </button>
                 </div>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5">
                 {modelAExam.testQuestions.map((q, idx) => (
                   <span
                     key={q.id}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[12px] bg-[#ffffff] border-2 border-[#000437] text-[13px] font-bold text-[#000437]"
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#ffffff] border border-[#d6d6d6] text-[12px] text-[#1d1d1f]"
                   >
-                    <span className="text-[#777777]">{idx + 1}:</span>
-                    <span className="text-[#58cc02] font-black">{q.correctAnswer}</span>
+                    <span className="text-[#707070]">{idx + 1}:</span>
+                    <span className="font-semibold text-[#0071e3]">{q.correctAnswer}</span>
                   </span>
                 ))}
               </div>
@@ -550,41 +551,41 @@ export const ExamView: React.FC<ExamViewProps> = ({
 
             {/* Modelo B Card */}
             <div
-              className={`rounded-[12px] border-2 p-4 transition ${
+              className={`rounded-[20px] border p-4 transition ${
                 activeModel === 'B'
-                  ? 'border-[#58cc02] bg-[#d7ffb8]/25'
-                  : 'border-[#afafaf] bg-[#ffffff]'
+                  ? 'border-[#1d1d1f] bg-[#fafafc]'
+                  : 'border-[#d6d6d6] bg-[#ffffff]'
               }`}
             >
               <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-                <span className="text-[15px] font-bold uppercase tracking-[0.053em] text-[#4b4b4b]">
-                  CLAVE RÁPIDA · MODELO B (FILA PAR #{modelBSeed})
+                <span className="text-[13px] font-semibold text-[#1d1d1f]">
+                  Clave Modelo B (Fila Par #{modelBSeed})
                 </span>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
                   <button
                     type="button"
                     onClick={() => handleCopy('student', 'B')}
-                    className="px-2.5 py-1 rounded-[12px] border-2 border-[#afafaf] hover:border-[#1cb0f6] bg-[#ffffff] text-[#1cb0f6] text-[12px] font-bold uppercase tracking-[0.053em]"
+                    className="apple-pill-ghost text-[12px] py-1 px-3"
                   >
-                    {copiedType === 'student-B' ? '✓ EXAMEN B COPIADO' : 'COPIAR EXAMEN B'}
+                    {copiedType === 'student-B' ? '✓ Copiado' : 'Copiar B'}
                   </button>
                   <button
                     type="button"
                     onClick={() => handleCopy('solucionario', 'B')}
-                    className="px-2.5 py-1 rounded-[12px] bg-[#58cc02] text-[#ffffff] text-[12px] font-bold uppercase tracking-[0.053em]"
+                    className="apple-pill-primary text-[12px] py-1 px-3"
                   >
-                    {copiedType === 'solucionario-B' ? '✓ SOLUCIONARIO B' : 'SOLUCIONARIO B'}
+                    {copiedType === 'solucionario-B' ? '✓ Solución B' : 'Solución B'}
                   </button>
                 </div>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5">
                 {modelBExam.testQuestions.map((q, idx) => (
                   <span
                     key={q.id}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[12px] bg-[#ffffff] border-2 border-[#000437] text-[13px] font-bold text-[#000437]"
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#ffffff] border border-[#d6d6d6] text-[12px] text-[#1d1d1f]"
                   >
-                    <span className="text-[#777777]">{idx + 1}:</span>
-                    <span className="text-[#1cb0f6] font-black">{q.correctAnswer}</span>
+                    <span className="text-[#707070]">{idx + 1}:</span>
+                    <span className="font-semibold text-[#0071e3]">{q.correctAnswer}</span>
                   </span>
                 ))}
               </div>
@@ -594,21 +595,23 @@ export const ExamView: React.FC<ExamViewProps> = ({
       )}
 
       {/* Action Dock: View Switcher + 1-Click Copy/Export Tools */}
-      <div className="no-print duo-card p-4 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+      <div className="no-print bg-[#ffffff] border border-[#d6d6d6] rounded-[24px] p-4 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
         
         {/* Left Mode Switcher */}
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-1.5 bg-[#f5f5f7] p-1 rounded-full">
           <button
             onClick={() => {
               SoundService.playClick();
               setViewMode('solucionario');
             }}
-            className={`duo-nav-pill py-2.5 px-4 ${
-              viewMode === 'solucionario' ? 'duo-nav-pill-active' : ''
+            className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-[13px] transition ${
+              viewMode === 'solucionario'
+                ? 'bg-[#ffffff] text-[#1d1d1f] font-medium shadow-[0_1px_2px_rgba(0,0,0,0.06)]'
+                : 'text-[#707070] hover:text-[#1d1d1f]'
             }`}
           >
-            <Award className="h-4 w-4 text-[#58cc02]" />
-            <span>SOLUCIONARIO Y PESOS (MODELO {activeModel})</span>
+            <Award className="h-3.5 w-3.5 text-[#0071e3]" />
+            <span>Solucionario ({activeModel})</span>
           </button>
 
           <button
@@ -616,24 +619,26 @@ export const ExamView: React.FC<ExamViewProps> = ({
               SoundService.playClick();
               setViewMode('student');
             }}
-            className={`duo-nav-pill py-2.5 px-4 ${
-              viewMode === 'student' ? 'duo-nav-pill-active' : ''
+            className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-[13px] transition ${
+              viewMode === 'student'
+                ? 'bg-[#ffffff] text-[#1d1d1f] font-medium shadow-[0_1px_2px_rgba(0,0,0,0.06)]'
+                : 'text-[#707070] hover:text-[#1d1d1f]'
             }`}
           >
-            <FileText className="h-4 w-4 text-[#1cb0f6]" />
-            <span>HOJA DE EXAMEN A4 (MODELO {activeModel})</span>
+            <FileText className="h-3.5 w-3.5 text-[#707070]" />
+            <span>Hoja de examen A4 ({activeModel})</span>
           </button>
         </div>
 
         {/* Right Copy & Export Actions */}
-        <div className="flex flex-wrap items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2">
           {onGoToGenerator && (
             <button
               onClick={onGoToGenerator}
-              className="duo-btn-outlined py-2.5 px-3.5"
+              className="apple-pill-ghost text-[13px] py-1.5 px-3.5"
             >
-              <Sparkles className="h-4 w-4" />
-              <span>GENERAR DESDE FUENTES</span>
+              <Sparkles className="h-3.5 w-3.5 text-[#707070]" />
+              <span>Nuevo examen</span>
             </button>
           )}
 
@@ -644,61 +649,53 @@ export const ExamView: React.FC<ExamViewProps> = ({
                 SoundService.playClick();
                 onOpenOnlinePortal();
               }}
-              className="duo-btn-outlined border-[#58cc02] text-[#000437] bg-[#d7ffb8] py-2.5 px-3.5"
-              title="Compartir enlace web seguro con los alumnos (anti-copia activo)"
+              className="apple-pill-primary text-[13px] py-1.5 px-4"
+              title="Compartir enlace web seguro con los alumnos"
             >
-              <Share2 className="h-4 w-4 text-[#58cc02]" />
-              <span>ENLACE ONLINE ALUMNO</span>
+              <Share2 className="h-3.5 w-3.5" />
+              <span>Enlace online alumno</span>
             </button>
           )}
 
           <button
             onClick={() => handleCopy('student', activeModel)}
-            className="duo-btn-outlined py-2.5 px-3.5"
+            className="apple-pill-ghost text-[13px] py-1.5 px-3.5"
           >
             {copiedType === `student-${activeModel}` ? (
-              <Check className="h-4 w-4 text-[#58cc02]" />
+              <Check className="h-3.5 w-3.5 text-[#0071e3]" />
             ) : (
-              <Copy className="h-4 w-4" />
+              <Copy className="h-3.5 w-3.5 text-[#707070]" />
             )}
             <span>
               {copiedType === `student-${activeModel}`
-                ? '¡COPIADO!'
-                : `COPIAR EXAMEN ${activeModel}`}
+                ? '¡Copiado!'
+                : `Copiar examen ${activeModel}`}
             </span>
           </button>
 
           <button
             onClick={() => handleCopy('solucionario', activeModel)}
-            className="duo-btn-outlined py-2.5 px-3.5"
+            className="apple-pill-ghost text-[13px] py-1.5 px-3.5"
           >
             {copiedType === `solucionario-${activeModel}` ? (
-              <Check className="h-4 w-4 text-[#58cc02]" />
+              <Check className="h-3.5 w-3.5 text-[#0071e3]" />
             ) : (
-              <Copy className="h-4 w-4" />
+              <Copy className="h-3.5 w-3.5 text-[#707070]" />
             )}
             <span>
               {copiedType === `solucionario-${activeModel}`
-                ? '¡COPIADO!'
-                : `COPIAR SOLUCIONARIO ${activeModel}`}
+                ? '¡Copiado!'
+                : `Copiar solución ${activeModel}`}
             </span>
           </button>
 
           <button
             onClick={() => handleDownloadWord(viewMode)}
-            className="duo-nav-pill py-2 px-3 text-[13px]"
+            className="apple-pill-wash text-[13px] py-1.5 px-3"
             title="Descargar archivo .doc para Microsoft Word"
           >
-            <Download className="h-4 w-4" />
-            <span>WORD ({activeModel})</span>
-          </button>
-
-          <button
-            onClick={() => handleCopy('aiken', activeModel)}
-            className="duo-nav-pill py-2 px-3 text-[13px]"
-            title="Copiar preguntas test en formato Aiken para Moodle"
-          >
-            <span>{copiedType === `aiken-${activeModel}` ? '¡AIKEN!' : 'MOODLE AIKEN'}</span>
+            <Download className="h-3.5 w-3.5" />
+            <span>Word</span>
           </button>
 
           <button
@@ -708,19 +705,19 @@ export const ExamView: React.FC<ExamViewProps> = ({
               ExportService.downloadMoodleXML(displayedExam);
               onNotify?.('Descargando Banco Moodle XML', 'Archivo XML estándar listo para importar en el Banco de Preguntas de Moodle.', 'info');
             }}
-            className="duo-nav-pill py-2 px-3 text-[13px]"
+            className="apple-pill-wash text-[13px] py-1.5 px-3"
             title="Descargar archivo Moodle XML estándar para el Banco de Preguntas"
           >
-            <Download className="h-4 w-4" />
-            <span>MOODLE XML</span>
+            <Download className="h-3.5 w-3.5" />
+            <span>Moodle XML</span>
           </button>
 
           <button
             onClick={() => window.print()}
             title="Imprimir en formato A4"
-            className="duo-nav-pill py-2 px-3"
+            className="p-2 rounded-full border border-[#d6d6d6] hover:bg-[#f5f5f7] text-[#1d1d1f] transition"
           >
-            <Printer className="h-4 w-4" />
+            <Printer className="h-3.5 w-3.5" />
           </button>
 
           <button
@@ -728,10 +725,10 @@ export const ExamView: React.FC<ExamViewProps> = ({
               SoundService.playClick();
               onProceedToGrading();
             }}
-            className="duo-btn-primary py-2.5 px-5"
+            className="apple-pill-primary text-[13px] py-1.5 px-4"
           >
-            <span>CORREGIR EXÁMENES</span>
-            <ArrowRight className="h-4 w-4" />
+            <span>Corregir OCR</span>
+            <ArrowRight className="h-3.5 w-3.5" />
           </button>
         </div>
 
@@ -898,37 +895,37 @@ export const ExamView: React.FC<ExamViewProps> = ({
           </div>
         </div>
       ) : (
-        /* INTERACTIVE SOLUCIONARIO & WEIGHTS MATRIX */
         <div className="space-y-8">
+          {/* INTERACTIVE SOLUCIONARIO & WEIGHTS MATRIX */}
           
           {/* BLOCK 1: MULTIPLE CHOICE MATRIX */}
-          <div className="duo-card p-0 overflow-hidden">
-            <div className="px-6 py-5 bg-[#ffffff] border-b-2 border-[#afafaf] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="bg-[#ffffff] border border-[#d6d6d6] rounded-[28px] overflow-hidden">
+            <div className="px-7 py-6 bg-[#ffffff] border-b border-[#d6d6d6] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <div className="flex items-center gap-2.5">
-                  <span className="px-3 py-1 text-[13px] font-bold uppercase tracking-[0.053em] bg-[#d7ffb8] text-[#4b4b4b] border-2 border-[#58cc02] rounded-[12px]">
-                    SECCIÓN I
+                  <span className="apple-badge-ember">
+                    Sección I
                   </span>
-                  <h3 className="text-[24px] font-bold text-[#4b4b4b]">
+                  <h3 className="text-[20px] font-semibold text-[#1d1d1f]">
                     Preguntas Tipo Test ({exam.testQuestions.length})
                   </h3>
                 </div>
-                <p className="duo-body-copy mt-1">
-                  Haz clic en cualquier letra (A, B, C, D) para cambiar la respuesta correcta o ajusta los puntos de cada pregunta.
+                <p className="text-[14px] text-[#707070] mt-1">
+                  Haz clic en cualquier letra para cambiar la clave oficial o ajusta los puntos de cada pregunta.
                 </p>
               </div>
 
               <button
                 type="button"
                 onClick={handleAddTestQuestion}
-                className="duo-btn-primary py-2.5 px-4 self-start sm:self-auto"
+                className="apple-pill-primary text-[13px] py-2 px-4 self-start sm:self-auto"
               >
                 <Plus className="h-4 w-4" />
-                <span>AÑADIR PREGUNTA TEST</span>
+                <span>Añadir pregunta test</span>
               </button>
             </div>
 
-            <div className="divide-y-2 divide-[#afafaf]">
+            <div className="divide-y divide-[#d6d6d6]">
               {exam.testQuestions.map((q, idx) => {
                 const isEditing = editingItemId === q.id;
                 return (
@@ -937,7 +934,7 @@ export const ExamView: React.FC<ExamViewProps> = ({
                     {/* Question Top Row */}
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                       <div className="flex items-start gap-3 flex-1">
-                        <span className="font-feather font-extrabold text-[28px] text-[#58cc02] leading-none mt-0.5">
+                        <span className="text-[20px] font-bold text-[#1d1d1f] leading-none mt-1">
                           {String(idx + 1).padStart(2, '0')}
                         </span>
                         <div className="flex-1">
@@ -946,10 +943,10 @@ export const ExamView: React.FC<ExamViewProps> = ({
                               rows={2}
                               value={q.question}
                               onChange={e => handleUpdateTestQuestion(q.id, { question: e.target.value })}
-                              className="w-full text-[17px] font-bold p-3 rounded-[12px] border-2 border-[#afafaf] bg-[#ffffff] text-[#4b4b4b] focus:outline-none focus:border-[#58cc02]"
+                              className="w-full text-[16px] font-medium p-3 rounded-[14px] border border-[#d6d6d6] bg-[#ffffff] text-[#1d1d1f] focus:outline-none focus:border-[#0071e3]"
                             />
                           ) : (
-                            <p className="text-[19px] font-bold text-[#4b4b4b] leading-[1.3]">
+                            <p className="text-[16px] font-medium text-[#1d1d1f] leading-snug">
                               {q.question}
                             </p>
                           )}
@@ -958,9 +955,9 @@ export const ExamView: React.FC<ExamViewProps> = ({
 
                       {/* Weight Stepper & Actions */}
                       <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
-                        <div className="flex items-center bg-[#ffffff] border-2 border-[#afafaf] rounded-[12px] px-3 py-1.5">
-                          <span className="text-[13px] font-bold uppercase tracking-[0.053em] text-[#777777] mr-2">
-                            PESO:
+                        <div className="flex items-center bg-[#fafafc] border border-[#d6d6d6] rounded-full px-3 py-1">
+                          <span className="text-[12px] text-[#707070] mr-1.5">
+                            Peso:
                           </span>
                           <button
                             type="button"
@@ -969,7 +966,7 @@ export const ExamView: React.FC<ExamViewProps> = ({
                                 points: Number(Math.max(0.1, q.points - 0.25).toFixed(2))
                               })
                             }
-                            className="px-2 text-[17px] font-bold text-[#4b4b4b]"
+                            className="px-1.5 text-[14px] text-[#1d1d1f]"
                           >
                             -
                           </button>
@@ -982,7 +979,7 @@ export const ExamView: React.FC<ExamViewProps> = ({
                             onChange={e =>
                               handleUpdateTestQuestion(q.id, { points: Math.max(0, Number(e.target.value)) })
                             }
-                            className="w-16 text-center text-[15px] font-bold bg-[#ffffff] border-2 border-[#afafaf] rounded-[12px] py-0.5 mx-1 tabular-nums text-[#4b4b4b]"
+                            className="w-14 text-center text-[13px] font-medium bg-[#ffffff] border border-[#d6d6d6] rounded-md py-0.5 mx-1 tabular-nums text-[#1d1d1f]"
                           />
                           <button
                             type="button"
@@ -991,20 +988,22 @@ export const ExamView: React.FC<ExamViewProps> = ({
                                 points: Number((q.points + 0.25).toFixed(2))
                               })
                             }
-                            className="px-2 text-[17px] font-bold text-[#4b4b4b]"
+                            className="px-1.5 text-[14px] text-[#1d1d1f]"
                           >
                             +
                           </button>
-                          <span className="text-[13px] font-bold text-[#777777] ml-1">PTS</span>
+                          <span className="text-[11px] text-[#707070] ml-1">pts</span>
                         </div>
 
                         <button
                           type="button"
                           onClick={() => setEditingItemId(isEditing ? null : q.id)}
-                          className={`duo-nav-pill p-2 ${isEditing ? 'duo-nav-pill-active' : ''}`}
+                          className={`p-2 rounded-full border transition ${
+                            isEditing ? 'bg-[#1d1d1f] text-[#ffffff] border-[#1d1d1f]' : 'border-[#d6d6d6] text-[#707070] hover:text-[#1d1d1f]'
+                          }`}
                           title="Editar texto y opciones"
                         >
-                          <Edit3 className="h-4 w-4" />
+                          <Edit3 className="h-3.5 w-3.5" />
                         </button>
 
                         <div className="flex flex-col">
@@ -1012,52 +1011,52 @@ export const ExamView: React.FC<ExamViewProps> = ({
                             type="button"
                             onClick={() => handleMoveTest(idx, -1)}
                             disabled={idx === 0}
-                            className="text-[#777777] hover:text-[#4b4b4b] disabled:opacity-30"
+                            className="text-[#707070] hover:text-[#1d1d1f] disabled:opacity-30 p-0.5"
                           >
-                            <ChevronUp className="h-4 w-4" />
+                            <ChevronUp className="h-3.5 w-3.5" />
                           </button>
                           <button
                             type="button"
                             onClick={() => handleMoveTest(idx, 1)}
                             disabled={idx === exam.testQuestions.length - 1}
-                            className="text-[#777777] hover:text-[#4b4b4b] disabled:opacity-30"
+                            className="text-[#707070] hover:text-[#1d1d1f] disabled:opacity-30 p-0.5"
                           >
-                            <ChevronDown className="h-4 w-4" />
+                            <ChevronDown className="h-3.5 w-3.5" />
                           </button>
                         </div>
 
                         <button
                           type="button"
                           onClick={() => handleDeleteTest(q.id)}
-                          className="p-2 text-[#777777] hover:text-[#4b4b4b] transition"
+                          className="p-2 text-[#707070] hover:text-[#1d1d1f] transition"
                           title="Eliminar pregunta"
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="h-3.5 w-3.5" />
                         </button>
                       </div>
                     </div>
 
                     {/* 4 Interactive Options */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pl-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 pl-7">
                       {(['A', 'B', 'C', 'D'] as const).map(opt => {
                         const isCorrect = q.correctAnswer === opt;
                         return (
                           <div
                             key={opt}
-                            className={`p-3 rounded-[12px] border-2 transition flex items-start gap-3 ${
+                            className={`p-3 rounded-[16px] border transition flex items-start gap-3 ${
                               isCorrect
-                                ? 'bg-[#d7ffb8] border-[#58cc02] text-[#4b4b4b]'
-                                : 'bg-[#ffffff] border-[#afafaf] text-[#777777]'
+                                ? 'border-[#0071e3] bg-[#0071e3]/5 text-[#1d1d1f]'
+                                : 'border-[#d6d6d6] bg-[#ffffff] text-[#474747]'
                             }`}
                           >
                             <button
                               type="button"
                               onClick={() => handleUpdateTestQuestion(q.id, { correctAnswer: opt })}
-                              title="Marcar como respuesta correcta en el solucionario"
-                              className={`w-7 h-7 rounded-[12px] text-[13px] font-bold flex items-center justify-center shrink-0 border-2 transition ${
+                              title="Marcar como respuesta correcta"
+                              className={`w-6 h-6 rounded-full text-[12px] font-semibold flex items-center justify-center shrink-0 border transition ${
                                 isCorrect
-                                  ? 'bg-[#58cc02] border-[#58cc02] text-[#ffffff]'
-                                  : 'bg-[#ffffff] border-[#afafaf] text-[#777777] hover:border-[#4b4b4b]'
+                                  ? 'bg-[#0071e3] border-[#0071e3] text-[#ffffff]'
+                                  : 'bg-[#ffffff] border-[#d6d6d6] text-[#707070] hover:border-[#1d1d1f]'
                               }`}
                             >
                               {opt}
@@ -1073,18 +1072,18 @@ export const ExamView: React.FC<ExamViewProps> = ({
                                       options: { ...q.options, [opt]: e.target.value }
                                     })
                                   }
-                                  className="w-full text-[15px] px-2.5 py-1 bg-[#ffffff] border-2 border-[#afafaf] rounded-[12px] text-[#4b4b4b]"
+                                  className="w-full text-[14px] px-2.5 py-1 bg-[#ffffff] border border-[#d6d6d6] rounded-[10px] text-[#1d1d1f]"
                                 />
                               ) : (
-                                <span className={`text-[15px] block ${isCorrect ? 'font-bold text-[#4b4b4b]' : ''}`}>
+                                <span className={`text-[14px] block ${isCorrect ? 'font-medium text-[#1d1d1f]' : ''}`}>
                                   {q.options[opt]}
                                 </span>
                               )}
                             </div>
 
                             {isCorrect && (
-                              <span className="text-[13px] font-bold uppercase tracking-[0.053em] px-2 py-0.5 rounded-[12px] bg-[#58cc02] text-[#ffffff] shrink-0">
-                                CORRECTA
+                              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-[#0071e3] text-[#ffffff] shrink-0">
+                                Correcta
                               </span>
                             )}
                           </div>
@@ -1093,31 +1092,31 @@ export const ExamView: React.FC<ExamViewProps> = ({
                     </div>
 
                     {/* Pedagogical Rationale */}
-                    <div className="pl-8">
+                    <div className="pl-7">
                       {isEditing ? (
                         <div className="space-y-1">
-                          <label className="text-[13px] font-bold uppercase tracking-[0.053em] text-[#777777]">
-                            Justificación didáctica del solucionario:
+                          <label className="text-[12px] text-[#707070]">
+                            Justificación didáctica:
                           </label>
                           <input
                             type="text"
                             value={q.explanation}
                             onChange={e => handleUpdateTestQuestion(q.id, { explanation: e.target.value })}
-                            className="w-full text-[15px] px-3 py-2 bg-[#ffffff] border-2 border-[#afafaf] rounded-[12px] text-[#4b4b4b]"
+                            className="w-full text-[14px] px-3 py-2 bg-[#ffffff] border border-[#d6d6d6] rounded-[12px] text-[#1d1d1f]"
                           />
                         </div>
                       ) : (
-                        <div className="px-4 py-2.5 rounded-[12px] bg-[#ffffff] border-2 border-[#afafaf] text-[15px] text-[#777777] flex items-baseline gap-2">
-                          <span className="font-bold uppercase text-[13px] tracking-[0.053em] text-[#4b4b4b] shrink-0">
-                            EXPLICACIÓN:
+                        <div className="px-4 py-2.5 rounded-[16px] bg-[#fafafc] border border-[#d6d6d6] text-[13px] text-[#707070] flex items-baseline gap-2">
+                          <span className="font-semibold text-[12px] text-[#1d1d1f] shrink-0">
+                            Explicación:
                           </span>
                           <span>{q.explanation}</span>
                         </div>
                       )}
                     </div>
 
-                    {/* Source Evidence & Traceability Badge (docentiaV2 Innovation) */}
-                    <div className="pl-8 flex flex-wrap items-center gap-2">
+                    {/* Source Evidence & Traceability Badge */}
+                    <div className="pl-7 flex flex-wrap items-center gap-2">
                       <button
                         type="button"
                         onClick={() => {
@@ -1131,19 +1130,19 @@ export const ExamView: React.FC<ExamViewProps> = ({
                             isTest: true
                           });
                         }}
-                        className={`text-[12px] font-bold px-3 py-1 rounded-[12px] border-2 transition flex items-center gap-1.5 ${
+                        className={`text-[12px] px-3 py-1 rounded-full border transition flex items-center gap-1.5 ${
                           q.isSourceVerified
-                            ? 'bg-[#d7ffb8] border-[#58cc02] text-[#000437]'
-                            : 'bg-[#ffffff] border-[#afafaf] text-[#777777] hover:border-[#58cc02]'
+                            ? 'bg-[#fafafc] border-[#1d1d1f] text-[#1d1d1f] font-medium'
+                            : 'bg-[#ffffff] border-[#d6d6d6] text-[#707070] hover:border-[#1d1d1f]'
                         }`}
-                        title="Consultar fragmento exacto del documento fuente de donde se extrajo"
+                        title="Consultar fragmento exacto del documento fuente"
                       >
-                        <BookOpen className="w-3.5 h-3.5 text-[#58cc02]" />
-                        <span>FUENTE: {q.sourceDocumentName ? q.sourceDocumentName.slice(0, 36) : 'Doc. Curricular'}</span>
+                        <BookOpen className="w-3.5 h-3.5 text-[#707070]" />
+                        <span>Fuente: {q.sourceDocumentName ? q.sourceDocumentName.slice(0, 36) : 'Doc. Curricular'}</span>
                         {q.isSourceVerified ? (
-                          <span className="text-[#58cc02] font-black">✔ AUDITADA</span>
+                          <span className="text-[#0071e3] font-medium">✔ Auditada</span>
                         ) : (
-                          <span className="text-[#777777]">· Cotejar</span>
+                          <span className="text-[#707070]">· Cotejar</span>
                         )}
                       </button>
                     </div>
@@ -1155,42 +1154,42 @@ export const ExamView: React.FC<ExamViewProps> = ({
           </div>
 
           {/* BLOCK 2: OPEN EXERCISES & RUBRICS MATRIX */}
-          <div className="duo-card p-0 overflow-hidden">
-            <div className="px-6 py-5 bg-[#ffffff] border-b-2 border-[#afafaf] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="bg-[#ffffff] border border-[#d6d6d6] rounded-[28px] overflow-hidden">
+            <div className="px-7 py-6 bg-[#ffffff] border-b border-[#d6d6d6] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <div className="flex items-center gap-2.5">
-                  <span className="px-3 py-1 text-[13px] font-bold uppercase tracking-[0.053em] bg-[#ffffff] text-[#1cb0f6] border-2 border-[#1cb0f6] rounded-[12px]">
-                    SECCIÓN II
+                  <span className="apple-badge-ember">
+                    Sección II
                   </span>
-                  <h3 className="text-[24px] font-bold text-[#4b4b4b]">
+                  <h3 className="text-[20px] font-semibold text-[#1d1d1f]">
                     Propuestas de Ejercicios y Solucionario ({exam.exercises.length})
                   </h3>
                 </div>
-                <p className="duo-body-copy mt-1">
-                  El corrector OCR comparará las respuestas de los alumnos con estos criterios y pasos de resolución.
+                <p className="text-[14px] text-[#707070] mt-1">
+                  El corrector OCR comparará las respuestas manuscritas con estos criterios y pasos de resolución.
                 </p>
               </div>
 
               <button
                 type="button"
                 onClick={handleAddExercise}
-                className="duo-btn-primary py-2.5 px-4 self-start sm:self-auto"
+                className="apple-pill-primary text-[13px] py-2 px-4 self-start sm:self-auto"
               >
                 <Plus className="h-4 w-4" />
-                <span>AÑADIR EJERCICIO</span>
+                <span>Añadir ejercicio</span>
               </button>
             </div>
 
-            <div className="divide-y-2 divide-[#afafaf]">
+            <div className="divide-y divide-[#d6d6d6]">
               {exam.exercises.map((ex, idx) => {
                 const isEditing = editingItemId === ex.id;
                 return (
                   <div key={ex.id} className="p-6 bg-[#ffffff] space-y-4">
                     
                     {/* Exercise Header & Weight Control */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-2 border-[#afafaf]/40 pb-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#d6d6d6]/60 pb-3">
                       <div className="flex items-baseline gap-3 flex-1">
-                        <span className="font-feather font-extrabold text-[28px] text-[#58cc02]">
+                        <span className="text-[20px] font-bold text-[#1d1d1f]">
                           Ej. {idx + 1}
                         </span>
                         {isEditing ? (
@@ -1198,17 +1197,17 @@ export const ExamView: React.FC<ExamViewProps> = ({
                             type="text"
                             value={ex.title}
                             onChange={e => handleUpdateExercise(ex.id, { title: e.target.value })}
-                            className="flex-1 text-[19px] font-bold px-3 py-1.5 border-2 border-[#afafaf] rounded-[12px] bg-[#ffffff] text-[#4b4b4b]"
+                            className="flex-1 text-[16px] font-medium px-3 py-1.5 border border-[#d6d6d6] rounded-[12px] bg-[#ffffff] text-[#1d1d1f]"
                           />
                         ) : (
-                          <h4 className="text-[19px] font-bold text-[#4b4b4b]">{ex.title}</h4>
+                          <h4 className="text-[17px] font-semibold text-[#1d1d1f]">{ex.title}</h4>
                         )}
                       </div>
 
                       <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
-                        <div className="flex items-center bg-[#ffffff] border-2 border-[#afafaf] rounded-[12px] px-3 py-1.5">
-                          <span className="text-[13px] font-bold uppercase tracking-[0.053em] text-[#777777] mr-2">
-                            PESO:
+                        <div className="flex items-center bg-[#fafafc] border border-[#d6d6d6] rounded-full px-3 py-1">
+                          <span className="text-[12px] text-[#707070] mr-1.5">
+                            Peso:
                           </span>
                           <button
                             type="button"
@@ -1217,7 +1216,7 @@ export const ExamView: React.FC<ExamViewProps> = ({
                                 points: Number(Math.max(0.25, ex.points - 0.5).toFixed(2))
                               })
                             }
-                            className="px-2 text-[17px] font-bold text-[#4b4b4b]"
+                            className="px-1.5 text-[14px] text-[#1d1d1f]"
                           >
                             -
                           </button>
@@ -1230,7 +1229,7 @@ export const ExamView: React.FC<ExamViewProps> = ({
                             onChange={e =>
                               handleUpdateExercise(ex.id, { points: Math.max(0, Number(e.target.value)) })
                             }
-                            className="w-16 text-center text-[15px] font-bold bg-[#ffffff] border-2 border-[#afafaf] rounded-[12px] py-0.5 mx-1 tabular-nums text-[#4b4b4b]"
+                            className="w-14 text-center text-[13px] font-medium bg-[#ffffff] border border-[#d6d6d6] rounded-md py-0.5 mx-1 tabular-nums text-[#1d1d1f]"
                           />
                           <button
                             type="button"
@@ -1239,31 +1238,30 @@ export const ExamView: React.FC<ExamViewProps> = ({
                                 points: Number((ex.points + 0.5).toFixed(2))
                               })
                             }
-                            className="px-2 text-[17px] font-bold text-[#4b4b4b]"
+                            className="px-1.5 text-[14px] text-[#1d1d1f]"
                           >
                             +
                           </button>
-                          <span className="text-[13px] font-bold text-[#777777] ml-1">PTS</span>
+                          <span className="text-[11px] text-[#707070] ml-1">pts</span>
                         </div>
 
                         <button
                           type="button"
                           onClick={() => setEditingItemId(isEditing ? null : ex.id)}
-                          className={`duo-nav-pill py-1.5 px-3 text-[13px] ${
-                            isEditing ? 'duo-nav-pill-active' : ''
+                          className={`px-3 py-1 text-[12px] rounded-full border transition ${
+                            isEditing ? 'bg-[#1d1d1f] text-[#ffffff] border-[#1d1d1f]' : 'border-[#d6d6d6] text-[#707070] hover:text-[#1d1d1f]'
                           }`}
                         >
-                          <Edit3 className="h-4 w-4" />
-                          <span>{isEditing ? 'LISTO' : 'EDITAR'}</span>
+                          <span>{isEditing ? 'Listo' : 'Editar'}</span>
                         </button>
 
                         <button
                           type="button"
                           onClick={() => handleDeleteExercise(ex.id)}
-                          className="p-2 text-[#777777] hover:text-[#4b4b4b] transition"
+                          className="p-2 text-[#707070] hover:text-[#1d1d1f] transition"
                           title="Eliminar ejercicio"
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="h-3.5 w-3.5" />
                         </button>
                       </div>
                     </div>
@@ -1274,34 +1272,34 @@ export const ExamView: React.FC<ExamViewProps> = ({
                       {/* Left 6 cols: Statement & Rubric Criteria */}
                       <div className="lg:col-span-6 space-y-4">
                         <div>
-                          <span className="text-[13px] font-bold uppercase tracking-[0.053em] text-[#777777] block mb-1.5">
-                            ENUNCIADO DEL EJERCICIO
+                          <span className="text-[12px] font-semibold uppercase tracking-wider text-[#707070] block mb-1.5">
+                            Enunciado del ejercicio
                           </span>
                           {isEditing ? (
                             <textarea
                               rows={5}
                               value={ex.statement}
                               onChange={e => handleUpdateExercise(ex.id, { statement: e.target.value })}
-                              className="w-full text-[15px] p-3.5 rounded-[12px] border-2 border-[#afafaf] bg-[#ffffff] text-[#4b4b4b]"
+                              className="w-full text-[14px] p-3.5 rounded-[16px] border border-[#d6d6d6] bg-[#ffffff] text-[#1d1d1f]"
                             />
                           ) : (
-                            <div className="p-4 rounded-[12px] bg-[#ffffff] border-2 border-[#afafaf] text-[15px] text-[#4b4b4b] whitespace-pre-line leading-relaxed">
+                            <div className="p-4 rounded-[18px] bg-[#fafafc] border border-[#d6d6d6] text-[14px] text-[#1d1d1f] whitespace-pre-line leading-relaxed">
                               {ex.statement}
                             </div>
                           )}
                         </div>
 
                         <div>
-                          <span className="text-[13px] font-bold uppercase tracking-[0.053em] text-[#777777] block mb-1.5">
-                            CRITERIOS DE RÚBRICA
+                          <span className="text-[12px] font-semibold uppercase tracking-wider text-[#707070] block mb-1.5">
+                            Criterios de rúbrica
                           </span>
                           <div className="space-y-2">
                             {ex.rubricCriteria.map((crit, cIdx) => (
                               <div
                                 key={cIdx}
-                                className="flex items-start gap-2.5 text-[15px] bg-[#ffffff] p-3 rounded-[12px] border-2 border-[#afafaf]"
+                                className="flex items-start gap-2.5 text-[14px] bg-[#ffffff] p-3 rounded-[14px] border border-[#d6d6d6]"
                               >
-                                <CheckCircle2 className="h-5 w-5 text-[#58cc02] shrink-0 mt-0.5" />
+                                <CheckCircle2 className="h-4 w-4 text-[#0071e3] shrink-0 mt-0.5" />
                                 {isEditing ? (
                                   <input
                                     type="text"
@@ -1311,10 +1309,10 @@ export const ExamView: React.FC<ExamViewProps> = ({
                                       next[cIdx] = e.target.value;
                                       handleUpdateExercise(ex.id, { rubricCriteria: next });
                                     }}
-                                    className="flex-1 text-[15px] border-b-2 border-[#afafaf] focus:outline-none text-[#4b4b4b]"
+                                    className="flex-1 text-[14px] border-b border-[#d6d6d6] focus:outline-none text-[#1d1d1f]"
                                   />
                                 ) : (
-                                  <span className="text-[#4b4b4b]">{crit}</span>
+                                  <span className="text-[#1d1d1f]">{crit}</span>
                                 )}
                               </div>
                             ))}
@@ -1324,18 +1322,18 @@ export const ExamView: React.FC<ExamViewProps> = ({
 
                       {/* Right 6 cols: Model Solution Steps (Solucionario) */}
                       <div className="lg:col-span-6 flex flex-col">
-                        <span className="text-[13px] font-bold uppercase tracking-[0.053em] text-[#58cc02] block mb-1.5">
-                          SOLUCIONARIO OFICIAL PASO A PASO (REFERENCIA OCR)
+                        <span className="text-[12px] font-semibold uppercase tracking-wider text-[#0071e3] block mb-1.5">
+                          Solucionario oficial de referencia OCR
                         </span>
                         {isEditing ? (
                           <textarea
                             rows={9}
                             value={ex.solutionSteps}
                             onChange={e => handleUpdateExercise(ex.id, { solutionSteps: e.target.value })}
-                            className="flex-1 w-full text-[15px] p-4 rounded-[12px] border-2 border-[#58cc02] bg-[#d7ffb8]/40 text-[#4b4b4b]"
+                            className="flex-1 w-full text-[14px] p-4 rounded-[18px] border border-[#0071e3] bg-[#ffffff] text-[#1d1d1f]"
                           />
                         ) : (
-                          <div className="flex-1 p-4 rounded-[12px] bg-[#d7ffb8] text-[#4b4b4b] text-[15px] font-medium whitespace-pre-line leading-relaxed border-2 border-[#58cc02]">
+                          <div className="flex-1 p-4 rounded-[18px] bg-[#fafafc] text-[#1d1d1f] text-[14px] whitespace-pre-line leading-relaxed border border-[#d6d6d6]">
                             {ex.solutionSteps}
                           </div>
                         )}
@@ -1343,8 +1341,8 @@ export const ExamView: React.FC<ExamViewProps> = ({
 
                     </div>
 
-                    {/* Source Evidence & Traceability Badge (docentiaV2 Innovation) */}
-                    <div className="flex flex-wrap items-center gap-2 pt-2 border-t-2 border-[#afafaf]/30">
+                    {/* Source Evidence & Traceability Badge */}
+                    <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-[#d6d6d6]/40">
                       <button
                         type="button"
                         onClick={() => {
@@ -1358,19 +1356,19 @@ export const ExamView: React.FC<ExamViewProps> = ({
                             isTest: false
                           });
                         }}
-                        className={`text-[12px] font-bold px-3 py-1 rounded-[12px] border-2 transition flex items-center gap-1.5 ${
+                        className={`text-[12px] px-3 py-1 rounded-full border transition flex items-center gap-1.5 ${
                           ex.isSourceVerified
-                            ? 'bg-[#d7ffb8] border-[#58cc02] text-[#000437]'
-                            : 'bg-[#ffffff] border-[#afafaf] text-[#777777] hover:border-[#58cc02]'
+                            ? 'bg-[#fafafc] border-[#1d1d1f] text-[#1d1d1f] font-medium'
+                            : 'bg-[#ffffff] border-[#d6d6d6] text-[#707070] hover:border-[#1d1d1f]'
                         }`}
-                        title="Consultar fragmento exacto del documento fuente de donde se extrajo"
+                        title="Consultar fragmento exacto del documento fuente"
                       >
-                        <BookOpen className="w-3.5 h-3.5 text-[#58cc02]" />
-                        <span>FUENTE: {ex.sourceDocumentName ? ex.sourceDocumentName.slice(0, 36) : 'Doc. Curricular'}</span>
+                        <BookOpen className="w-3.5 h-3.5 text-[#707070]" />
+                        <span>Fuente: {ex.sourceDocumentName ? ex.sourceDocumentName.slice(0, 36) : 'Doc. Curricular'}</span>
                         {ex.isSourceVerified ? (
-                          <span className="text-[#58cc02] font-black">✔ AUDITADA</span>
+                          <span className="text-[#0071e3] font-medium">✔ Auditada</span>
                         ) : (
-                          <span className="text-[#777777]">· Cotejar</span>
+                          <span className="text-[#707070]">· Cotejar</span>
                         )}
                       </button>
                     </div>
@@ -1384,82 +1382,82 @@ export const ExamView: React.FC<ExamViewProps> = ({
         </div>
       )}
 
-      {/* MODAL MESA DE EVIDENCIAS Y TRAZABILIDAD (DE DOCENTIA V2) */}
+      {/* MODAL MESA DE EVIDENCIAS Y TRAZABILIDAD */}
       {evidenceModalItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#000437]/60 backdrop-blur-xs animate-fadeIn">
-          <div className="bg-[#ffffff] text-[#4b4b4b] rounded-[12px] border-2 border-[#afafaf] shadow-2xl max-w-xl w-full p-6 space-y-4">
-            <div className="flex items-center justify-between border-b-2 border-[#afafaf]/40 pb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1d1d1f]/40 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-[#ffffff] text-[#1d1d1f] rounded-[24px] border border-[#d6d6d6] shadow-[0_16px_48px_rgba(0,0,0,0.12)] max-w-xl w-full p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-[#d6d6d6]/60 pb-3">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-[12px] bg-[#d7ffb8] border-2 border-[#58cc02] text-[#58cc02] flex items-center justify-center">
-                  <BookOpen className="w-5 h-5" />
+                <div className="w-8 h-8 rounded-full bg-[#f5f5f7] border border-[#d6d6d6] text-[#0071e3] flex items-center justify-center">
+                  <BookOpen className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-[17px] font-bold text-[#4b4b4b]">
+                  <h3 className="text-[16px] font-semibold text-[#1d1d1f]">
                     Trazabilidad de Fuente Curricular
                   </h3>
-                  <p className="text-[12px] text-[#777777]">
-                    Mesa de evidencias para justificar la pertinencia del contenido ante inspección o alumnos.
+                  <p className="text-[12px] text-[#707070]">
+                    Mesa de evidencias para justificar la pertinencia del contenido.
                   </p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setEvidenceModalItem(null)}
-                className="p-1.5 text-[#777777] hover:text-[#4b4b4b] rounded-[12px] border-2 border-[#afafaf]"
+                className="p-1.5 text-[#707070] hover:text-[#1d1d1f] rounded-full"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             <div>
-              <span className="text-[12px] font-bold uppercase tracking-[0.053em] text-[#777777] block mb-1">
-                ELEMENTO EVALUADO
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#707070] block mb-1">
+                Elemento evaluado
               </span>
-              <p className="text-[15px] font-bold text-[#4b4b4b] bg-[#f8fafc] p-3 rounded-[12px] border-2 border-[#afafaf]/50">
+              <p className="text-[14px] text-[#1d1d1f] bg-[#fafafc] p-3 rounded-[14px] border border-[#d6d6d6]">
                 {evidenceModalItem.title}
               </p>
             </div>
 
             <div>
-              <span className="text-[12px] font-bold uppercase tracking-[0.053em] text-[#58cc02] block mb-1">
-                DOCUMENTO ORIGEN COTEJADO
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#0071e3] block mb-1">
+                Documento origen cotejado
               </span>
-              <p className="text-[13px] font-mono font-bold text-[#000437]">
+              <p className="text-[13px] text-[#1d1d1f]">
                 📄 {evidenceModalItem.docName}
               </p>
             </div>
 
             <div>
-              <span className="text-[12px] font-bold uppercase tracking-[0.053em] text-[#777777] block mb-1">
-                FRAGMENTO TEXTUAL EXACTO EN LA FUENTE
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#707070] block mb-1">
+                Fragmento textual exacto en la fuente
               </span>
-              <blockquote className="p-3.5 rounded-[12px] bg-[#d7ffb8]/30 border-l-4 border-[#58cc02] text-[14px] text-[#4b4b4b] italic leading-relaxed">
+              <blockquote className="p-3.5 rounded-[14px] bg-[#fafafc] border-l-2 border-[#0071e3] text-[13px] text-[#1d1d1f] italic leading-relaxed">
                 "{evidenceModalItem.excerpt}"
               </blockquote>
             </div>
 
-            <div className="pt-2 flex items-center justify-between border-t-2 border-[#afafaf]/40">
+            <div className="pt-2 flex items-center justify-between border-t border-[#d6d6d6]/60">
               <button
                 type="button"
                 onClick={() => handleToggleVerifySource(evidenceModalItem.id, evidenceModalItem.isTest)}
-                className={`py-2 px-4 rounded-[12px] border-2 text-[13px] font-bold uppercase tracking-[0.053em] flex items-center gap-2 ${
+                className={`py-2 px-4 rounded-full text-[13px] font-normal flex items-center gap-2 ${
                   evidenceModalItem.isVerified
-                    ? 'bg-[#d7ffb8] border-[#58cc02] text-[#000437]'
-                    : 'duo-btn-primary'
+                    ? 'bg-[#f5f5f7] border border-[#d6d6d6] text-[#1d1d1f]'
+                    : 'apple-pill-primary'
                 }`}
               >
-                <CheckCircle2 className="w-4 h-4 text-[#58cc02]" />
+                <CheckCircle2 className="w-4 h-4 text-[#0071e3]" />
                 <span>
-                  {evidenceModalItem.isVerified ? '✔ MARCADA COMO AUDITADA' : 'MARCAR COMO VERIFICADA'}
+                  {evidenceModalItem.isVerified ? '✔ Marcada como auditada' : 'Marcar como verificada'}
                 </span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setEvidenceModalItem(null)}
-                className="duo-btn-neutral py-2 px-4 text-[13px]"
+                className="apple-pill-ghost text-[13px] py-1.5 px-4"
               >
-                CERRAR
+                Cerrar
               </button>
             </div>
           </div>

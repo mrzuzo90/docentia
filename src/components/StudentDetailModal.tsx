@@ -1,22 +1,19 @@
 import React, { useState } from 'react';
 import {
   X,
-  AlertTriangle,
   CheckCircle2,
-  Check,
-  User,
-  Edit3,
-  Save,
-  ShieldAlert,
+  AlertTriangle,
   ZoomIn,
   ZoomOut,
-  ScanLine,
+  Save,
+  Check,
   ChevronLeft,
   ChevronRight,
-  Sparkles
+  ShieldAlert,
+  User,
+  ScanLine
 } from 'lucide-react';
-import { Exam, StudentGradeReport, StudentSubmission, QuestionCorrection } from '../types';
-import { createSimulatedScanDataUrl } from '../services/mockData';
+import { Exam, StudentSubmission, StudentGradeReport, QuestionCorrection } from '../types';
 import { SoundService } from '../services/soundService';
 
 interface StudentDetailModalProps {
@@ -36,132 +33,91 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
   onClose,
   onSaveReport
 }) => {
-  const initialReport = submission.gradeReport;
-  if (!initialReport) return null;
+  const report = submission.gradeReport;
+  const initialCorrections = report?.corrections || [];
 
-  const [corrections, setCorrections] = useState<QuestionCorrection[]>(initialReport.corrections || []);
-  const [overallFeedback, setOverallFeedback] = useState(initialReport.overallFeedback || '');
-  const [activeTab, setActiveTab] = useState<'all' | 'unclear'>('all');
-  const [zoomLevel, setZoomLevel] = useState<number>(100);
-  const [showLaserScan, setShowLaserScan] = useState<boolean>(true);
-  const [savedSuccess, setSavedSuccess] = useState(false);
+  const [corrections, setCorrections] = useState<QuestionCorrection[]>(initialCorrections);
+  const [overallFeedback, setOverallFeedback] = useState(report?.overallFeedback || '');
+  const [zoomLevel, setZoomLevel] = useState(100);
   const [focusedQuestionId, setFocusedQuestionId] = useState<string | null>(null);
+  const [showLaserScan, setShowLaserScan] = useState(true);
+  const [savedSuccess, setSavedSuccess] = useState(false);
+  const [activeTab, setActiveTab] = useState<'all' | 'unclear'>('all');
 
-  // Sync state when switching student via prev/next buttons
-  React.useEffect(() => {
-    if (submission.gradeReport) {
-      setCorrections(submission.gradeReport.corrections || []);
-      setOverallFeedback(submission.gradeReport.overallFeedback || '');
-      setActiveTab('all');
-    }
-  }, [submission.id]);
+  const currentIdx = allSubmissions.findIndex(s => s.id === submission.id);
+  const prevSub = currentIdx > 0 ? allSubmissions[currentIdx - 1] : null;
+  const nextSub = currentIdx < allSubmissions.length - 1 ? allSubmissions[currentIdx + 1] : null;
 
-  // Live section & global score calculations
-  const testCorrections = corrections.filter(c => c.type === 'test');
-  const exCorrections = corrections.filter(c => c.type === 'exercise');
-
-  const currentTestScore = testCorrections.reduce(
-    (sum, c) => sum + (c.teacherOverrideScore !== undefined ? c.teacherOverrideScore : c.scoreAwarded),
-    0
-  );
-  const currentExScore = exCorrections.reduce(
-    (sum, c) => sum + (c.teacherOverrideScore !== undefined ? c.teacherOverrideScore : c.scoreAwarded),
-    0
-  );
-
-  const testMax = initialReport.testSectionMax || exam.testQuestions.reduce((a, b) => a + b.points, 0) || 4.0;
-  const exMax = initialReport.exerciseSectionMax || exam.exercises.reduce((a, b) => a + b.points, 0) || 6.0;
-  const totalMax = testMax + exMax || 10.0;
-
-  // 0 to 10 evaluation of each section (explicit requirement)
-  const testScoreOutOf10 = testMax > 0 ? Number(((currentTestScore / testMax) * 10).toFixed(2)) : 0;
-  const exScoreOutOf10 = exMax > 0 ? Number(((currentExScore / exMax) * 10).toFixed(2)) : 0;
-  const currentFinalScore = Number((((currentTestScore + currentExScore) / totalMax) * 10).toFixed(2));
-
-  const remainingReviewsCount = corrections.filter(c => c.needsManualReview).length;
-  const hasRemainingReviews = remainingReviewsCount > 0;
-
-  // Generate fallback visual scan if submission didn't have one
-  const scanUrl =
-    submission.scanImageUrl ||
-    createSimulatedScanDataUrl({
-      studentName: submission.studentName,
-      studentId: submission.studentIdCode || 'EXP-2026-042',
-      examTitle: exam.title,
-      dateStr: new Date(submission.submissionDate).toLocaleDateString('es-ES'),
-      q1Choice: 'C',
-      q2Choice: 'B',
-      q2CrossedOut: hasRemainingReviews ? 'A' : undefined,
-      q3Choice: 'C',
-      q4Choice: 'B',
-      ex1Lines: [
-        corrections.find(c => c.type === 'exercise')?.ocrExtractedText.slice(0, 62) ||
-          "a) Desarrollo manuscrito según pauta del ejercicio 1...",
-        "b) Verificación de secuencias y complementariedad correcta."
-      ],
-      ex2Lines: [
-        "a) Explicación conceptual del fenómeno estudiado...",
-        hasRemainingReviews
-          ? "b) [Tachón y mancha de tinta en el cálculo final...]"
-          : "b) Resolución completa verificada por reconocimiento óptico."
-      ],
-      hasSmudgeInEx2: hasRemainingReviews
-    });
-
-  const handleScoreOverrideChange = (questionId: string, val: number) => {
+  const handleScoreOverrideChange = (qId: string, score: number) => {
     SoundService.playClick();
+    const clamped = Math.max(0, parseFloat(score.toFixed(2)));
     setCorrections(prev =>
-      prev.map(c => {
-        if (c.questionId === questionId) {
-          const clamped = Number(Math.max(0, Math.min(c.maxScore, val)).toFixed(2));
-          return {
-            ...c,
-            teacherOverrideScore: clamped
-          };
-        }
-        return c;
-      })
+      prev.map(c => (c.questionId === qId ? { ...c, teacherOverrideScore: clamped } : c))
     );
   };
 
-  const handleTeacherCommentChange = (questionId: string, comment: string) => {
+  const handleTeacherCommentChange = (qId: string, comment: string) => {
     setCorrections(prev =>
-      prev.map(c => (c.questionId === questionId ? { ...c, teacherComment: comment } : c))
+      prev.map(c => (c.questionId === qId ? { ...c, teacherComment: comment } : c))
     );
   };
 
-  const handleResolveReview = (questionId: string, newScore?: number) => {
-    SoundService.playSuccess();
+  const handleResolveReview = (qId: string, fullPoints: number) => {
+    SoundService.playCorrect();
     setCorrections(prev =>
-      prev.map(c => {
-        if (c.questionId === questionId) {
-          return {
-            ...c,
-            teacherOverrideScore: newScore !== undefined ? newScore : c.teacherOverrideScore ?? c.scoreAwarded,
-            needsManualReview: false,
-            reviewResolvedByTeacher: true
-          };
-        }
-        return c;
-      })
+      prev.map(c =>
+        c.questionId === qId
+          ? {
+              ...c,
+              needsManualReview: false,
+              teacherOverrideScore: fullPoints,
+              teacherComment: 'Validado tras revisión docente.'
+            }
+          : c
+      )
     );
   };
+
+  const currentTestSum = corrections
+    .filter(c => c.type === 'test')
+    .reduce((acc, c) => acc + (c.teacherOverrideScore !== undefined ? c.teacherOverrideScore : c.scoreAwarded), 0);
+
+  const currentExSum = corrections
+    .filter(c => c.type === 'exercise')
+    .reduce((acc, c) => acc + (c.teacherOverrideScore !== undefined ? c.teacherOverrideScore : c.scoreAwarded), 0);
+
+  const currentFinalScore = parseFloat(Math.min(10, currentTestSum + currentExSum).toFixed(2));
+
+  const testScoreOutOf10 =
+    exam.testSectionWeight > 0 ? (currentTestSum / exam.testSectionWeight) * 10 : 0;
+  const exScoreOutOf10 =
+    exam.exerciseSectionWeight > 0 ? (currentExSum / exam.exerciseSectionWeight) * 10 : 0;
+
+  const hasRemainingReviews = corrections.some(c => c.needsManualReview);
+  const remainingReviewsCount = corrections.filter(c => c.needsManualReview).length;
 
   const handleSaveAll = () => {
-    SoundService.playSuccess();
+    SoundService.playSave();
     const updatedReport: StudentGradeReport = {
-      ...initialReport,
-      testSectionScore: Number(currentTestScore.toFixed(2)),
-      testSectionScoreOutOf10: testScoreOutOf10,
-      exerciseSectionScore: Number(currentExScore.toFixed(2)),
-      exerciseSectionScoreOutOf10: exScoreOutOf10,
+      id: submission.gradeReport?.id || `rep-${submission.id}`,
+      submissionId: submission.id,
+      studentName: submission.studentName,
+      testSectionScore: currentTestSum,
+      testSectionMax: exam.testSectionWeight || 4.0,
+      testSectionScoreOutOf10: Number(testScoreOutOf10.toFixed(2)),
+      exerciseSectionScore: currentExSum,
+      exerciseSectionMax: exam.exerciseSectionWeight || 6.0,
+      exerciseSectionScoreOutOf10: Number(exScoreOutOf10.toFixed(2)),
       finalScore: currentFinalScore,
-      overallFeedback,
-      corrections,
       needsManualReview: hasRemainingReviews,
-      manualReviewReasons: corrections
-        .filter(c => c.needsManualReview && c.reviewReason)
-        .map(c => c.reviewReason as string),
+      manualReviewReasons: hasRemainingReviews
+        ? corrections
+            .filter(c => c.needsManualReview)
+            .map(c => `Pregunta: ${c.questionTitle} - Requiere verificación`)
+        : [],
+      overallFeedback: overallFeedback.trim() || 'Evaluación revisada por el profesor.',
+      corrections,
+      gradedAt: submission.gradeReport?.gradedAt || new Date().toISOString(),
       reviewedByTeacherAt: new Date().toISOString()
     };
 
@@ -170,11 +126,6 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
     setTimeout(() => setSavedSuccess(false), 2400);
   };
 
-  const currentIdx = allSubmissions.findIndex(s => s.id === submission.id);
-  const prevSub = currentIdx > 0 ? allSubmissions[currentIdx - 1] : null;
-  const nextSub = currentIdx >= 0 && currentIdx < allSubmissions.length - 1 ? allSubmissions[currentIdx + 1] : null;
-
-  // Next student needing review (fluent review flow from docentiaV2)
   const nextPendingStudent = allSubmissions.find(
     s => s.id !== submission.id && (s.status === 'needs_review' || s.gradeReport?.needsManualReview)
   );
@@ -182,71 +133,77 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
   const handleSaveAndNextPending = () => {
     handleSaveAll();
     if (nextPendingStudent && onSelectSubmission) {
-      setTimeout(() => {
-        onSelectSubmission(nextPendingStudent);
-      }, 300);
+      onSelectSubmission(nextPendingStudent);
+      setSavedSuccess(false);
+    } else {
+      onClose();
     }
   };
 
   const displayedCorrections =
     activeTab === 'unclear' ? corrections.filter(c => c.needsManualReview) : corrections;
 
-  // Bounding boxes coordinates on simulated scan sheet
+  const scanUrl =
+    submission.scanImageUrl ||
+    'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="850" viewBox="0 0 600 850"><rect width="100%" height="100%" fill="%23ffffff"/><text x="40" y="80" font-family="sans-serif" font-size="20" fill="%231d1d1f">EXAMEN OFICIAL</text><text x="40" y="110" font-family="sans-serif" font-size="14" fill="%23707070">Alumno: ' +
+      encodeURIComponent(submission.studentName) +
+      '</text><line x1="40" y1="130" x2="560" y2="130" stroke="%23d6d6d6" stroke-width="1"/><text x="40" y="170" font-family="sans-serif" font-size="14" fill="%231d1d1f">Respuestas Manuscritas Registradas:</text><text x="60" y="210" font-family="sans-serif" font-size="13" fill="%23474747">1. C  |  2. B  |  3. C  |  4. B</text><text x="40" y="270" font-family="sans-serif" font-size="14" fill="%231d1d1f">Resolución Ejercicios de Desarrollo:</text><text x="60" y="310" font-family="sans-serif" font-size="13" fill="%23474747">a) Transcripción ARN: 5-AUG GCU AAA UGA-3</text><text x="60" y="340" font-family="sans-serif" font-size="13" fill="%23474747">b) Anticodones correspondientes: UAC, CGA, UUU</text><text x="60" y="380" font-family="sans-serif" font-size="13" fill="%23474747">c) Mutación puntual C a T impide el inicio de la traducción.</text><rect x="40" y="440" width="520" height="340" rx="12" fill="%23fafafc" stroke="%23d6d6d6"/></svg>';
+
   const boundingBoxes = [
     {
       id: 'block-test',
-      label: 'Cuestionario Test (Preguntas 1-4)',
-      top: '18%',
-      height: '32%',
-      isDoubtful: corrections.some(c => c.type === 'test' && c.needsManualReview)
+      label: 'Bloque Tipo Test',
+      top: '21%',
+      height: '11%',
+      isDoubtful: corrections.filter(c => c.type === 'test').some(c => c.needsManualReview)
     },
     {
       id: exam.exercises[0]?.id || 'ex-1',
-      label: 'Ejercicio 1: Transcripción y Mutación',
-      top: '52%',
-      height: '21%',
+      label: 'Ejercicio 1',
+      top: '35%',
+      height: '16%',
       isDoubtful: corrections.find(c => c.questionId === exam.exercises[0]?.id)?.needsManualReview || false
     },
     {
       id: exam.exercises[1]?.id || 'ex-2',
-      label: 'Ejercicio 2: Código Genético / Mancha de Tinta',
-      top: '74%',
-      height: '22%',
+      label: 'Ejercicio 2',
+      top: '53%',
+      height: '24%',
       isDoubtful: corrections.find(c => c.questionId === exam.exercises[1]?.id)?.needsManualReview || hasRemainingReviews
     }
   ];
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#000437]/50 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 animate-fadeIn">
-      <div className="bg-[#ffffff] text-[#4b4b4b] rounded-[12px] border-2 border-[#afafaf] shadow-2xl max-w-6xl w-full h-[95vh] flex flex-col overflow-hidden">
+    <div className="fixed inset-0 z-50 bg-[#1d1d1f]/40 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 animate-fadeIn">
+      <div className="bg-[#ffffff] text-[#1d1d1f] rounded-[28px] border border-[#d6d6d6] shadow-[0_24px_64px_rgba(0,0,0,0.16)] max-w-6xl w-full h-[95vh] flex flex-col overflow-hidden">
         
         {/* MODAL HEADER */}
-        <div className="p-4 sm:p-5 bg-[#ffffff] border-b-2 border-[#afafaf] flex flex-wrap items-center justify-between gap-3 shrink-0">
+        <div className="p-4 sm:p-5 bg-[#ffffff] border-b border-[#d6d6d6] flex flex-wrap items-center justify-between gap-3 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-[12px] bg-[#d7ffb8] border-2 border-[#58cc02] text-[#58cc02] flex items-center justify-center font-bold">
+            <div className="w-10 h-10 rounded-full bg-[#f5f5f7] border border-[#d6d6d6] text-[#0071e3] flex items-center justify-center font-bold">
               <User className="h-5 w-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-[20px] font-bold text-[#4b4b4b] leading-tight">
+                <h2 className="text-[19px] font-semibold text-[#1d1d1f] leading-tight">
                   {submission.studentName}
                 </h2>
-                <span className="px-2.5 py-0.5 rounded-[12px] bg-[#ffffff] border-2 border-[#afafaf] text-[12px] font-bold uppercase tracking-[0.053em] text-[#777777]">
+                <span className="px-2.5 py-0.5 rounded-full border border-[#d6d6d6] text-[12px] text-[#707070] bg-[#fafafc]">
                   {submission.studentIdCode || 'EXP-2026'}
                 </span>
                 {submission.isOnlineSubmission && (
-                  <span className="px-2.5 py-0.5 rounded-[12px] bg-[#d7ffb8] border-2 border-[#58cc02] text-[12px] font-bold text-[#000437]">
-                    🌐 ONLINE · {submission.tabSwitchCount || 0} SALIDAS
+                  <span className="px-2.5 py-0.5 rounded-full bg-[#0071e3]/10 text-[12px] font-medium text-[#0071e3]">
+                    Online · {submission.tabSwitchCount || 0} salidas
                   </span>
                 )}
               </div>
-              <p className="text-[13px] text-[#777777] mt-0.5">
+              <p className="text-[12px] text-[#707070] mt-0.5">
                 {exam.title} · Pliego: {submission.scanPdfName || 'Examen_Escaneado.pdf'}
               </p>
             </div>
 
             {allSubmissions.length > 1 && onSelectSubmission && (
-              <div className="hidden md:flex items-center gap-1 pl-3 border-l-2 border-[#afafaf]/40">
+              <div className="hidden md:flex items-center gap-1 pl-3 border-l border-[#d6d6d6]">
                 <button
                   type="button"
                   disabled={!prevSub}
@@ -254,12 +211,12 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
                     SoundService.playClick();
                     if (prevSub) onSelectSubmission(prevSub);
                   }}
-                  className="p-1.5 rounded-[12px] border-2 border-[#afafaf] hover:border-[#4b4b4b] disabled:opacity-30 text-[#4b4b4b]"
+                  className="p-1.5 rounded-full border border-[#d6d6d6] hover:border-[#1d1d1f] disabled:opacity-30 text-[#1d1d1f] transition"
                   title="Alumno anterior"
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </button>
-                <span className="text-[12px] font-bold text-[#777777] px-1.5">
+                <span className="text-[12px] text-[#707070] px-1.5">
                   {currentIdx + 1} / {allSubmissions.length}
                 </span>
                 <button
@@ -269,7 +226,7 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
                     SoundService.playClick();
                     if (nextSub) onSelectSubmission(nextSub);
                   }}
-                  className="p-1.5 rounded-[12px] border-2 border-[#afafaf] hover:border-[#4b4b4b] disabled:opacity-30 text-[#4b4b4b]"
+                  className="p-1.5 rounded-full border border-[#d6d6d6] hover:border-[#1d1d1f] disabled:opacity-30 text-[#1d1d1f] transition"
                   title="Siguiente alumno"
                 >
                   <ChevronRight className="h-4 w-4" />
@@ -280,35 +237,35 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
 
           {/* Section 0-10 Scores + Overall Score */}
           <div className="flex items-center gap-3">
-            <div className="hidden sm:flex items-center gap-3 bg-[#ffffff] px-3.5 py-1.5 rounded-[12px] border-2 border-[#afafaf]">
+            <div className="hidden sm:flex items-center gap-3 bg-[#fafafc] px-4 py-1.5 rounded-full border border-[#d6d6d6]">
               <div className="text-right">
-                <span className="text-[11px] font-bold uppercase tracking-[0.053em] text-[#777777] block">
-                  TEST (0–10)
+                <span className="text-[11px] text-[#707070] uppercase block">
+                  Test (0–10)
                 </span>
-                <span className="text-[15px] font-bold text-[#58cc02] tabular-nums">
-                  {testScoreOutOf10.toFixed(1)}<span className="text-[12px] text-[#777777]">/10</span>
+                <span className="text-[14px] font-semibold text-[#1d1d1f] tabular-nums">
+                  {testScoreOutOf10.toFixed(1)}<span className="text-[11px] text-[#707070]">/10</span>
                 </span>
               </div>
 
-              <span className="text-[#afafaf]">|</span>
+              <span className="text-[#d6d6d6]">|</span>
 
               <div className="text-right">
-                <span className="text-[11px] font-bold uppercase tracking-[0.053em] text-[#777777] block">
-                  EJERCICIOS (0–10)
+                <span className="text-[11px] text-[#707070] uppercase block">
+                  Ejercicios (0–10)
                 </span>
-                <span className="text-[15px] font-bold text-[#1cb0f6] tabular-nums">
-                  {exScoreOutOf10.toFixed(1)}<span className="text-[12px] text-[#777777]">/10</span>
+                <span className="text-[14px] font-semibold text-[#0071e3] tabular-nums">
+                  {exScoreOutOf10.toFixed(1)}<span className="text-[11px] text-[#707070]">/10</span>
                 </span>
               </div>
 
-              <span className="text-[#afafaf]">|</span>
+              <span className="text-[#d6d6d6]">|</span>
 
               <div className="text-right pl-1">
-                <span className="text-[11px] font-bold uppercase tracking-[0.053em] text-[#4b4b4b] block">
-                  GLOBAL PONDERADA
+                <span className="text-[11px] font-medium text-[#1d1d1f] block">
+                  Global Ponderada
                 </span>
-                <span className="font-feather font-extrabold text-[22px] text-[#58cc02] tabular-nums leading-none">
-                  {currentFinalScore.toFixed(2)} <span className="text-[13px] text-[#777777]">/ 10</span>
+                <span className="text-[18px] font-bold text-[#1d1d1f] tabular-nums leading-none">
+                  {currentFinalScore.toFixed(2)} <span className="text-[12px] text-[#707070]">/ 10</span>
                 </span>
               </div>
             </div>
@@ -316,7 +273,7 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="p-2 text-[#777777] hover:text-[#4b4b4b] rounded-[12px] border-2 border-[#afafaf]"
+              className="p-2 text-[#707070] hover:text-[#1d1d1f] rounded-full hover:bg-[#f5f5f7] transition"
             >
               <X className="h-5 w-5" />
             </button>
@@ -325,33 +282,33 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
 
         {/* REVIEW ALERT BANNER IF APPLICABLE */}
         {hasRemainingReviews && (
-          <div className="bg-[#d7ffb8] border-b-2 border-[#58cc02] text-[#4b4b4b] px-5 py-2.5 flex items-center justify-between gap-3 text-[14px] font-bold shrink-0">
+          <div className="bg-[#b64400]/5 border-b border-[#b64400]/20 text-[#b64400] px-5 py-2.5 flex items-center justify-between gap-3 text-[13px] font-medium shrink-0">
             <div className="flex items-center gap-2">
-              <ShieldAlert className="h-5 w-5 text-[#58cc02] shrink-0" />
+              <ShieldAlert className="h-4 w-4 text-[#b64400] shrink-0" />
               <span>
-                INCIDENCIA OCR DETECTADA: Hay {remainingReviewsCount} ejercicio(s) con caligrafía dudosa o tachadura que requieren validación del profesor.
+                Incidencia OCR detectada: {remainingReviewsCount} ejercicio(s) con caligrafía ambigua o tachadura pendiente de confirmación.
               </span>
             </div>
             <button
               type="button"
               onClick={() => setActiveTab(activeTab === 'unclear' ? 'all' : 'unclear')}
-              className="px-3 py-1 bg-[#ffffff] border-2 border-[#58cc02] rounded-[12px] text-[12px] font-bold uppercase tracking-[0.053em] text-[#4b4b4b] hover:bg-[#58cc02] hover:text-white transition"
+              className="px-3 py-1 bg-[#ffffff] border border-[#b64400]/40 rounded-full text-[12px] text-[#b64400] hover:bg-[#b64400] hover:text-white transition"
             >
-              {activeTab === 'unclear' ? 'Ver Todo' : `Filtrar Incidencias (${remainingReviewsCount})`}
+              {activeTab === 'unclear' ? 'Ver todo' : `Filtrar incidencias (${remainingReviewsCount})`}
             </button>
           </div>
         )}
 
         {/* SPLIT-SCREEN WORKBENCH */}
-        <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 min-h-0 divide-y lg:divide-y-0 lg:divide-x-2 divide-[#afafaf] overflow-hidden">
+        <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 min-h-0 divide-y lg:divide-y-0 lg:divide-x divide-[#d6d6d6] overflow-hidden">
           
           {/* LEFT PANE (5 COLS): OCR SCAN VIEWER WITH INTERACTIVE BOUNDING BOXES */}
           <div className="lg:col-span-5 bg-[#ffffff] flex flex-col min-h-0 overflow-hidden">
-            <div className="px-4 py-2.5 bg-[#ffffff] border-b-2 border-[#afafaf] flex items-center justify-between text-xs text-[#777777] shrink-0">
+            <div className="px-4 py-2.5 bg-[#fafafc] border-b border-[#d6d6d6] flex items-center justify-between text-xs text-[#707070] shrink-0">
               <div className="flex items-center gap-2">
-                <ScanLine className="h-4 w-4 text-[#58cc02]" />
-                <span className="text-[12px] font-bold uppercase tracking-[0.053em] text-[#4b4b4b]">
-                  PLIEGO ESCANEADO + CAJAS OCR
+                <ScanLine className="h-4 w-4 text-[#0071e3]" />
+                <span className="text-[12px] font-medium text-[#1d1d1f]">
+                  Pliego digitalizado + Cajas OCR
                 </span>
               </div>
 
@@ -359,10 +316,10 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowLaserScan(!showLaserScan)}
-                  className={`px-2 py-0.5 rounded-[12px] border-2 text-[11px] font-bold uppercase transition ${
+                  className={`px-2.5 py-0.5 rounded-full border text-[11px] transition ${
                     showLaserScan
-                      ? 'bg-[#d7ffb8] border-[#58cc02] text-[#4b4b4b]'
-                      : 'bg-[#ffffff] border-[#afafaf] text-[#777777]'
+                      ? 'bg-[#1d1d1f] text-[#ffffff] border-[#1d1d1f]'
+                      : 'bg-[#ffffff] border-[#d6d6d6] text-[#707070]'
                   }`}
                 >
                   Láser {showLaserScan ? 'ON' : 'OFF'}
@@ -370,18 +327,18 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setZoomLevel(Math.max(60, zoomLevel - 20))}
-                  className="p-1 hover:text-[#4b4b4b] rounded-[12px] border-2 border-[#afafaf]"
+                  className="p-1 hover:text-[#1d1d1f] rounded-full border border-[#d6d6d6] transition"
                   title="Alejar"
                 >
                   <ZoomOut className="h-3.5 w-3.5" />
                 </button>
-                <span className="text-[12px] font-bold text-[#4b4b4b] w-10 text-center tabular-nums">
+                <span className="text-[12px] font-medium text-[#1d1d1f] w-10 text-center tabular-nums">
                   {zoomLevel}%
                 </span>
                 <button
                   type="button"
                   onClick={() => setZoomLevel(Math.min(180, zoomLevel + 20))}
-                  className="p-1 hover:text-[#4b4b4b] rounded-[12px] border-2 border-[#afafaf]"
+                  className="p-1 hover:text-[#1d1d1f] rounded-full border border-[#d6d6d6] transition"
                   title="Acercar"
                 >
                   <ZoomIn className="h-3.5 w-3.5" />
@@ -390,19 +347,19 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
             </div>
 
             {/* Scrollable Scan Canvas with Bounding Boxes */}
-            <div className="flex-1 overflow-auto p-4 sm:p-6 flex justify-center items-start bg-[#f9f9f9] relative">
+            <div className="flex-1 overflow-auto p-4 sm:p-6 flex justify-center items-start bg-[#f5f5f7] relative">
               <div
                 style={{ width: `${zoomLevel}%`, maxWidth: '640px' }}
-                className="relative rounded-[12px] border-2 border-[#afafaf] bg-white transition-all duration-200"
+                className="relative rounded-[20px] border border-[#d6d6d6] bg-white transition-all duration-200 overflow-hidden shadow-sm"
               >
                 {showLaserScan && (
-                  <div className="pointer-events-none absolute left-0 right-0 h-1 bg-[#58cc02] opacity-80 duo-anim-scan-beam z-20" />
+                  <div className="pointer-events-none absolute left-0 right-0 h-0.5 bg-[#0071e3] opacity-80 duo-anim-scan-beam z-20 shadow-[0_0_8px_#0071e3]" />
                 )}
 
                 <img
                   src={scanUrl}
                   alt={`Escaneo de ${submission.studentName}`}
-                  className="w-full h-auto block rounded-[10px] select-none"
+                  className="w-full h-auto block select-none"
                 />
 
                 {/* Overlaid Interactive OCR Bounding Boxes */}
@@ -421,23 +378,23 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
                         left: '4%',
                         width: '92%'
                       }}
-                      className={`absolute rounded-[8px] border-2 cursor-pointer transition-all ${
+                      className={`absolute rounded-[12px] border cursor-pointer transition-all ${
                         isFocused
-                          ? 'border-[#1cb0f6] bg-[#1cb0f6]/20 ring-4 ring-[#1cb0f6]/30 z-10'
+                          ? 'border-[#0071e3] bg-[#0071e3]/10 ring-2 ring-[#0071e3]/30 z-10'
                           : box.isDoubtful
-                          ? 'border-[#ff9600] bg-[#ff9600]/15 hover:bg-[#ff9600]/25'
-                          : 'border-[#58cc02] bg-[#58cc02]/10 hover:bg-[#58cc02]/20'
+                          ? 'border-[#b64400] bg-[#b64400]/10 hover:bg-[#b64400]/15'
+                          : 'border-[#1d1d1f] bg-[#1d1d1f]/5 hover:bg-[#1d1d1f]/10'
                       }`}
                       title={`${box.label} (Clic para inspeccionar)`}
                     >
                       <span
-                        className={`absolute top-1 left-2 px-2 py-0.5 rounded-[6px] text-[10px] font-bold uppercase tracking-[0.053em] shadow-xs ${
+                        className={`absolute top-1 left-2 px-2 py-0.5 rounded-full text-[10px] font-medium tracking-tight ${
                           box.isDoubtful
-                            ? 'bg-[#ff9600] text-white'
-                            : 'bg-[#58cc02] text-white'
+                            ? 'bg-[#b64400] text-white'
+                            : 'bg-[#1d1d1f] text-white'
                         }`}
                       >
-                        {box.isDoubtful ? '⚠ OCR DUDOSO' : '✔ OCR VERIFICADO'}
+                        {box.isDoubtful ? '⚠ OCR Dudoso' : '✔ OCR Leído'}
                       </span>
                     </div>
                   );
@@ -450,16 +407,16 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
           <div className="lg:col-span-7 flex flex-col min-h-0 bg-[#ffffff]">
             
             {/* Filter Sub-bar */}
-            <div className="px-5 py-3 bg-[#ffffff] border-b-2 border-[#afafaf] flex items-center justify-between gap-2 shrink-0">
-              <div className="flex items-center gap-2">
+            <div className="px-5 py-3 bg-[#fafafc] border-b border-[#d6d6d6] flex items-center justify-between gap-2 shrink-0">
+              <div className="flex items-center gap-1.5 bg-[#ffffff] p-1 rounded-full border border-[#d6d6d6]">
                 <button
                   type="button"
                   onClick={() => {
                     SoundService.playClick();
                     setActiveTab('all');
                   }}
-                  className={`duo-nav-pill py-1.5 px-3 text-[12px] ${
-                    activeTab === 'all' ? 'duo-nav-pill-active' : ''
+                  className={`px-3 py-1 rounded-full text-[12px] transition ${
+                    activeTab === 'all' ? 'bg-[#1d1d1f] text-[#ffffff] font-medium' : 'text-[#707070] hover:text-[#1d1d1f]'
                   }`}
                 >
                   Todas ({corrections.length})
@@ -470,16 +427,16 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
                     SoundService.playClick();
                     setActiveTab('unclear');
                   }}
-                  className={`duo-nav-pill py-1.5 px-3 text-[12px] ${
-                    activeTab === 'unclear' ? 'duo-nav-pill-active' : ''
+                  className={`px-3 py-1 rounded-full text-[12px] transition flex items-center gap-1.5 ${
+                    activeTab === 'unclear' ? 'bg-[#b64400] text-[#ffffff] font-medium' : 'text-[#707070] hover:text-[#1d1d1f]'
                   }`}
                 >
-                  <AlertTriangle className="h-3.5 w-3.5 text-[#58cc02]" />
+                  <AlertTriangle className="h-3 w-3" />
                   <span>Incidencias ({remainingReviewsCount})</span>
                 </button>
               </div>
 
-              <span className="text-[12px] font-bold text-[#777777] hidden sm:inline">
+              <span className="text-[12px] text-[#707070] hidden sm:inline">
                 Solucionario Oficial y Rúbricas
               </span>
             </div>
@@ -498,48 +455,48 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
                     key={corr.questionId}
                     id={`card-${corr.questionId}`}
                     onClick={() => setFocusedQuestionId(corr.questionId)}
-                    className={`rounded-[12px] border-2 p-4 space-y-3 transition ${
+                    className={`rounded-[20px] border p-4 space-y-3 transition ${
                       isCardFocused
-                        ? 'border-[#1cb0f6] bg-[#1cb0f6]/5 ring-2 ring-[#1cb0f6]/20'
+                        ? 'border-[#0071e3] bg-[#0071e3]/5 ring-2 ring-[#0071e3]/20'
                         : hasReview
-                        ? 'border-[#58cc02] bg-[#d7ffb8]/20'
-                        : 'border-[#afafaf] bg-[#ffffff]'
+                        ? 'border-[#b64400]/40 bg-[#b64400]/5'
+                        : 'border-[#d6d6d6] bg-[#ffffff]'
                     }`}
                   >
                     {/* Card Header */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-[#afafaf]/30 pb-2.5">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#d6d6d6]/60 pb-2.5">
                       <div className="flex items-center gap-2">
                         <span
-                          className={`px-2 py-0.5 rounded-[12px] text-[11px] font-bold uppercase tracking-[0.053em] border-2 ${
+                          className={`px-2 py-0.5 rounded-full text-[11px] font-medium border ${
                             corr.type === 'test'
-                              ? 'bg-[#d7ffb8] border-[#58cc02] text-[#4b4b4b]'
-                              : 'bg-[#ffffff] border-[#1cb0f6] text-[#1cb0f6]'
+                              ? 'bg-[#fafafc] border-[#d6d6d6] text-[#1d1d1f]'
+                              : 'bg-[#0071e3]/10 border-[#0071e3]/30 text-[#0071e3]'
                           }`}
                         >
-                          {corr.type === 'test' ? 'TEST' : 'EJERCICIO'}
+                          {corr.type === 'test' ? 'Test' : 'Ejercicio'}
                         </span>
-                        <h3 className="text-[16px] font-bold text-[#4b4b4b]">{corr.questionTitle}</h3>
+                        <h3 className="text-[15px] font-semibold text-[#1d1d1f]">{corr.questionTitle}</h3>
                       </div>
 
                       {/* Micro-Grading Controls */}
                       <div className="flex flex-wrap items-center gap-1.5 self-end sm:self-auto">
                         <span
-                          className={`px-2 py-0.5 rounded-[12px] text-[11px] font-bold uppercase tracking-[0.053em] border-2 ${
+                          className={`px-2 py-0.5 rounded-full text-[10px] font-medium border ${
                             corr.ocrConfidence === 'high'
-                              ? 'bg-[#d7ffb8] border-[#58cc02] text-[#4b4b4b]'
+                              ? 'bg-[#ffffff] border-[#d6d6d6] text-[#707070]'
                               : corr.ocrConfidence === 'medium'
-                              ? 'bg-[#ffffff] border-[#1cb0f6] text-[#1cb0f6]'
-                              : 'bg-[#ffffff] border-[#ff9600] text-[#ff9600]'
+                              ? 'bg-[#0071e3]/10 border-[#0071e3]/20 text-[#0071e3]'
+                              : 'bg-[#b64400]/10 border-[#b64400]/20 text-[#b64400]'
                           }`}
                         >
                           OCR: {corr.ocrConfidence.toUpperCase()}
                         </span>
 
-                        <div className="flex items-center bg-[#ffffff] border-2 border-[#afafaf] rounded-[12px] px-2 py-1">
+                        <div className="flex items-center bg-[#fafafc] border border-[#d6d6d6] rounded-full px-2 py-0.5">
                           <button
                             type="button"
                             onClick={() => handleScoreOverrideChange(corr.questionId, currentPoints - 0.25)}
-                            className="px-1 text-[14px] font-bold text-[#4b4b4b]"
+                            className="px-1 text-[13px] text-[#1d1d1f]"
                           >
                             -
                           </button>
@@ -552,16 +509,16 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
                             onChange={e =>
                               handleScoreOverrideChange(corr.questionId, parseFloat(e.target.value) || 0)
                             }
-                            className="w-14 text-center text-[13px] font-bold bg-[#ffffff] rounded border border-[#afafaf] py-0.5 mx-1 tabular-nums text-[#4b4b4b]"
+                            className="w-12 text-center text-[12px] font-medium bg-[#ffffff] rounded border border-[#d6d6d6] py-0.5 mx-1 tabular-nums text-[#1d1d1f]"
                           />
                           <button
                             type="button"
                             onClick={() => handleScoreOverrideChange(corr.questionId, currentPoints + 0.25)}
-                            className="px-1 text-[14px] font-bold text-[#4b4b4b]"
+                            className="px-1 text-[13px] text-[#1d1d1f]"
                           >
                             +
                           </button>
-                          <span className="text-[12px] text-[#777777] ml-1 font-bold">
+                          <span className="text-[11px] text-[#707070] ml-1">
                             / {corr.maxScore.toFixed(2)}p
                           </span>
                         </div>
@@ -573,69 +530,57 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
                       <button
                         type="button"
                         onClick={() => handleScoreOverrideChange(corr.questionId, currentPoints + 0.25)}
-                        className="px-2 py-1 rounded-[12px] border-2 border-[#afafaf] bg-[#ffffff] hover:border-[#4b4b4b] text-[11px] font-bold"
+                        className="px-2.5 py-0.5 rounded-full border border-[#d6d6d6] bg-[#ffffff] hover:border-[#1d1d1f] text-[11px] text-[#1d1d1f] transition"
                       >
                         +0.25 pt
                       </button>
                       <button
                         type="button"
                         onClick={() => handleScoreOverrideChange(corr.questionId, currentPoints + 0.5)}
-                        className="px-2 py-1 rounded-[12px] border-2 border-[#afafaf] bg-[#ffffff] hover:border-[#4b4b4b] text-[11px] font-bold"
+                        className="px-2.5 py-0.5 rounded-full border border-[#d6d6d6] bg-[#ffffff] hover:border-[#1d1d1f] text-[11px] text-[#1d1d1f] transition"
                       >
                         +0.50 pt
                       </button>
                       <button
                         type="button"
                         onClick={() => handleScoreOverrideChange(corr.questionId, Number((corr.maxScore / 2).toFixed(2)))}
-                        className="px-2 py-1 rounded-[12px] border-2 border-[#afafaf] bg-[#ffffff] hover:border-[#4b4b4b] text-[11px] font-bold"
+                        className="px-2.5 py-0.5 rounded-full border border-[#d6d6d6] bg-[#ffffff] hover:border-[#1d1d1f] text-[11px] text-[#1d1d1f] transition"
                       >
                         Mitad (50%)
                       </button>
                       <button
                         type="button"
                         onClick={() => handleResolveReview(corr.questionId, corr.maxScore)}
-                        className="px-2.5 py-1 rounded-[12px] bg-[#58cc02] text-white text-[11px] font-bold"
+                        className="px-3 py-0.5 rounded-full bg-[#0071e3] text-white text-[11px] font-normal transition hover:bg-[#0077ed]"
                       >
-                        ✔ Dar por Válido ({corr.maxScore.toFixed(2)} pts)
+                        ✔ Dar por válido ({corr.maxScore.toFixed(2)} pts)
                       </button>
                     </div>
 
-                    {/* MANUAL REVIEW TRIAGE ALERT BOX */}
-                    {hasReview && (
-                      <div className="bg-[#d7ffb8]/40 border-2 border-[#58cc02] rounded-[12px] p-3 space-y-2">
-                        <div className="flex items-start gap-2 text-[13px] text-[#4b4b4b]">
-                          <AlertTriangle className="h-4 w-4 text-[#58cc02] shrink-0 mt-0.5" />
-                          <div>
-                            <span className="text-[11px] font-bold uppercase tracking-[0.053em] text-[#58cc02] block">
-                              CALIGRAFÍA DUDOSA O TACHADURA
-                            </span>
-                            <p className="font-bold mt-0.5">
-                              {corr.reviewReason || 'Tachón detectado en el escaneo manuscrito.'}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* OCR Transcription vs Rubric Comparison */}
+                    {/* Student Answer vs Solution */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-[13px]">
-                      <div className="p-3 rounded-[12px] bg-[#ffffff] border-2 border-[#afafaf]">
-                        <span className="text-[11px] font-bold uppercase tracking-[0.053em] text-[#777777] block mb-1">
-                          Texto Reconocido por OCR
+                      <div className="p-3 rounded-[14px] bg-[#fafafc] border border-[#d6d6d6] space-y-1">
+                        <span className="text-[11px] uppercase text-[#707070] block">
+                          Respuesta leída del alumno:
                         </span>
-                        <p className="font-bold text-[#4b4b4b] whitespace-pre-line">
-                          {corr.ocrExtractedText || 'No se reconoció texto en este recuadro.'}
+                        <p className="text-[#1d1d1f] whitespace-pre-line leading-relaxed">
+                          {corr.studentAnswerRaw || 'Sin respuesta manuscrita identificada'}
                         </p>
                       </div>
 
-                      <div className="p-3 rounded-[12px] bg-[#d7ffb8]/30 border-2 border-[#58cc02]">
-                        <span className="text-[11px] font-bold uppercase tracking-[0.053em] text-[#58cc02] block mb-1">
-                          Criterio / Solucionario
+                      <div className="p-3 rounded-[14px] bg-[#ffffff] border border-[#d6d6d6] space-y-1">
+                        <span className="text-[11px] uppercase text-[#0071e3] block">
+                          Solución oficial esperada:
                         </span>
-                        <p className="font-medium text-[#4b4b4b] leading-relaxed">
-                          {corr.feedback}
+                        <p className="text-[#1d1d1f] whitespace-pre-line leading-relaxed">
+                          {corr.expectedAnswer}
                         </p>
                       </div>
+                    </div>
+
+                    {/* Feedback Reasoning */}
+                    <div className="text-[12px] text-[#707070] italic">
+                      Diagnóstico: {corr.feedback}
                     </div>
 
                     {/* Teacher Override Comment Input */}
@@ -645,7 +590,7 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
                         placeholder="Observación personalizada del profesor para el boletín..."
                         value={corr.teacherComment || ''}
                         onChange={e => handleTeacherCommentChange(corr.questionId, e.target.value)}
-                        className="w-full text-[13px] px-3 py-1.5 rounded-[12px] border-2 border-[#afafaf] bg-[#ffffff] text-[#4b4b4b] focus:outline-none focus:border-[#58cc02]"
+                        className="w-full text-[13px] px-3 py-1.5 rounded-[12px] border border-[#d6d6d6] bg-[#ffffff] text-[#1d1d1f] focus:outline-none focus:border-[#0071e3]"
                       />
                     </div>
                   </div>
@@ -654,21 +599,21 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
             </div>
 
             {/* Overall Feedback & Save Footer */}
-            <div className="p-4 bg-[#ffffff] border-t-2 border-[#afafaf] space-y-3 shrink-0">
+            <div className="p-4 bg-[#ffffff] border-t border-[#d6d6d6] space-y-3 shrink-0">
               <textarea
                 rows={2}
                 placeholder="Comentario global para el acta y boletín del alumno..."
                 value={overallFeedback}
                 onChange={e => setOverallFeedback(e.target.value)}
-                className="w-full text-[13px] p-2.5 rounded-[12px] border-2 border-[#afafaf] bg-[#ffffff] text-[#4b4b4b] focus:outline-none focus:border-[#58cc02]"
+                className="w-full text-[13px] p-2.5 rounded-[14px] border border-[#d6d6d6] bg-[#ffffff] text-[#1d1d1f] focus:outline-none focus:border-[#0071e3]"
               />
 
               <div className="flex items-center justify-between">
                 <div>
                   {savedSuccess && (
-                    <span className="text-[13px] font-bold text-[#58cc02] flex items-center gap-1.5">
+                    <span className="text-[13px] font-medium text-[#0071e3] flex items-center gap-1.5">
                       <Check className="h-4 w-4" />
-                      ¡Calificación guardada y consolidada en el acta!
+                      Calificación guardada y consolidada en el acta.
                     </span>
                   )}
                 </div>
@@ -677,30 +622,30 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
                   <button
                     type="button"
                     onClick={onClose}
-                    className="duo-btn-neutral py-2 px-4 text-[13px]"
+                    className="apple-pill-ghost text-[13px] py-1.5 px-4"
                   >
-                    CERRAR
+                    Cerrar
                   </button>
 
                   {nextPendingStudent && onSelectSubmission && (
                     <button
                       type="button"
                       onClick={handleSaveAndNextPending}
-                      className="duo-btn-outlined border-[#58cc02] text-[#000437] bg-[#d7ffb8] py-2 px-4 text-[13px]"
+                      className="apple-pill-wash text-[13px] py-1.5 px-4"
                       title="Guardar cambios y saltar al siguiente examen con caligrafía dudosa"
                     >
-                      <CheckCircle2 className="h-4 w-4 text-[#58cc02]" />
-                      <span>GUARDAR Y SIGUIENTE PENDIENTE</span>
+                      <CheckCircle2 className="h-3.5 w-3.5 text-[#0071e3]" />
+                      <span>Guardar y siguiente pendiente</span>
                     </button>
                   )}
 
                   <button
                     type="button"
                     onClick={handleSaveAll}
-                    className="duo-btn-primary py-2 px-5 text-[13px]"
+                    className="apple-pill-primary text-[13px] py-1.5 px-5"
                   >
-                    <Save className="h-4 w-4" />
-                    <span>GUARDAR REVISIÓN ({currentFinalScore.toFixed(2)}/10)</span>
+                    <Save className="h-3.5 w-3.5" />
+                    <span>Guardar revisión ({currentFinalScore.toFixed(2)}/10)</span>
                   </button>
                 </div>
               </div>

@@ -10,7 +10,6 @@ import {
   ScanLine,
   Trash2,
   ChevronDown,
-  Flame,
   Volume2,
   VolumeX
 } from 'lucide-react';
@@ -49,32 +48,27 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const [isExamMenuOpen, setIsExamMenuOpen] = useState(false);
   const [isMuted, setIsMuted] = useState(() => SoundService.isMuted());
-  const [streakDays, setStreakDays] = useState(() => SoundService.getStreak());
 
   const navItems = [
     {
       id: 'upload' as const,
-      label: '1. CREAR EXAMEN',
-      countLabel: `${currentExam.documents.length} doc`,
+      label: 'Crear examen',
       icon: UploadCloud
     },
     {
       id: 'exam' as const,
-      label: '2. SOLUCIONARIO',
-      countLabel: `${currentExam.testQuestions.length + currentExam.exercises.length} ítems`,
+      label: 'Solucionario',
       icon: FileText
     },
     {
       id: 'grading' as const,
-      label: '3. CORREGIR OCR',
-      countLabel: pendingReviewsCount > 0 ? `${pendingReviewsCount} dudoso` : `${totalSubmissionsCount}`,
+      label: 'Corrección OCR',
       icon: ScanLine,
       badge: pendingReviewsCount > 0 ? pendingReviewsCount : undefined
     },
     {
       id: 'gradebook' as const,
-      label: '4. NOTAS 0-10',
-      countLabel: 'Acta',
+      label: 'Acta de notas',
       icon: BarChart3
     }
   ];
@@ -85,35 +79,27 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   return (
-    <header className="no-print sticky top-0 z-30 bg-[#ffffff] border-b-2 border-[#afafaf]">
-      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+    <header className="no-print sticky top-0 z-30 bg-[#ffffff]/80 backdrop-blur-md border-b border-[#d6d6d6] transition-all">
+      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
         
-        {/* Brand Logo (Duolingo Feather 700 style + Mascot Icon) */}
+        {/* Brand Logo (Apple Whispered Mark + Docentia) */}
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={() => handleTabSwitch('upload')}
-            className="flex items-center gap-2.5 text-left focus:outline-none"
+            className="flex items-center gap-2.5 text-left focus:outline-none group"
           >
-            {/* Animated Sticker Dinosaur Mascot Badge (Profe Pachy) */}
             <img
-              src="/assets/mascot/badge-pachy-avatar.png"
-              alt="Mascota Profe Pachy (Paquicefalosaurio)"
-              className="w-10 h-10 shrink-0 transition-transform hover:scale-110 drop-shadow-xs"
+              src="/assets/mascot/lechuza-mark.svg"
+              alt="Marca Docentia"
+              className="w-7 h-7 shrink-0 transition-transform group-hover:scale-105"
             />
-            <div>
-              <span
-                className="block font-feather font-extrabold text-[28px] leading-none tracking-[-0.02em] text-[#58cc02]"
-              >
-                docentia
-              </span>
-              <span className="block text-[13px] font-bold uppercase tracking-[0.053em] text-[#777777]">
-                AULA INTELIGENTE
-              </span>
-            </div>
+            <span className="font-semibold text-[19px] leading-none tracking-[-0.02em] text-[#1d1d1f]">
+              docentia
+            </span>
           </button>
 
-          {/* Exam Selector Pill (Nav Language Pill style) */}
+          {/* Exam Selector Pill (Minimalist hairline pill) */}
           <div className="relative hidden xl:block ml-2">
             <button
               type="button"
@@ -121,20 +107,20 @@ export const Navbar: React.FC<NavbarProps> = ({
                 SoundService.playClick();
                 setIsExamMenuOpen(!isExamMenuOpen);
               }}
-              className="duo-nav-pill py-2 px-3.5 text-[14px]"
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#d6d6d6] hover:border-[#1d1d1f] text-[13px] text-[#1d1d1f] bg-[#ffffff]/60 transition-colors"
             >
               <span className="max-w-[140px] truncate">{currentExam.subject}</span>
-              <ChevronDown className="w-4 h-4 text-[#777777]" />
+              <ChevronDown className="w-3.5 h-3.5 text-[#707070]" />
             </button>
 
             {isExamMenuOpen && (
               <div
-                className="absolute left-0 mt-2 w-80 bg-[#ffffff] border-2 border-[#afafaf] rounded-[12px] p-3 z-50 space-y-2"
+                className="absolute left-0 mt-2 w-80 bg-[#ffffff] border border-[#d6d6d6] rounded-[20px] p-3 z-50 space-y-2 shadow-[0_8px_28px_rgba(0,0,0,0.08)]"
                 onMouseLeave={() => setIsExamMenuOpen(false)}
               >
-                <div className="flex items-center justify-between px-2 pb-2 border-b-2 border-[#afafaf]/40">
-                  <span className="text-[13px] font-bold uppercase tracking-[0.053em] text-[#777777]">
-                    MIS EXÁMENES ({exams.length})
+                <div className="flex items-center justify-between px-2 pb-2 border-b border-[#d6d6d6]/60">
+                  <span className="text-[12px] font-medium text-[#707070]">
+                    Convocatorias ({exams.length})
                   </span>
                   <button
                     type="button"
@@ -143,14 +129,14 @@ export const Navbar: React.FC<NavbarProps> = ({
                       setIsExamMenuOpen(false);
                       onCreateNewExam();
                     }}
-                    className="text-[13px] font-bold uppercase tracking-[0.053em] text-[#1cb0f6] hover:underline flex items-center gap-1"
+                    className="text-[12px] font-medium text-[#0066cc] hover:underline flex items-center gap-1"
                   >
                     <Plus className="w-3.5 h-3.5" />
-                    NUEVO
+                    Nueva
                   </button>
                 </div>
 
-                <div className="max-h-60 overflow-y-auto space-y-1.5">
+                <div className="max-h-60 overflow-y-auto space-y-1">
                   {exams.map(ex => {
                     const isSelected = ex.id === currentExam.id;
                     return (
@@ -161,15 +147,15 @@ export const Navbar: React.FC<NavbarProps> = ({
                           onSelectExam(ex);
                           setIsExamMenuOpen(false);
                         }}
-                        className={`flex items-center justify-between p-2.5 rounded-[12px] cursor-pointer border-2 transition ${
+                        className={`flex items-center justify-between p-2 rounded-[14px] cursor-pointer transition ${
                           isSelected
-                            ? 'bg-[#d7ffb8] border-[#58cc02] text-[#4b4b4b]'
-                            : 'bg-[#ffffff] border-transparent hover:border-[#afafaf] text-[#4b4b4b]'
+                            ? 'bg-[#f5f5f7] text-[#1d1d1f] font-medium'
+                            : 'hover:bg-[#f5f5f7] text-[#474747]'
                         }`}
                       >
                         <div className="min-w-0 pr-2">
-                          <div className="text-[15px] font-bold truncate">{ex.title}</div>
-                          <div className="text-[13px] text-[#777777] truncate">
+                          <div className="text-[14px] truncate">{ex.title}</div>
+                          <div className="text-[12px] text-[#707070] truncate">
                             {ex.subject} · {ex.targetLevel}
                           </div>
                         </div>
@@ -177,10 +163,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                           <button
                             type="button"
                             onClick={e => onDeleteExam(ex.id, e)}
-                            className="p-1.5 text-[#777777] hover:text-[#4b4b4b]"
+                            className="p-1 text-[#707070] hover:text-[#1d1d1f]"
                             title="Eliminar examen"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         )}
                       </div>
@@ -188,7 +174,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   })}
                 </div>
 
-                <div className="pt-2 border-t-2 border-[#afafaf]/40">
+                <div className="pt-2 border-t border-[#d6d6d6]/60">
                   <button
                     type="button"
                     onClick={() => {
@@ -196,10 +182,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                       setIsExamMenuOpen(false);
                       onLoadDemo();
                     }}
-                    className="w-full py-2 px-3 rounded-[12px] border-2 border-[#afafaf] text-[13px] font-bold uppercase tracking-[0.053em] text-[#777777] hover:text-[#4b4b4b] flex items-center justify-center gap-1.5"
+                    className="w-full py-1.5 px-3 rounded-full border border-[#d6d6d6] text-[12px] font-normal text-[#707070] hover:text-[#1d1d1f] flex items-center justify-center gap-1.5 transition"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
-                    RESTAURAR DEMO
+                    Restaurar demo
                   </button>
                 </div>
               </div>
@@ -207,8 +193,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
 
-        {/* Center Navigation Pills (Duolingo Sticker Nav Pills with 3D Lip) */}
-        <nav className="flex items-center gap-2 overflow-x-auto py-1">
+        {/* Center Navigation Pills (Apple Segments) */}
+        <nav className="flex items-center gap-1 bg-[#f5f5f7] p-1 rounded-full overflow-x-auto">
           {navItems.map(item => {
             const isActive = activeTab === item.id;
             const Icon = item.icon;
@@ -217,18 +203,20 @@ export const Navbar: React.FC<NavbarProps> = ({
                 key={item.id}
                 type="button"
                 onClick={() => handleTabSwitch(item.id)}
-                className={`duo-nav-pill py-2 px-3.5 whitespace-nowrap ${
-                  isActive ? 'duo-nav-pill-active' : ''
+                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[13px] transition whitespace-nowrap ${
+                  isActive
+                    ? 'bg-[#ffffff] text-[#1d1d1f] font-medium shadow-[0_1px_2px_rgba(0,0,0,0.06)]'
+                    : 'text-[#474747] hover:text-[#1d1d1f]'
                 }`}
               >
                 <Icon
-                  className={`w-4 h-4 ${
-                    isActive ? 'text-[#58cc02]' : 'text-[#777777]'
+                  className={`w-3.5 h-3.5 ${
+                    isActive ? 'text-[#0071e3]' : 'text-[#707070]'
                   }`}
                 />
                 <span>{item.label}</span>
                 {item.badge !== undefined && (
-                  <span className="px-2 py-0.5 rounded-[12px] bg-[#58cc02] text-[#ffffff] text-[13px] font-bold">
+                  <span className="px-1.5 py-0.2 rounded-full bg-[#b64400] text-[#ffffff] text-[11px] font-medium">
                     {item.badge}
                   </span>
                 )}
@@ -237,70 +225,59 @@ export const Navbar: React.FC<NavbarProps> = ({
           })}
         </nav>
 
-        {/* Right Gamification, Wallet & Subscription Controls */}
+        {/* Right Controls (Apple Minimalist Pills) */}
         <div className="flex items-center gap-2 shrink-0">
-          {/* Teacher Streak Pill (Duolingo Gamification) */}
-          <button
-            type="button"
-            onClick={() => setStreakDays(SoundService.incrementStreak())}
-            className="hidden md:inline-flex items-center gap-1.5 px-3 py-2 rounded-[12px] border-2 border-[#afafaf] hover:border-[#4b4b4b] bg-[#ffffff] text-[#4b4b4b] text-[14px] font-bold uppercase tracking-[0.053em] transition active:translate-y-0.5"
-            title="Racha de días evaluando con Docentia (Haz clic para celebrar)"
-          >
-            <Flame className="w-4 h-4 text-[#ff9600] fill-[#ff9600]" />
-            <span>{streakDays}</span>
-          </button>
-
-          {/* WebAudio Sound Effects Toggle */}
+          {/* Sound Mute Toggle */}
           <button
             type="button"
             onClick={() => setIsMuted(SoundService.toggleMute())}
-            className="p-2 rounded-[12px] border-2 border-[#afafaf] hover:border-[#4b4b4b] bg-[#ffffff] text-[#777777] hover:text-[#4b4b4b] transition active:translate-y-0.5"
-            title={isMuted ? 'Activar efectos de sonido UI' : 'Silenciar efectos de sonido UI'}
+            className="p-2 rounded-full text-[#707070] hover:text-[#1d1d1f] hover:bg-[#f5f5f7] transition"
+            title={isMuted ? 'Activar sonido' : 'Silenciar sonido'}
           >
             {isMuted ? (
-              <VolumeX className="w-4 h-4 text-[#afafaf]" />
+              <VolumeX className="w-4 h-4 text-[#707070]" />
             ) : (
-              <Volume2 className="w-4 h-4 text-[#58cc02]" />
+              <Volume2 className="w-4 h-4 text-[#1d1d1f]" />
             )}
           </button>
 
+          {/* Pending Reviews Badge Pill */}
           {pendingReviewsCount > 0 && (
             <button
               type="button"
               onClick={() => handleTabSwitch('grading')}
-              className="duo-btn-outlined border-[#58cc02] text-[#4b4b4b] bg-[#d7ffb8] py-2 px-3 text-[13px]"
-              title="Exámenes con letra dudosa que requieren revisión del profesor"
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#b64400]/10 text-[#b64400] text-[12px] font-medium hover:bg-[#b64400]/15 transition"
+              title="Exámenes pendientes de revisión manual"
             >
-              <AlertTriangle className="w-4 h-4 text-[#58cc02]" />
-              <span className="hidden sm:inline">REVISAR:</span>
-              <span>{pendingReviewsCount}</span>
+              <AlertTriangle className="w-3.5 h-3.5" />
+              <span>{pendingReviewsCount} por revisar</span>
             </button>
           )}
 
-          {/* Outlined Secondary Account/Credits Button (Spark Blue #1cb0f6 + 2px #afafaf border) */}
+          {/* Credits Balance Pill */}
           <button
             type="button"
             onClick={() => {
               SoundService.playClick();
               onOpenPricingModal('ledger');
             }}
-            className="duo-btn-outlined py-2 px-3.5"
-            title="Ver mi billetera de créditos y extracto"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#d6d6d6] hover:border-[#1d1d1f] text-[13px] text-[#1d1d1f] bg-transparent transition"
+            title="Ver saldo de créditos y extracto"
           >
-            <Coins className="w-4 h-4 text-[#1cb0f6]" />
-            <span>{billingAccount.creditsBalance} CR.</span>
+            <Coins className="w-3.5 h-3.5 text-[#707070]" />
+            <span>{billingAccount.creditsBalance} cr.</span>
           </button>
 
-          {/* Primary Filled Green CTA (#58cc02 fill, white text, 15px uppercase 700) */}
+          {/* Primary Filled Pill CTA (#0071e3 Electric Blue) */}
           <button
             type="button"
             onClick={() => {
               SoundService.playClick();
               onOpenPricingModal('plans');
             }}
-            className="duo-btn-primary py-2.5 px-4"
+            className="apple-pill-primary text-[14px] py-1.5 px-4"
           >
-            <span>PLANES</span>
+            <span>Planes</span>
           </button>
         </div>
 
