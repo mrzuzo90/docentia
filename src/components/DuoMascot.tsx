@@ -14,9 +14,9 @@ interface DuoMascotProps {
 
 const VARIANT_SPEECHES: Record<MascotVariant, string[]> = {
   professor: [
-    '¡Hola profe! Sube tus PDFs y yo preparo el examen.',
+    '¡Hola profe! Soy Profe Pachy, tu paquicefalosaurio sabio.',
     '¡Listo para redactar test y problemas con rúbrica!',
-    '¡Haz clic en mí para darme ánimos antes de evaluar!',
+    '¡Haz clic en mí para celebrar antes de evaluar!',
     '¡Todo el solucionario saldrá listo para copiar y pegar!'
   ],
   exam: [
@@ -40,7 +40,7 @@ const VARIANT_SPEECHES: Record<MascotVariant, string[]> = {
 };
 
 /**
- * Authentic Duolingo-style Mascot ("Profe Búho") powered by consistent Nanobanana PNG assets:
+ * Authentic Chibi Mascot ("Profe Pachy", Paquicefalosaurio sabio) powered by consistent Nanobanana PNG assets:
  * - Continuous discreet idle breathing animation (squash-and-stretch)
  * - 2D cursor parallax tilt (mascot leans towards user pointer)
  * - Interactive click jump + boing sound + confetti burst + +10 XP badge
@@ -130,18 +130,18 @@ export const DuoMascot: React.FC<DuoMascotProps> = ({
     switch (variant) {
       case 'professor':
       case 'exam':
-        return '/assets/mascot/profesor-buho-idle.png';
+        return '/assets/mascot/pachy-profe-idle.png';
       case 'scanner':
-        return '/assets/mascot/profesor-buho-scanning.png';
+        return '/assets/mascot/pachy-profe-scanning.png';
       case 'trophy':
-        return '/assets/mascot/profesor-buho-celebrating.png';
+        return '/assets/mascot/pachy-profe-celebrating.png';
       default:
-        return '/assets/mascot/profesor-buho-idle.png';
+        return '/assets/mascot/pachy-profe-idle.png';
     }
   };
 
   const activeAsset = tempCelebrating
-    ? '/assets/mascot/profesor-buho-celebrating.png'
+    ? '/assets/mascot/pachy-profe-celebrating.png'
     : getBaseAssetPath();
 
   const activeSpeech = customSpeech || VARIANT_SPEECHES[variant][speechIndex];
@@ -163,7 +163,7 @@ export const DuoMascot: React.FC<DuoMascotProps> = ({
           handleMascotClick();
         }
       }}
-      title={interactive ? '¡Haz clic para interactuar con Profe Búho!' : undefined}
+      title={interactive ? '¡Haz clic para interactuar con Profe Pachy!' : undefined}
       className={`relative inline-flex flex-col items-center justify-center select-none group ${
         interactive ? 'cursor-pointer' : ''
       } ${className}`}
@@ -208,7 +208,7 @@ export const DuoMascot: React.FC<DuoMascotProps> = ({
       >
         <img
           src={activeAsset}
-          alt={`Profe Búho - ${variant}`}
+          alt={`Profe Pachy - ${variant}`}
           className="w-full h-auto object-contain max-h-[300px] select-none filter drop-shadow-md transition-transform"
           draggable={false}
         />
@@ -266,9 +266,9 @@ export const DuoCompanionDock: React.FC<DuoCompanionDockProps> = ({
   };
 
   const assetFileMap = {
-    idle: '/assets/mascot/profesor-buho-idle.png',
-    celebrating: '/assets/mascot/profesor-buho-celebrating.png',
-    scanning: '/assets/mascot/profesor-buho-scanning.png'
+    idle: '/assets/mascot/pachy-profe-idle.png',
+    celebrating: '/assets/mascot/pachy-profe-celebrating.png',
+    scanning: '/assets/mascot/pachy-profe-scanning.png'
   };
 
   return (
@@ -278,16 +278,16 @@ export const DuoCompanionDock: React.FC<DuoCompanionDockProps> = ({
           <div className="flex items-center justify-between border-b-2 border-[#afafaf]/40 pb-2.5 mb-3">
             <div className="flex items-center gap-2">
               <img
-                src="/assets/mascot/badge-owl-avatar.png"
-                alt="Avatar Profe Búho"
+                src="/assets/mascot/badge-pachy-avatar.png"
+                alt="Avatar Profe Pachy"
                 className="w-7 h-7 object-contain"
               />
               <div>
                 <h4 className="text-[14px] font-bold text-[#4b4b4b] leading-none">
-                  Profe Búho · Asistente
+                  Profe Pachy · Asistente
                 </h4>
                 <span className="text-[11px] font-bold uppercase tracking-[0.053em] text-[#58cc02]">
-                  Mascota Nanobanana ({creditsBalance} Cr.)
+                  Paquicefalosaurio Chibi ({creditsBalance} Cr.)
                 </span>
               </div>
             </div>
@@ -304,7 +304,7 @@ export const DuoCompanionDock: React.FC<DuoCompanionDockProps> = ({
           <div className="bg-[#d7ffb8]/30 border-2 border-[#58cc02] rounded-[12px] p-3 flex flex-col items-center">
             <img
               src={assetFileMap[poseAsset]}
-              alt={`Profe Búho - ${poseAsset}`}
+              alt={`Profe Pachy - ${poseAsset}`}
               className="w-36 h-36 object-contain select-none filter drop-shadow-sm duo-mascot-breathing"
             />
             <div className="flex items-center gap-1.5 mt-2.5">
@@ -344,14 +344,14 @@ export const DuoCompanionDock: React.FC<DuoCompanionDockProps> = ({
         className="group flex items-center gap-2.5 bg-[#ffffff] hover:bg-[#d7ffb8]/40 border-2 border-[#000437] rounded-[12px] px-3 py-2 transition-transform active:translate-y-0.5 shadow-md"
       >
         <img
-          src="/assets/mascot/badge-owl-avatar.png"
-          alt="Profe Búho"
+          src="/assets/mascot/badge-pachy-avatar.png"
+          alt="Profe Pachy"
           className="w-9 h-9 object-contain transition-transform group-hover:scale-110"
         />
         <div className="text-left pr-1">
           <div className="flex items-center gap-1.5">
             <span className="text-[13px] font-bold uppercase tracking-[0.053em] text-[#4b4b4b]">
-              Profe Búho
+              Profe Pachy
             </span>
             <span className="inline-block w-2 h-2 rounded-full bg-[#58cc02]" />
           </div>
