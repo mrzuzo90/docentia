@@ -9,9 +9,13 @@ import {
   AlertTriangle,
   ScanLine,
   Trash2,
-  ChevronDown
+  ChevronDown,
+  Flame,
+  Volume2,
+  VolumeX
 } from 'lucide-react';
 import { Exam, UserBillingAccount } from '../types';
+import { SoundService } from '../services/soundService';
 
 interface NavbarProps {
   activeTab: 'upload' | 'exam' | 'grading' | 'gradebook';
@@ -44,6 +48,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   totalSubmissionsCount
 }) => {
   const [isExamMenuOpen, setIsExamMenuOpen] = useState(false);
+  const [isMuted, setIsMuted] = useState(() => SoundService.isMuted());
+  const [streakDays, setStreakDays] = useState(() => SoundService.getStreak());
 
   const navItems = [
     {
@@ -73,6 +79,11 @@ export const Navbar: React.FC<NavbarProps> = ({
     }
   ];
 
+  const handleTabSwitch = (tab: 'upload' | 'exam' | 'grading' | 'gradebook') => {
+    SoundService.playClick();
+    setActiveTab(tab);
+  };
+
   return (
     <header className="no-print sticky top-0 z-30 bg-[#ffffff] border-b-2 border-[#afafaf]">
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
@@ -81,7 +92,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={() => setActiveTab('upload')}
+            onClick={() => handleTabSwitch('upload')}
             className="flex items-center gap-2.5 text-left focus:outline-none"
           >
             {/* Animated Sticker Owl Mascot Badge */}
@@ -106,10 +117,13 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="relative hidden xl:block ml-2">
             <button
               type="button"
-              onClick={() => setIsExamMenuOpen(!isExamMenuOpen)}
+              onClick={() => {
+                SoundService.playClick();
+                setIsExamMenuOpen(!isExamMenuOpen);
+              }}
               className="duo-nav-pill py-2 px-3.5 text-[14px]"
             >
-              <span className="max-w-[160px] truncate">{currentExam.subject}</span>
+              <span className="max-w-[140px] truncate">{currentExam.subject}</span>
               <ChevronDown className="w-4 h-4 text-[#777777]" />
             </button>
 
@@ -125,6 +139,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <button
                     type="button"
                     onClick={() => {
+                      SoundService.playClick();
                       setIsExamMenuOpen(false);
                       onCreateNewExam();
                     }}
@@ -142,6 +157,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       <div
                         key={ex.id}
                         onClick={() => {
+                          SoundService.playClick();
                           onSelectExam(ex);
                           setIsExamMenuOpen(false);
                         }}
@@ -176,6 +192,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <button
                     type="button"
                     onClick={() => {
+                      SoundService.playClick();
                       setIsExamMenuOpen(false);
                       onLoadDemo();
                     }}
@@ -190,7 +207,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
 
-        {/* Center Navigation Pills (Duolingo Sticker Nav Pills) */}
+        {/* Center Navigation Pills (Duolingo Sticker Nav Pills with 3D Lip) */}
         <nav className="flex items-center gap-2 overflow-x-auto py-1">
           {navItems.map(item => {
             const isActive = activeTab === item.id;
@@ -199,7 +216,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 key={item.id}
                 type="button"
-                onClick={() => setActiveTab(item.id)}
+                onClick={() => handleTabSwitch(item.id)}
                 className={`duo-nav-pill py-2 px-3.5 whitespace-nowrap ${
                   isActive ? 'duo-nav-pill-active' : ''
                 }`}
@@ -220,12 +237,37 @@ export const Navbar: React.FC<NavbarProps> = ({
           })}
         </nav>
 
-        {/* Right Wallet & Subscription Controls */}
-        <div className="flex items-center gap-2.5 shrink-0">
+        {/* Right Gamification, Wallet & Subscription Controls */}
+        <div className="flex items-center gap-2 shrink-0">
+          {/* Teacher Streak Pill (Duolingo Gamification) */}
+          <button
+            type="button"
+            onClick={() => setStreakDays(SoundService.incrementStreak())}
+            className="hidden md:inline-flex items-center gap-1.5 px-3 py-2 rounded-[12px] border-2 border-[#afafaf] hover:border-[#4b4b4b] bg-[#ffffff] text-[#4b4b4b] text-[14px] font-bold uppercase tracking-[0.053em] transition active:translate-y-0.5"
+            title="Racha de días evaluando con Docentia (Haz clic para celebrar)"
+          >
+            <Flame className="w-4 h-4 text-[#ff9600] fill-[#ff9600]" />
+            <span>{streakDays}</span>
+          </button>
+
+          {/* WebAudio Sound Effects Toggle */}
+          <button
+            type="button"
+            onClick={() => setIsMuted(SoundService.toggleMute())}
+            className="p-2 rounded-[12px] border-2 border-[#afafaf] hover:border-[#4b4b4b] bg-[#ffffff] text-[#777777] hover:text-[#4b4b4b] transition active:translate-y-0.5"
+            title={isMuted ? 'Activar efectos de sonido UI' : 'Silenciar efectos de sonido UI'}
+          >
+            {isMuted ? (
+              <VolumeX className="w-4 h-4 text-[#afafaf]" />
+            ) : (
+              <Volume2 className="w-4 h-4 text-[#58cc02]" />
+            )}
+          </button>
+
           {pendingReviewsCount > 0 && (
             <button
               type="button"
-              onClick={() => setActiveTab('grading')}
+              onClick={() => handleTabSwitch('grading')}
               className="duo-btn-outlined border-[#58cc02] text-[#4b4b4b] bg-[#d7ffb8] py-2 px-3 text-[13px]"
               title="Exámenes con letra dudosa que requieren revisión del profesor"
             >
@@ -238,21 +280,27 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Outlined Secondary Account/Credits Button (Spark Blue #1cb0f6 + 2px #afafaf border) */}
           <button
             type="button"
-            onClick={() => onOpenPricingModal('ledger')}
+            onClick={() => {
+              SoundService.playClick();
+              onOpenPricingModal('ledger');
+            }}
             className="duo-btn-outlined py-2 px-3.5"
             title="Ver mi billetera de créditos y extracto"
           >
             <Coins className="w-4 h-4 text-[#1cb0f6]" />
-            <span>{billingAccount.creditsBalance} CRÉDITOS</span>
+            <span>{billingAccount.creditsBalance} CR.</span>
           </button>
 
           {/* Primary Filled Green CTA (#58cc02 fill, white text, 15px uppercase 700) */}
           <button
             type="button"
-            onClick={() => onOpenPricingModal('plans')}
+            onClick={() => {
+              SoundService.playClick();
+              onOpenPricingModal('plans');
+            }}
             className="duo-btn-primary py-2.5 px-4"
           >
-            <span>PLANES / RECARGAR</span>
+            <span>PLANES</span>
           </button>
         </div>
 

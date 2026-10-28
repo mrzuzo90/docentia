@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Copy,
   Check,
@@ -15,11 +15,14 @@ import {
   ChevronUp,
   ChevronDown,
   Sparkles,
-  Type
+  Type,
+  Shuffle,
+  Share2
 } from 'lucide-react';
 import { Exam, TestQuestion, OpenExercise } from '../types';
 import { ExportService } from '../services/exportService';
 import { GeminiService } from '../services/geminiService';
+import { SoundService } from '../services/soundService';
 import { DuoMascot } from './DuoMascot';
 
 interface ExamViewProps {
@@ -27,7 +30,81 @@ interface ExamViewProps {
   onUpdateExam: (updated: Exam) => void;
   onProceedToGrading: () => void;
   onGoToGenerator?: () => void;
+  onOpenOnlinePortal?: () => void;
   onNotify?: (title: string, description?: string, type?: 'success' | 'info' | 'warning') => void;
+}
+
+/**
+ * Deterministically permutes questions and options (A, B, C, D) to create an
+ * anti-cheating Modelo B while keeping the Solucionario 100% accurate.
+ */
+function buildModelBExam(baseExam: Exam, seed: number): Exam {
+  const letters: ('A' | 'B' | 'C' | 'D')[] = ['A', 'B', 'C', 'D'];
+
+  // Deterministic pseudo-random generator from seed
+  let s = (seed * 9301 + 49297) % 233280;
+  const nextRand = () => {
+    s = (s * 9301 + 49297) % 233280;
+    return s / 233280;
+  };
+
+  // Shuffle questions order
+  const questionsCopy = [...baseExam.testQuestions];
+  for (let i = questionsCopy.length - 1; i > 0; i--) {
+    const j = Math.floor(nextRand() * (i + 1));
+    [questionsCopy[i], questionsCopy[j]] = [questionsCopy[j], questionsCopy[i]];
+  }
+
+  // Ensure question 0 moved if there are >= 2 questions
+  if (
+    questionsCopy.length >= 2 &&
+    questionsCopy[0].id === baseExam.testQuestions[0].id
+  ) {
+    [questionsCopy[0], questionsCopy[1]] = [questionsCopy[1], questionsCopy[0]];
+  }
+
+  // Permute options A, B, C, D inside each question and remap correctAnswer
+  const shuffledQuestions: TestQuestion[] = questionsCopy.map(q => {
+    const entries = letters.map(letter => ({
+      originalLetter: letter,
+      text: q.options[letter],
+      isCorrect: q.correctAnswer === letter
+    }));
+
+    for (let i = entries.length - 1; i > 0; i--) {
+      const j = Math.floor(nextRand() * (i + 1));
+      [entries[i], entries[j]] = [entries[j], entries[i]];
+    }
+
+    const newOptions: Record<'A' | 'B' | 'C' | 'D', string> = {
+      A: entries[0].text,
+      B: entries[1].text,
+      C: entries[2].text,
+      D: entries[3].text
+    };
+
+    const newCorrectIdx = entries.findIndex(e => e.isCorrect);
+    const newCorrectLetter = letters[newCorrectIdx >= 0 ? newCorrectIdx : 0];
+
+    return {
+      ...q,
+      options: newOptions,
+      correctAnswer: newCorrectLetter
+    };
+  });
+
+  // Also reverse exercises order if there are >= 2 exercises
+  const shuffledExercises =
+    baseExam.exercises.length >= 2
+      ? [...baseExam.exercises].reverse()
+      : baseExam.exercises;
+
+  return {
+    ...baseExam,
+    title: `${baseExam.title} — MODELO B (FILA PAR)`,
+    testQuestions: shuffledQuestions,
+    exercises: shuffledExercises
+  };
 }
 
 export const ExamView: React.FC<ExamViewProps> = ({
@@ -35,41 +112,79 @@ export const ExamView: React.FC<ExamViewProps> = ({
   onUpdateExam,
   onProceedToGrading,
   onGoToGenerator,
+  onOpenOnlinePortal,
   onNotify
 }) => {
   const [viewMode, setViewMode] = useState<'solucionario' | 'student'>('solucionario');
+  const [activeModel, setActiveModel] = useState<'A' | 'B'>('A');
+  const [modelBSeed, setModelBSeed] = useState<number>(1);
   const [paperFont, setPaperFont] = useState<'serif' | 'sans' | 'mono'>('serif');
   const [copiedType, setCopiedType] = useState<string | null>(null);
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
+
+  const modelAExam = useMemo(
+    () => ({
+      ...exam,
+      title: activeModel === 'A' ? exam.title : `${exam.title} — MODELO A`
+    }),
+    [exam, activeModel]
+  );
+
+  const modelBExam = useMemo(() => buildModelBExam(exam, modelBSeed), [exam, modelBSeed]);
+
+  const displayedExam = activeModel === 'B' ? modelBExam : exam;
 
   const totalTestPoints = exam.testQuestions.reduce((sum, q) => sum + (Number(q.points) || 0), 0);
   const totalExercisePoints = exam.exercises.reduce((sum, ex) => sum + (Number(ex.points) || 0), 0);
   const totalPoints = Number((totalTestPoints + totalExercisePoints).toFixed(2));
 
-  const handleCopy = async (type: 'student' | 'solucionario' | 'aiken') => {
-    await ExportService.copyRichExamToClipboard(exam, type);
-    setCopiedType(type);
+  const handleCopy = async (
+    type: 'student' | 'solucionario' | 'aiken',
+    targetModel: 'A' | 'B' = activeModel
+  ) => {
+    SoundService.playSuccess();
+    const targetExam =
+      targetModel === 'B'
+        ? modelBExam
+        : { ...exam, title: `${exam.title} (MODELO A)` };
+    await ExportService.copyRichExamToClipboard(targetExam, type);
+    const copyKey = `${type}-${targetModel}`;
+    setCopiedType(copyKey);
     if (onNotify) {
       const label =
         type === 'student'
-          ? 'Modelo de Examen para el Alumno copiado'
+          ? `Examen Alumno (MODELO ${targetModel}) copiado`
           : type === 'solucionario'
-          ? 'Solucionario Oficial y Rúbricas copiados'
-          : 'Formato Moodle (Aiken) copiado';
+          ? `Solucionario Oficial (MODELO ${targetModel}) copiado`
+          : `Formato Moodle Aiken (MODELO ${targetModel}) copiado`;
       onNotify(label, 'Listo para pegar directamente en Word, Google Docs o tu plantilla docente.', 'success');
     }
     setTimeout(() => setCopiedType(null), 2500);
   };
 
   const handleDownloadWord = (mode: 'student' | 'solucionario') => {
-    ExportService.downloadWordDocument(exam, mode);
+    SoundService.playClick();
+    ExportService.downloadWordDocument(displayedExam, mode);
     if (onNotify) {
       onNotify(
-        mode === 'student' ? 'Descargando Examen (.doc)' : 'Descargando Solucionario (.doc)',
+        mode === 'student'
+          ? `Descargando Examen Modelo ${activeModel} (.doc)`
+          : `Descargando Solucionario Modelo ${activeModel} (.doc)`,
         'Archivo compatible con Microsoft Word, LibreOffice y Google Docs.',
         'info'
       );
     }
+  };
+
+  const handleReshuffleModelB = () => {
+    SoundService.playMascotBoing();
+    setActiveModel('B');
+    setModelBSeed(prev => prev + 1);
+    onNotify?.(
+      'Modelo B Anti-Copia Re-barajado (0 Créditos)',
+      'Se ha permutado el orden de preguntas y las opciones A, B, C, D con su nuevo solucionario.',
+      'success'
+    );
   };
 
   const handleUpdateTestQuestion = (id: string, patch: Partial<TestQuestion>) => {
@@ -88,6 +203,7 @@ export const ExamView: React.FC<ExamViewProps> = ({
 
   const handleNormalizeTo10 = () => {
     if (totalPoints === 0) return;
+    SoundService.playSuccess();
     const factor = 10 / totalPoints;
 
     const updatedTest = exam.testQuestions.map(q => ({
@@ -122,6 +238,7 @@ export const ExamView: React.FC<ExamViewProps> = ({
   };
 
   const handleAddTestQuestion = () => {
+    SoundService.playSuccess();
     const sourceText =
       (exam.documents || []).map(d => d.content).join('\n\n') ||
       `${exam.subject} (${exam.targetLevel}): ${exam.title}`;
@@ -150,6 +267,7 @@ export const ExamView: React.FC<ExamViewProps> = ({
       explanation: 'Justificación didáctica para el solucionario docente.',
       points: 1.0
     };
+    setActiveModel('A');
     onUpdateExam({
       ...exam,
       testQuestions: [...exam.testQuestions, newQ]
@@ -159,6 +277,7 @@ export const ExamView: React.FC<ExamViewProps> = ({
   };
 
   const handleAddExercise = () => {
+    SoundService.playSuccess();
     const sourceText =
       (exam.documents || []).map(d => d.content).join('\n\n') ||
       `${exam.subject} (${exam.targetLevel}): ${exam.title}`;
@@ -185,6 +304,7 @@ export const ExamView: React.FC<ExamViewProps> = ({
       solutionSteps: 'Paso 1: Planteamiento de las ecuaciones o principios...\nPaso 2: Resolución y conclusión esperada.',
       points: 2.5
     };
+    setActiveModel('A');
     onUpdateExam({
       ...exam,
       exercises: [...exam.exercises, newEx]
@@ -239,16 +359,16 @@ export const ExamView: React.FC<ExamViewProps> = ({
       <div className="no-print py-4 grid grid-cols-1 lg:grid-cols-12 items-center gap-8">
         <div className="lg:col-span-7 space-y-4">
           <span className="inline-block text-[15px] font-bold uppercase tracking-[0.053em] text-[#1cb0f6]">
-            PASO 2 · MATRIZ Y SOLUCIONARIO OFICIAL
+            PASO 2 · MATRIZ, MODELOS ANTI-COPIA Y SOLUCIONARIO
           </span>
           <h2 className="duo-section-headline">
             listo para copiar, pegar e imprimir.
           </h2>
           <h3 className="duo-hero-headline text-[24px] sm:text-[32px]">
-            {exam.title}
+            {displayedExam.title}
           </h3>
           <p className="duo-body-copy max-w-[480px]">
-            Elige el peso de cada pregunta o ejercicio sobre 10 puntos, edita el solucionario de referencia y copia el examen con un clic en tu plantilla de Word, Google Docs o Moodle.
+            Elige el peso de cada pregunta sobre 10 puntos, genera al instante los <strong>Modelos A y B Anti-Copia</strong> con sus solucionarios independientes, y cópialos con un clic en Word o Google Docs.
           </p>
 
           {/* Live Weight Sticker Pill Box */}
@@ -280,29 +400,179 @@ export const ExamView: React.FC<ExamViewProps> = ({
         </div>
       </div>
 
+      {/* ANTI-CHEATING MODEL A & MODEL B GENERATOR & DUAL ANSWER KEY MATRIX */}
+      {exam.testQuestions.length > 0 && (
+        <div className="no-print duo-card border-[#58cc02] bg-[#ffffff] p-5 space-y-4">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b-2 border-[#afafaf]/40 pb-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="px-3 py-1 rounded-[12px] bg-[#d7ffb8] border-2 border-[#58cc02] text-[#000437] text-[12px] font-bold uppercase tracking-[0.053em]">
+                  SISTEMA ANTI-COPIA EN AULA · 0 CRÉDITOS IA
+                </span>
+                <h4 className="text-[19px] font-bold text-[#4b4b4b]">
+                  Generador de Modelos A y B con Doble Solucionario
+                </h4>
+              </div>
+              <p className="text-[15px] font-medium text-[#777777] mt-1">
+                Baraja automáticamente el orden de las preguntas y las opciones (A, B, C, D) para filas pares e impares, recalculando la clave de respuestas al instante.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={() => {
+                  SoundService.playClick();
+                  setActiveModel('A');
+                }}
+                className={`duo-nav-pill py-2 px-4 ${
+                  activeModel === 'A' ? 'duo-nav-pill-active' : ''
+                }`}
+              >
+                <span>VIENDO: MODELO A (ORIGINAL)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  SoundService.playClick();
+                  setActiveModel('B');
+                }}
+                className={`duo-nav-pill py-2 px-4 ${
+                  activeModel === 'B' ? 'duo-nav-pill-active' : ''
+                }`}
+              >
+                <span>VIENDO: MODELO B (BARAJADO)</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleReshuffleModelB}
+                className="duo-btn-outlined py-2 px-3.5"
+                title="Generar una nueva permutación aleatoria para el Modelo B"
+              >
+                <Shuffle className="w-4 h-4" />
+                <span>RE-BARAJAR B (#{modelBSeed})</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Side-by-Side Quick Answer Key Comparison (Modelo A vs Modelo B) */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* Modelo A Card */}
+            <div
+              className={`rounded-[12px] border-2 p-4 transition ${
+                activeModel === 'A'
+                  ? 'border-[#58cc02] bg-[#d7ffb8]/25'
+                  : 'border-[#afafaf] bg-[#ffffff]'
+              }`}
+            >
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+                <span className="text-[15px] font-bold uppercase tracking-[0.053em] text-[#4b4b4b]">
+                  CLAVE RÁPIDA · MODELO A (FILA IMPAR)
+                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleCopy('student', 'A')}
+                    className="px-2.5 py-1 rounded-[12px] border-2 border-[#afafaf] hover:border-[#1cb0f6] bg-[#ffffff] text-[#1cb0f6] text-[12px] font-bold uppercase tracking-[0.053em]"
+                  >
+                    {copiedType === 'student-A' ? '✓ EXAMEN A COPIADO' : 'COPIAR EXAMEN A'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleCopy('solucionario', 'A')}
+                    className="px-2.5 py-1 rounded-[12px] bg-[#58cc02] text-[#ffffff] text-[12px] font-bold uppercase tracking-[0.053em]"
+                  >
+                    {copiedType === 'solucionario-A' ? '✓ SOLUCIONARIO A' : 'SOLUCIONARIO A'}
+                  </button>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {modelAExam.testQuestions.map((q, idx) => (
+                  <span
+                    key={q.id}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[12px] bg-[#ffffff] border-2 border-[#000437] text-[13px] font-bold text-[#000437]"
+                  >
+                    <span className="text-[#777777]">{idx + 1}:</span>
+                    <span className="text-[#58cc02] font-black">{q.correctAnswer}</span>
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Modelo B Card */}
+            <div
+              className={`rounded-[12px] border-2 p-4 transition ${
+                activeModel === 'B'
+                  ? 'border-[#58cc02] bg-[#d7ffb8]/25'
+                  : 'border-[#afafaf] bg-[#ffffff]'
+              }`}
+            >
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+                <span className="text-[15px] font-bold uppercase tracking-[0.053em] text-[#4b4b4b]">
+                  CLAVE RÁPIDA · MODELO B (FILA PAR #{modelBSeed})
+                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleCopy('student', 'B')}
+                    className="px-2.5 py-1 rounded-[12px] border-2 border-[#afafaf] hover:border-[#1cb0f6] bg-[#ffffff] text-[#1cb0f6] text-[12px] font-bold uppercase tracking-[0.053em]"
+                  >
+                    {copiedType === 'student-B' ? '✓ EXAMEN B COPIADO' : 'COPIAR EXAMEN B'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleCopy('solucionario', 'B')}
+                    className="px-2.5 py-1 rounded-[12px] bg-[#58cc02] text-[#ffffff] text-[12px] font-bold uppercase tracking-[0.053em]"
+                  >
+                    {copiedType === 'solucionario-B' ? '✓ SOLUCIONARIO B' : 'SOLUCIONARIO B'}
+                  </button>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {modelBExam.testQuestions.map((q, idx) => (
+                  <span
+                    key={q.id}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[12px] bg-[#ffffff] border-2 border-[#000437] text-[13px] font-bold text-[#000437]"
+                  >
+                    <span className="text-[#777777]">{idx + 1}:</span>
+                    <span className="text-[#1cb0f6] font-black">{q.correctAnswer}</span>
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Action Dock: View Switcher + 1-Click Copy/Export Tools */}
       <div className="no-print duo-card p-4 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
         
         {/* Left Mode Switcher */}
         <div className="flex flex-wrap items-center gap-2">
           <button
-            onClick={() => setViewMode('solucionario')}
+            onClick={() => {
+              SoundService.playClick();
+              setViewMode('solucionario');
+            }}
             className={`duo-nav-pill py-2.5 px-4 ${
               viewMode === 'solucionario' ? 'duo-nav-pill-active' : ''
             }`}
           >
             <Award className="h-4 w-4 text-[#58cc02]" />
-            <span>SOLUCIONARIO Y PESOS</span>
+            <span>SOLUCIONARIO Y PESOS (MODELO {activeModel})</span>
           </button>
 
           <button
-            onClick={() => setViewMode('student')}
+            onClick={() => {
+              SoundService.playClick();
+              setViewMode('student');
+            }}
             className={`duo-nav-pill py-2.5 px-4 ${
               viewMode === 'student' ? 'duo-nav-pill-active' : ''
             }`}
           >
             <FileText className="h-4 w-4 text-[#1cb0f6]" />
-            <span>HOJA DE EXAMEN A4 (ALUMNO)</span>
+            <span>HOJA DE EXAMEN A4 (MODELO {activeModel})</span>
           </button>
         </div>
 
@@ -318,28 +588,51 @@ export const ExamView: React.FC<ExamViewProps> = ({
             </button>
           )}
 
+          {onOpenOnlinePortal && (
+            <button
+              type="button"
+              onClick={() => {
+                SoundService.playClick();
+                onOpenOnlinePortal();
+              }}
+              className="duo-btn-outlined border-[#58cc02] text-[#000437] bg-[#d7ffb8] py-2.5 px-3.5"
+              title="Compartir enlace web seguro con los alumnos (anti-copia activo)"
+            >
+              <Share2 className="h-4 w-4 text-[#58cc02]" />
+              <span>ENLACE ONLINE ALUMNO</span>
+            </button>
+          )}
+
           <button
-            onClick={() => handleCopy('student')}
+            onClick={() => handleCopy('student', activeModel)}
             className="duo-btn-outlined py-2.5 px-3.5"
           >
-            {copiedType === 'student' ? (
+            {copiedType === `student-${activeModel}` ? (
               <Check className="h-4 w-4 text-[#58cc02]" />
             ) : (
               <Copy className="h-4 w-4" />
             )}
-            <span>{copiedType === 'student' ? '¡COPIADO!' : 'COPIAR EXAMEN'}</span>
+            <span>
+              {copiedType === `student-${activeModel}`
+                ? '¡COPIADO!'
+                : `COPIAR EXAMEN ${activeModel}`}
+            </span>
           </button>
 
           <button
-            onClick={() => handleCopy('solucionario')}
+            onClick={() => handleCopy('solucionario', activeModel)}
             className="duo-btn-outlined py-2.5 px-3.5"
           >
-            {copiedType === 'solucionario' ? (
+            {copiedType === `solucionario-${activeModel}` ? (
               <Check className="h-4 w-4 text-[#58cc02]" />
             ) : (
               <Copy className="h-4 w-4" />
             )}
-            <span>{copiedType === 'solucionario' ? '¡COPIADO!' : 'COPIAR SOLUCIONARIO'}</span>
+            <span>
+              {copiedType === `solucionario-${activeModel}`
+                ? '¡COPIADO!'
+                : `COPIAR SOLUCIONARIO ${activeModel}`}
+            </span>
           </button>
 
           <button
@@ -348,15 +641,15 @@ export const ExamView: React.FC<ExamViewProps> = ({
             title="Descargar archivo .doc para Microsoft Word"
           >
             <Download className="h-4 w-4" />
-            <span>WORD</span>
+            <span>WORD ({activeModel})</span>
           </button>
 
           <button
-            onClick={() => handleCopy('aiken')}
+            onClick={() => handleCopy('aiken', activeModel)}
             className="duo-nav-pill py-2 px-3 text-[13px]"
             title="Copiar preguntas test en formato Aiken para Moodle"
           >
-            <span>{copiedType === 'aiken' ? '¡AIKEN!' : 'MOODLE'}</span>
+            <span>{copiedType === `aiken-${activeModel}` ? '¡AIKEN!' : 'MOODLE'}</span>
           </button>
 
           <button
@@ -368,7 +661,10 @@ export const ExamView: React.FC<ExamViewProps> = ({
           </button>
 
           <button
-            onClick={onProceedToGrading}
+            onClick={() => {
+              SoundService.playClick();
+              onProceedToGrading();
+            }}
             className="duo-btn-primary py-2.5 px-5"
           >
             <span>CORREGIR EXÁMENES</span>
@@ -384,7 +680,7 @@ export const ExamView: React.FC<ExamViewProps> = ({
           {/* Paper Typography & Layout Bar */}
           <div className="no-print flex items-center justify-between max-w-4xl mx-auto px-2">
             <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-500">
-              PREVISUALIZACIÓN DE PLIEGO IMPRESO DIN A4 (210 × 297 MM)
+              PREVISUALIZACIÓN DE PLIEGO IMPRESO DIN A4 · MODELO {activeModel}
             </span>
             <div className="flex items-center space-x-1 bg-white px-2 py-1 rounded-lg border border-[#0C0D0E]/12 text-xs">
               <Type className="h-3.5 w-3.5 text-zinc-400 mr-1" />
@@ -421,14 +717,19 @@ export const ExamView: React.FC<ExamViewProps> = ({
             {/* Official Boxed Academic Header */}
             <div className="border-2 border-[#0C0D0E] grid grid-cols-12">
               <div className="col-span-9 p-4 border-b border-r border-[#0C0D0E]">
-                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500 font-bold">
-                  {exam.institution || 'CENTRO EDUCATIVO • DEPARTAMENTO DIDÁCTICO'}
-                </p>
+                <div className="flex items-center justify-between">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500 font-bold">
+                    {displayedExam.institution || 'CENTRO EDUCATIVO • DEPARTAMENTO DIDÁCTICO'}
+                  </p>
+                  <span className="px-2 py-0.5 border border-[#0C0D0E] font-mono text-[10px] font-bold uppercase">
+                    MODELO {activeModel}
+                  </span>
+                </div>
                 <h1 className="font-serif italic text-2xl sm:text-3xl font-bold text-[#0C0D0E] mt-1">
-                  {exam.title}
+                  {displayedExam.title}
                 </h1>
                 <p className="font-sans text-xs text-zinc-700 mt-1">
-                  <strong>Asignatura:</strong> {exam.subject} &nbsp;·&nbsp; <strong>Curso:</strong> {exam.targetLevel} &nbsp;·&nbsp; <strong>Tiempo:</strong> {exam.durationMinutes || 60} min
+                  <strong>Asignatura:</strong> {displayedExam.subject} &nbsp;·&nbsp; <strong>Curso:</strong> {displayedExam.targetLevel} &nbsp;·&nbsp; <strong>Tiempo:</strong> {displayedExam.durationMinutes || 60} min
                 </p>
               </div>
               <div className="col-span-3 p-4 border-b border-[#0C0D0E] flex flex-col items-center justify-center text-center bg-[#F6F5F0]/50">
@@ -447,19 +748,19 @@ export const ExamView: React.FC<ExamViewProps> = ({
               </div>
             </div>
 
-            {exam.instructions && (
+            {displayedExam.instructions && (
               <div className="border-l-2 border-[#0C0D0E] pl-4 py-1 text-xs text-zinc-700 italic font-sans">
-                <strong>Directrices de la prueba:</strong> {exam.instructions}
-                {exam.testPenalty ? ` (Penalización por fallo en test: -${exam.testPenalty} pts).` : ''}
+                <strong>Directrices de la prueba:</strong> {displayedExam.instructions}
+                {displayedExam.testPenalty ? ` (Penalización por fallo en test: -${displayedExam.testPenalty} pts).` : ''}
               </div>
             )}
 
             {/* Section I: Test */}
-            {exam.testQuestions.length > 0 && (
+            {displayedExam.testQuestions.length > 0 && (
               <div className="space-y-5">
                 <div className="flex items-baseline justify-between border-b-2 border-[#0C0D0E] pb-1.5">
                   <h2 className="font-sans text-xs font-extrabold uppercase tracking-[0.12em]">
-                    PARTE I — CUESTIONARIO DE OPCIÓN MÚLTIPLE
+                    PARTE I — CUESTIONARIO DE OPCIÓN MÚLTIPLE (MODELO {activeModel})
                   </h2>
                   <span className="font-mono text-xs font-bold">
                     [{totalTestPoints.toFixed(2)} PUNTOS]
@@ -467,7 +768,7 @@ export const ExamView: React.FC<ExamViewProps> = ({
                 </div>
 
                 <div className="space-y-5">
-                  {exam.testQuestions.map((q, idx) => (
+                  {displayedExam.testQuestions.map((q, idx) => (
                     <div key={q.id} className="space-y-2 break-inside-avoid">
                       <div className="flex justify-between items-baseline gap-4">
                         <p className="text-sm font-bold leading-snug">

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { SoundService } from '../services/soundService';
 
 export type MascotVariant = 'professor' | 'exam' | 'scanner' | 'trophy';
 export type MascotExpression = 'focused' | 'happy' | 'wink' | 'star';
@@ -110,6 +111,8 @@ export const DuoMascot: React.FC<DuoMascotProps> = ({
 
   const handleMascotClick = useCallback(() => {
     if (!interactive) return;
+
+    SoundService.playMascotBoing();
 
     // Trigger jump animation
     setIsJumping(false);

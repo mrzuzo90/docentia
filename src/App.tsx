@@ -23,6 +23,7 @@ import { ExamView } from './components/ExamView';
 import { GradingView } from './components/GradingView';
 import { GradebookView } from './components/GradebookView';
 import { PricingModal } from './components/PricingModal';
+import { OnlineExamPortal } from './components/OnlineExamPortal';
 import { DuoMascot, DuoCompanionDock } from './components/DuoMascot';
 import {
   Exam,
@@ -59,6 +60,7 @@ export function App() {
   const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
   const [pricingModalTab, setPricingModalTab] = useState<'plans' | 'packs' | 'ledger'>('plans');
   const [insufficientCreditsMsg, setInsufficientCreditsMsg] = useState<string | null>(null);
+  const [isOnlinePortalOpen, setIsOnlinePortalOpen] = useState(false);
   const [isCommandOpen, setIsCommandOpen] = useState(false);
   const [commandQuery, setCommandQuery] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -241,6 +243,17 @@ export function App() {
   const handleSubmissionsChange = (newSubmissions: StudentSubmission[]) => {
     setSubmissions(newSubmissions);
     StorageService.saveSubmissions(exam.id, newSubmissions);
+  };
+
+  const handleAddOnlineSubmission = (newSub: StudentSubmission) => {
+    const updated = [newSub, ...submissions];
+    setSubmissions(updated);
+    StorageService.saveSubmissions(exam.id, updated);
+    addToast(
+      `Examen Online recibido: ${newSub.studentName}`,
+      `Nota calculada: ${newSub.gradeReport?.finalScore.toFixed(2)}/10 · Incidencias: ${newSub.tabSwitchCount || 0}`,
+      'success'
+    );
   };
 
   const handleLoadDemo = () => {
@@ -461,6 +474,7 @@ export function App() {
               onUpdateExam={handleUpdateExam}
               onProceedToGrading={() => setActiveTab('grading')}
               onGoToGenerator={() => setActiveTab('upload')}
+              onOpenOnlinePortal={() => setIsOnlinePortalOpen(true)}
               onNotify={addToast}
             />
           )}
@@ -723,6 +737,15 @@ export function App() {
         activeTab={activeTab}
         pendingReviewsCount={pendingReviewsCount}
         creditsBalance={billingAccount.creditsBalance}
+      />
+
+      {/* Secure Online Exam Portal (Anti-Cheat & Student Direct Link) */}
+      <OnlineExamPortal
+        isOpen={isOnlinePortalOpen}
+        onClose={() => setIsOnlinePortalOpen(false)}
+        exam={exam}
+        onAddSubmission={handleAddOnlineSubmission}
+        onNotify={addToast}
       />
 
       {/* Pricing, Subscription & Credit Wallet Modal */}

@@ -79,6 +79,8 @@ export interface StudentSubmission {
   scanPdfName?: string;
   rawStudentText?: string;
   status: 'pending' | 'grading' | 'graded' | 'needs_review';
+  isOnlineSubmission?: boolean;
+  tabSwitchCount?: number;
   gradeReport?: StudentGradeReport;
 }
 

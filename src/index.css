@@ -147,7 +147,7 @@
   text-transform: uppercase;
 }
 
-/* Primary CTA Button: Fill #58cc02, white text, duolingo-sans 700 at 15px uppercase with 0.0530em tracking, 12px border-radius, 16px horizontal padding. No border. */
+/* Primary CTA Button: Fill #58cc02, white text, duolingo-sans 700 at 15px uppercase with 0.0530em tracking, 12px border-radius, 16px horizontal padding + 3D tactile sticker lip */
 .duo-btn-primary {
   display: inline-flex;
   align-items: center;
@@ -164,8 +164,9 @@
   border-radius: 12px;
   padding: 12px 16px;
   border: none;
+  box-shadow: 0 4px 0 #46a302;
   cursor: pointer;
-  transition: filter 0.15s ease, transform 0.1s ease;
+  transition: filter 0.12s ease, transform 0.08s ease, box-shadow 0.08s ease;
 }
 
 .duo-btn-primary:hover:not(:disabled) {
@@ -173,22 +174,24 @@
 }
 
 .duo-btn-primary:active:not(:disabled) {
-  transform: translateY(1px);
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #46a302;
 }
 
 .duo-btn-primary:disabled {
   background-color: var(--color-faded-gray);
   color: var(--color-paper-white);
+  box-shadow: 0 4px 0 #8f8f8f;
   cursor: not-allowed;
 }
 
-/* Outlined Account / Secondary Button: Transparent fill, text in #1cb0f6, duolingo-sans 700 at 14-15px uppercase, 12px border-radius, 16px horizontal padding, 2px solid border in #afafaf */
+/* Outlined Account / Secondary Button: Transparent fill, text in #1cb0f6, duolingo-sans 700 at 14-15px uppercase, 12px border-radius, 16px horizontal padding, 2px solid border in #afafaf + 3D sticker lip */
 .duo-btn-outlined {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background-color: transparent;
+  background-color: #ffffff;
   color: var(--color-spark-blue);
   font-family: var(--font-duolingo-sans);
   font-weight: 700;
@@ -199,20 +202,59 @@
   border-radius: 12px;
   padding: 10px 16px;
   border: 2px solid var(--color-faded-gray);
+  box-shadow: 0 4px 0 var(--color-faded-gray);
   cursor: pointer;
-  transition: border-color 0.15s ease, background-color 0.15s ease;
+  transition: border-color 0.12s ease, transform 0.08s ease, box-shadow 0.08s ease;
 }
 
 .duo-btn-outlined:hover:not(:disabled) {
   border-color: var(--color-spark-blue);
+  box-shadow: 0 4px 0 var(--color-spark-blue);
 }
 
-/* Nav Language Pill: Transparent fill, text in #777777 at 15px uppercase with 0.0530em tracking, 12px border-radius, 10px vertical and 16px horizontal padding, 2px solid border in #afafaf */
+.duo-btn-outlined:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--color-spark-blue);
+}
+
+/* Neutral Outlined Sticker Button */
+.duo-btn-neutral {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: #ffffff;
+  color: var(--color-charcoal);
+  font-family: var(--font-duolingo-sans);
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.33;
+  letter-spacing: 0.053em;
+  text-transform: uppercase;
+  border-radius: 12px;
+  padding: 10px 16px;
+  border: 2px solid var(--color-faded-gray);
+  box-shadow: 0 4px 0 var(--color-faded-gray);
+  cursor: pointer;
+  transition: border-color 0.12s ease, transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+.duo-btn-neutral:hover:not(:disabled) {
+  border-color: var(--color-charcoal);
+  box-shadow: 0 4px 0 var(--color-charcoal);
+}
+
+.duo-btn-neutral:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--color-charcoal);
+}
+
+/* Nav Language Pill: Transparent fill, text in #777777 at 15px uppercase with 0.0530em tracking, 12px border-radius, 10px vertical and 16px horizontal padding, 2px solid border in #afafaf + 3D sticker lip */
 .duo-nav-pill {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background-color: transparent;
+  background-color: #ffffff;
   color: var(--color-pencil-gray);
   font-family: var(--font-duolingo-sans);
   font-weight: 700;
@@ -223,19 +265,27 @@
   border-radius: 12px;
   padding: 10px 16px;
   border: 2px solid var(--color-faded-gray);
+  box-shadow: 0 3px 0 var(--color-faded-gray);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.12s ease;
 }
 
 .duo-nav-pill:hover {
   color: var(--color-charcoal);
   border-color: var(--color-charcoal);
+  box-shadow: 0 3px 0 var(--color-charcoal);
+}
+
+.duo-nav-pill:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--color-charcoal);
 }
 
 .duo-nav-pill-active {
   background-color: var(--color-storybook-green);
   color: var(--color-charcoal);
   border: 2px solid var(--color-eager-green);
+  box-shadow: 0 3px 0 var(--color-eager-green);
 }
 
 /* Sticker Card Surface: Pure white, 2px solid #afafaf, 12px radius, no shadow */
