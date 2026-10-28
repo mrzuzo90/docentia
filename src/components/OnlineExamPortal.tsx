@@ -331,8 +331,8 @@ export const OnlineExamPortal: React.FC<OnlineExamPortalProps> = ({
           <div className="p-6 sm:p-8 space-y-6 overflow-y-auto">
             <div className="flex items-center justify-between border-b border-[#d6d6d6] pb-5">
               <div className="flex items-center gap-3.5">
-                <div className="w-10 h-10 rounded-full bg-[#f5f5f7] border border-[#d6d6d6] text-[#1d1d1f] flex items-center justify-center">
-                  <Share2 className="h-5 w-5" />
+                <div className="w-11 h-11 rounded-full bg-[#f5f5f7] border border-[#d6d6d6] flex items-center justify-center p-1.5">
+                  <img src="/assets/mascot/lechuza-security.svg" alt="Seguridad" className="w-full h-full object-contain" />
                 </div>
                 <div>
                   <h3 className="text-[22px] font-semibold text-[#1d1d1f] tracking-tight">
@@ -607,7 +607,8 @@ export const OnlineExamPortal: React.FC<OnlineExamPortalProps> = ({
           <div className="flex-1 flex flex-col min-h-0">
             {/* Top Student Header */}
             <div className="px-6 py-4 bg-white/80 backdrop-blur-md border-b border-[#d6d6d6] flex items-center justify-between gap-3 shrink-0">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2.5">
+                <img src="/assets/mascot/lechuza-mark.svg" alt="Docentia" className="w-5 h-5 object-contain" />
                 <span className="font-semibold text-[17px] text-[#1d1d1f] tracking-tight">
                   docentia
                 </span>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { SoundService } from '../services/soundService';
 
-export type MascotVariant = 'professor' | 'exam' | 'scanner' | 'trophy';
+export type MascotVariant = 'professor' | 'exam' | 'scanner' | 'trophy' | 'security';
 export type MascotExpression = 'focused' | 'happy' | 'wink' | 'star';
 
 interface DuoMascotProps {
@@ -35,15 +35,21 @@ const VARIANT_SPEECHES: Record<MascotVariant, string[]> = {
     'Tasa de aprobados, nota media y desviación estándar de la clase.',
     'Exportación inmediata a formatos CSV y hojas de cálculo.',
     'Cierre de convocatoria riguroso y homologable.'
+  ],
+  security: [
+    'Sensor de foco activo y detección de cambio de pestañas.',
+    'Bloqueo contextual anti-copia y neutralización de capturas.',
+    'Entrega cifrada directa al acta de calificaciones docente.',
+    'Garantía de autoría individual en evaluación web segura.'
   ]
 };
 
 /**
- * Sober Barn Owl (Lechuza Académica) — Apple Style Companion:
- * - Minimalist, dignified silhouette crafted in pure vector SVG
+ * Sober Geometric Owl — Apple Style Companion:
+ * - Minimalist geometric line-art with cyan/electric blue neural network chest
  * - Serene micro-animations (slow gentle breathing, observant calm gaze)
  * - Restrained typography and whispering guidance in SF Pro Text
- * - Zero cartoon bounce or noisy visual clutter
+ * - Tailored variants for every section of the platform
  */
 export const DuoMascot: React.FC<DuoMascotProps> = ({
   variant,
@@ -103,8 +109,11 @@ export const DuoMascot: React.FC<DuoMascotProps> = ({
       case 'scanner':
         return '/assets/mascot/lechuza-scanner.svg';
       case 'exam':
-      case 'trophy':
         return '/assets/mascot/lechuza-academic.svg';
+      case 'trophy':
+        return '/assets/mascot/lechuza-trophy.svg';
+      case 'security':
+        return '/assets/mascot/lechuza-security.svg';
       default:
         return '/assets/mascot/lechuza-sober.svg';
     }

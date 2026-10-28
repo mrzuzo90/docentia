@@ -182,8 +182,8 @@ export const PricingModal: React.FC<PricingModalProps> = ({
         {/* Top Header */}
         <div className="bg-white px-7 py-5 flex flex-wrap items-center justify-between gap-4 border-b border-[#d6d6d6]">
           <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-full bg-[#f5f5f7] border border-[#d6d6d6] flex items-center justify-center text-[#1d1d1f]">
-              <Coins className="w-5 h-5 text-[#1d1d1f]" />
+            <div className="w-10 h-10 rounded-full bg-[#f5f5f7] border border-[#d6d6d6] flex items-center justify-center p-2">
+              <img src="/assets/mascot/lechuza-mark.svg" alt="Docentia" className="w-full h-full object-contain" />
             </div>
             <div>
               <span className="block text-[11px] font-semibold tracking-wider uppercase text-[#707070]">

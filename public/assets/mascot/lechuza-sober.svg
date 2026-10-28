@@ -1,132 +1,127 @@
-<svg viewBox="0 0 400 480" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg viewBox="0 0 360 500" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <!-- Apple-grade serene gradients -->
-    <linearGradient id="bodyGradient" x1="200" y1="120" x2="200" y2="440" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#ffffff" />
-      <stop offset="45%" stop-color="#fafafc" />
-      <stop offset="100%" stop-color="#f0e4d3" stop-opacity="0.65" />
+    
+    <linearGradient id="neuralGrad" x1="180" y1="230" x2="180" y2="415" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="45%" stop-color="#06b6d4" />
+      <stop offset="100%" stop-color="#0284c7" />
     </linearGradient>
 
-    <linearGradient id="mantleGradient" x1="120" y1="100" x2="280" y2="380" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#2e3642" />
-      <stop offset="40%" stop-color="#3d4653" />
-      <stop offset="85%" stop-color="#596680" />
-      <stop offset="100%" stop-color="#8e9aaf" />
-    </linearGradient>
-
-    <linearGradient id="wingRightGradient" x1="260" y1="150" x2="330" y2="390" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#242c37" />
-      <stop offset="50%" stop-color="#384353" />
-      <stop offset="100%" stop-color="#4a5568" />
-    </linearGradient>
-
-    <linearGradient id="wingLeftGradient" x1="140" y1="150" x2="70" y2="390" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#242c37" />
-      <stop offset="50%" stop-color="#384353" />
-      <stop offset="100%" stop-color="#4a5568" />
-    </linearGradient>
-
-    <linearGradient id="facialDisc" x1="200" y1="70" x2="200" y2="200" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#ffffff" />
-      <stop offset="70%" stop-color="#fdfbf7" />
-      <stop offset="100%" stop-color="#f4ede2" />
-    </linearGradient>
-
-    <linearGradient id="goldTrim" x1="150" y1="70" x2="250" y2="200" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#d4af37" stop-opacity="0.7" />
-      <stop offset="50%" stop-color="#b68d40" stop-opacity="0.4" />
-      <stop offset="100%" stop-color="#8a6d3b" stop-opacity="0.1" />
-    </linearGradient>
-
-    <linearGradient id="appleBlueGlow" x1="200" y1="0" x2="200" y2="400" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#0071e3" stop-opacity="0.12" />
+    <radialGradient id="pedestalGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#0071e3" stop-opacity="0.08" />
       <stop offset="100%" stop-color="#0071e3" stop-opacity="0" />
-    </linearGradient>
+    </radialGradient>
 
-    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="12" result="blur" />
-      <feComposite in="SourceGraphic" in2="blur" operator="over" />
-    </filter>
   </defs>
+  <ellipse cx="180" cy="454" rx="80" ry="6" fill="#0c192c" fill-opacity="0.05" />
+  <g id="owl">
+    
+    <!-- EAR TUFTS -->
+    <line x1="145" y1="95" x2="69" y2="43" stroke="#0c192c" stroke-width="4.2" stroke-linecap="round" />
+    <line x1="215" y1="95" x2="291" y2="43" stroke="#0c192c" stroke-width="4.2" stroke-linecap="round" />
 
-  <style>
-    @keyframes soberBreathe {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-3px); }
-    }
-    @keyframes soberBlink {
-      0%, 94%, 100% { transform: scaleY(1); }
-      97% { transform: scaleY(0.1); }
-    }
-    .sober-body {
-      animation: soberBreathe 6s ease-in-out infinite;
-      transform-origin: center bottom;
-    }
-    .sober-eye {
-      animation: soberBlink 7s ease-in-out infinite;
-      transform-origin: 200px 145px;
-    }
-  </style>
+    <!-- OUTER WING FLANKS -->
+    <path d="M 70 170 L 70 375 L 85 365" stroke="#0c192c" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <path d="M 290 170 L 290 375 L 275 365" stroke="#0c192c" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
 
-  <!-- Ambient light pedestal (Apple style subtle circle) -->
-  <circle cx="200" cy="240" r="170" fill="url(#appleBlueGlow)" />
-  <ellipse cx="200" cy="442" rx="90" ry="8" fill="#1d1d1f" fill-opacity="0.06" />
+    <!-- LOWER BODY TAPER -->
+    <path d="M 85 365 C 95 395, 135 426, 180 426 C 225 426, 265 395, 275 365"
+          stroke="#0c192c" stroke-width="4.2" stroke-linecap="round" fill="none" />
 
-  <g class="sober-body">
-    <!-- Back / Mantle & Folded Wings -->
-    <path d="M148 110 C 130 160, 95 240, 90 350 C 88 385, 110 405, 138 410 C 158 370, 172 320, 180 270 Z"
-          fill="url(#wingLeftGradient)" opacity="0.95" />
-    <path d="M252 110 C 270 160, 305 240, 310 350 C 312 385, 290 405, 262 410 C 242 370, 228 320, 220 270 Z"
-          fill="url(#wingRightGradient)" opacity="0.95" />
+    <!-- WINGS INNER ARCS -->
+    <path d="M 86 234 C 95 270, 115 320, 85 365" stroke="#0c192c" stroke-width="4.2" stroke-linecap="round" fill="none" />
+    <!-- Right wing inner arc (cyan accent from reference) -->
+    <path d="M 274 234 C 265 270, 245 320, 275 365" stroke="url(#neuralGrad)" stroke-width="4.2" stroke-linecap="round" fill="none" />
 
-    <!-- Slender Torso / Breast (Pale Starlight Silk) -->
-    <path d="M152 120 C 152 120, 136 210, 145 320 C 152 385, 178 430, 200 432 C 222 430, 248 385, 255 320 C 264 210, 248 120, 248 120 C 230 135, 170 135, 152 120 Z"
-          fill="url(#bodyGradient)" />
+    <!-- HEAD CIRCLE -->
+    <circle cx="180" cy="156" r="111" stroke="#0c192c" stroke-width="4.2" fill="none" />
 
-    <!-- Subtle Feather Contour Linework (Hairline precision) -->
-    <path d="M175 220 C 190 235, 210 235, 225 220" stroke="#1d1d1f" stroke-opacity="0.08" stroke-width="1.2" stroke-linecap="round" fill="none" />
-    <path d="M170 260 C 190 278, 210 278, 230 260" stroke="#1d1d1f" stroke-opacity="0.08" stroke-width="1.2" stroke-linecap="round" fill="none" />
-    <path d="M178 300 C 192 315, 208 315, 222 300" stroke="#1d1d1f" stroke-opacity="0.08" stroke-width="1.2" stroke-linecap="round" fill="none" />
-    <path d="M185 340 C 195 350, 205 350, 215 340" stroke="#1d1d1f" stroke-opacity="0.07" stroke-width="1.2" stroke-linecap="round" fill="none" />
+    <!-- HEART-SHAPED FACIAL DISC -->
+    <path d="M 180 160 C 160 85, 116 85, 92 118 C 72 142, 69 170, 70 190"
+          stroke="#0c192c" stroke-width="4.2" stroke-linecap="round" fill="none" />
+    <path d="M 180 160 C 200 85, 244 85, 268 118 C 288 142, 291 170, 290 190"
+          stroke="#0c192c" stroke-width="4.2" stroke-linecap="round" fill="none" />
 
-    <!-- Mantle Hood / Upper Head Silhouette -->
-    <path d="M136 115 C 136 60, 165 42, 200 42 C 235 42, 264 60, 264 115 C 264 125, 258 135, 252 142 C 248 110, 232 90, 200 90 C 168 90, 152 110, 148 142 C 142 135, 136 125, 136 115 Z"
-          fill="url(#mantleGradient)" />
+    <!-- CHIN / NECK LINE BELOW BEAK -->
+    <path d="M 70 190 C 70 236, 120 248, 180 248 C 240 248, 290 236, 290 190"
+          stroke="#0c192c" stroke-width="4.2" stroke-linecap="round" fill="none" />
 
-    <!-- Heart-Shaped Facial Disc (The Definitive Barn Owl Hallmark) -->
-    <!-- Golden delicate hairline boundary -->
-    <path d="M200 96 C 182 72, 144 76, 144 118 C 144 154, 174 186, 200 206 C 226 186, 256 154, 256 118 C 256 76, 218 72, 200 96 Z"
-          fill="url(#goldTrim)" />
-    <!-- Facial Disc Pure Surface -->
-    <path d="M200 98 C 184 75, 147 79, 147 118 C 147 152, 175 183, 200 202 C 225 183, 253 152, 253 118 C 253 79, 216 75, 200 98 Z"
-          fill="url(#facialDisc)" stroke="#ffffff" stroke-width="1" />
+    
+    <!-- Concentric Geometric Eyes -->
+    <circle cx="124" cy="144" r="28" stroke="#0c192c" stroke-width="4.2" fill="none" />
+    <circle cx="124" cy="144" r="13" stroke="#0c192c" stroke-width="4.2" fill="none" />
+    <circle cx="236" cy="144" r="28" stroke="#0c192c" stroke-width="4.2" fill="none" />
+    <circle cx="236" cy="144" r="13" stroke="#0c192c" stroke-width="4.2" fill="none" />
+    
 
-    <!-- Facial Disc Division (Central bridge) -->
-    <path d="M200 98 L 200 162" stroke="#d4af37" stroke-opacity="0.35" stroke-width="1" stroke-linecap="round" />
+    <!-- BEAK (Inverted triangle touching heart notch at y=160 down to y=221) -->
+    <polygon points="156,160 204,160 180,221" stroke="#0c192c" stroke-width="4.2" stroke-linejoin="round" fill="none" />
 
-    <!-- Calm, Intelligent Eyes (Apple SF style — serene, deep, observant) -->
-    <g class="sober-eye">
-      <!-- Left Eye -->
-      <circle cx="178" cy="138" r="8.5" fill="#1d1d1f" />
-      <circle cx="178" cy="138" r="9.5" stroke="#d4af37" stroke-opacity="0.5" stroke-width="1" fill="none" />
-      <circle cx="176" cy="136" r="2" fill="#ffffff" />
-      
-      <!-- Right Eye -->
-      <circle cx="222" cy="138" r="8.5" fill="#1d1d1f" />
-      <circle cx="222" cy="138" r="9.5" stroke="#d4af37" stroke-opacity="0.5" stroke-width="1" fill="none" />
-      <circle cx="220" cy="136" r="2" fill="#ffffff" />
+    
+    <!-- CENTRAL CHEST SHIELD (CYAN ACCENT) -->
+    <path d="M 86 234 C 124 256, 236 256, 274 234"
+          stroke="url(#neuralGrad)" stroke-width="3" stroke-linecap="round" fill="none" />
+    <path d="M 86 234 C 132 255, 146 348, 180 408"
+          stroke="url(#neuralGrad)" stroke-width="3" stroke-linecap="round" fill="none" />
+    <path d="M 274 234 C 228 255, 214 348, 180 408"
+          stroke="url(#neuralGrad)" stroke-width="3" stroke-linecap="round" fill="none" />
+
+    <!-- CHEST ISOMETRIC NEURAL NETWORK -->
+    <g id="chest-grid">
+      <!-- Vertical Lines -->
+      <line x1="180" y1="256" x2="180" y2="408" stroke="url(#neuralGrad)" stroke-width="2" />
+      <line x1="153" y1="270" x2="153" y2="385" stroke="url(#neuralGrad)" stroke-width="2" />
+      <line x1="207" y1="270" x2="207" y2="385" stroke="url(#neuralGrad)" stroke-width="2" />
+      <line x1="126" y1="285" x2="126" y2="330" stroke="url(#neuralGrad)" stroke-width="2" />
+      <line x1="234" y1="285" x2="234" y2="330" stroke="url(#neuralGrad)" stroke-width="2" />
+
+      <!-- Horizontal Interconnects -->
+      <line x1="153" y1="284" x2="207" y2="284" stroke="url(#neuralGrad)" stroke-width="1.8" />
+      <line x1="126" y1="322" x2="234" y2="322" stroke="url(#neuralGrad)" stroke-width="1.8" />
+      <line x1="140" y1="358" x2="220" y2="358" stroke="url(#neuralGrad)" stroke-width="1.8" />
+
+      <!-- Diagonal Lattice Lines -->
+      <line x1="180" y1="256" x2="207" y2="284" stroke="url(#neuralGrad)" stroke-width="2" />
+      <line x1="207" y1="284" x2="234" y2="322" stroke="url(#neuralGrad)" stroke-width="2" />
+      <line x1="153" y1="284" x2="180" y2="322" stroke="url(#neuralGrad)" stroke-width="2" />
+      <line x1="180" y1="322" x2="207" y2="358" stroke="url(#neuralGrad)" stroke-width="2" />
+      <line x1="126" y1="322" x2="153" y2="358" stroke="url(#neuralGrad)" stroke-width="2" />
+      <line x1="153" y1="358" x2="180" y2="394" stroke="url(#neuralGrad)" stroke-width="2" />
+      <line x1="180" y1="394" x2="180" y2="408" stroke="url(#neuralGrad)" stroke-width="2" />
+
+      <line x1="180" y1="256" x2="153" y2="284" stroke="url(#neuralGrad)" stroke-width="2" />
+      <line x1="153" y1="284" x2="126" y2="322" stroke="url(#neuralGrad)" stroke-width="2" />
+      <line x1="207" y1="284" x2="180" y2="322" stroke="url(#neuralGrad)" stroke-width="2" />
+      <line x1="180" y1="322" x2="153" y2="358" stroke="url(#neuralGrad)" stroke-width="2" />
+      <line x1="234" y1="322" x2="207" y2="358" stroke="url(#neuralGrad)" stroke-width="2" />
+      <line x1="207" y1="358" x2="180" y2="394" stroke="url(#neuralGrad)" stroke-width="2" />
+
+      <!-- Active Neural Dots at Intersections -->
+      <circle cx="180" cy="256" r="3.2" fill="#38bdf8" />
+      <circle cx="180" cy="284" r="3.2" fill="#38bdf8" />
+      <circle cx="180" cy="322" r="3.4" fill="#06b6d4" />
+      <circle cx="180" cy="358" r="3.4" fill="#06b6d4" />
+      <circle cx="180" cy="394" r="3.2" fill="#0284c7" />
+
+      <circle cx="153" cy="284" r="3.2" fill="#38bdf8" />
+      <circle cx="153" cy="322" r="3.4" fill="#06b6d4" />
+      <circle cx="153" cy="358" r="3.2" fill="#0284c7" />
+
+      <circle cx="207" cy="284" r="3.2" fill="#38bdf8" />
+      <circle cx="207" cy="322" r="3.4" fill="#06b6d4" />
+      <circle cx="207" cy="358" r="3.2" fill="#0284c7" />
+
+      <circle cx="126" cy="322" r="2.8" fill="#38bdf8" />
+      <circle cx="234" cy="322" r="2.8" fill="#38bdf8" />
     </g>
+    
+    
 
-    <!-- Slender, Downward-turned Ivory Beak -->
-    <path d="M197 148 C 197 148, 200 168, 200 172 C 200 168, 203 148, 203 148 Z"
-          fill="#f0e4d3" stroke="#b68d40" stroke-opacity="0.4" stroke-width="0.8" />
-
-    <!-- Minimalist Perch / Slate Plinth (Geometric pure Apple aesthetic) -->
-    <rect x="156" y="430" width="88" height="6" rx="3" fill="#2e3642" />
-    <!-- Subtle Golden Academic Accents / Talons -->
-    <path d="M182 428 C 182 432, 186 434, 188 434" stroke="#d4af37" stroke-width="2" stroke-linecap="round" />
-    <path d="M190 428 C 190 432, 194 434, 196 434" stroke="#d4af37" stroke-width="2" stroke-linecap="round" />
-    <path d="M204 428 C 204 432, 208 434, 210 434" stroke="#d4af37" stroke-width="2" stroke-linecap="round" />
-    <path d="M212 428 C 212 432, 216 434, 218 434" stroke="#d4af37" stroke-width="2" stroke-linecap="round" />
+    <!-- FEET & GROUND BASE -->
+    <line x1="122" y1="444" x2="238" y2="444" stroke="#0c192c" stroke-width="4.2" stroke-linecap="round" />
+    <path d="M 122 444 C 122 418, 174 418, 174 444" stroke="#0c192c" stroke-width="4.2" fill="none" />
+    <path d="M 186 444 C 186 418, 238 418, 238 444" stroke="#0c192c" stroke-width="4.2" fill="none" />
+    <line x1="180" y1="426" x2="180" y2="444" stroke="#0c192c" stroke-width="4.2" />
+    
   </g>
 </svg>

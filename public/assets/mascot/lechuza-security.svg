@@ -1,0 +1,144 @@
+<svg viewBox="0 0 360 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    
+    <linearGradient id="neuralGrad" x1="180" y1="230" x2="180" y2="415" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="45%" stop-color="#06b6d4" />
+      <stop offset="100%" stop-color="#0284c7" />
+    </linearGradient>
+
+    <radialGradient id="pedestalGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#0071e3" stop-opacity="0.08" />
+      <stop offset="100%" stop-color="#0071e3" stop-opacity="0" />
+    </radialGradient>
+
+  </defs>
+  <ellipse cx="180" cy="454" rx="80" ry="6" fill="#0c192c" fill-opacity="0.05" />
+  <g id="owl">
+    
+    <!-- EAR TUFTS -->
+    <line x1="145" y1="95" x2="69" y2="43" stroke="#0c192c" stroke-width="4.2" stroke-linecap="round" />
+    <line x1="215" y1="95" x2="291" y2="43" stroke="#0c192c" stroke-width="4.2" stroke-linecap="round" />
+
+    <!-- OUTER WING FLANKS -->
+    <path d="M 70 170 L 70 375 L 85 365" stroke="#0c192c" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <path d="M 290 170 L 290 375 L 275 365" stroke="#0c192c" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+
+    <!-- LOWER BODY TAPER -->
+    <path d="M 85 365 C 95 395, 135 426, 180 426 C 225 426, 265 395, 275 365"
+          stroke="#0c192c" stroke-width="4.2" stroke-linecap="round" fill="none" />
+
+    <!-- WINGS INNER ARCS -->
+    <path d="M 86 234 C 95 270, 115 320, 85 365" stroke="#0c192c" stroke-width="4.2" stroke-linecap="round" fill="none" />
+    <!-- Right wing inner arc (cyan accent from reference) -->
+    <path d="M 274 234 C 265 270, 245 320, 275 365" stroke="url(#neuralGrad)" stroke-width="4.2" stroke-linecap="round" fill="none" />
+
+    <!-- HEAD CIRCLE -->
+    <circle cx="180" cy="156" r="111" stroke="#0c192c" stroke-width="4.2" fill="none" />
+
+    <!-- HEART-SHAPED FACIAL DISC -->
+    <path d="M 180 160 C 160 85, 116 85, 92 118 C 72 142, 69 170, 70 190"
+          stroke="#0c192c" stroke-width="4.2" stroke-linecap="round" fill="none" />
+    <path d="M 180 160 C 200 85, 244 85, 268 118 C 288 142, 291 170, 290 190"
+          stroke="#0c192c" stroke-width="4.2" stroke-linecap="round" fill="none" />
+
+    <!-- CHIN / NECK LINE BELOW BEAK -->
+    <path d="M 70 190 C 70 236, 120 248, 180 248 C 240 248, 290 236, 290 190"
+          stroke="#0c192c" stroke-width="4.2" stroke-linecap="round" fill="none" />
+
+    
+    <!-- Concentric Geometric Eyes -->
+    <circle cx="124" cy="144" r="28" stroke="#0c192c" stroke-width="4.2" fill="none" />
+    <circle cx="124" cy="144" r="13" stroke="#0c192c" stroke-width="4.2" fill="none" />
+    <circle cx="236" cy="144" r="28" stroke="#0c192c" stroke-width="4.2" fill="none" />
+    <circle cx="236" cy="144" r="13" stroke="#0c192c" stroke-width="4.2" fill="none" />
+    
+
+    <!-- BEAK (Inverted triangle touching heart notch at y=160 down to y=221) -->
+    <polygon points="156,160 204,160 180,221" stroke="#0c192c" stroke-width="4.2" stroke-linejoin="round" fill="none" />
+
+    
+    <!-- CENTRAL CHEST SHIELD (CYAN ACCENT) -->
+    <path d="M 86 234 C 124 256, 236 256, 274 234"
+          stroke="url(#neuralGrad)" stroke-width="3" stroke-linecap="round" fill="none" />
+    <path d="M 86 234 C 132 255, 146 348, 180 408"
+          stroke="url(#neuralGrad)" stroke-width="3" stroke-linecap="round" fill="none" />
+    <path d="M 274 234 C 228 255, 214 348, 180 408"
+          stroke="url(#neuralGrad)" stroke-width="3" stroke-linecap="round" fill="none" />
+
+    <!-- CHEST ISOMETRIC NEURAL NETWORK -->
+    <g id="chest-grid">
+      <!-- Vertical Lines -->
+      <line x1="180" y1="256" x2="180" y2="408" stroke="url(#neuralGrad)" stroke-width="2" />
+      <line x1="153" y1="270" x2="153" y2="385" stroke="url(#neuralGrad)" stroke-width="2" />
+      <line x1="207" y1="270" x2="207" y2="385" stroke="url(#neuralGrad)" stroke-width="2" />
+      <line x1="126" y1="285" x2="126" y2="330" stroke="url(#neuralGrad)" stroke-width="2" />
+      <line x1="234" y1="285" x2="234" y2="330" stroke="url(#neuralGrad)" stroke-width="2" />
+
+      <!-- Horizontal Interconnects -->
+      <line x1="153" y1="284" x2="207" y2="284" stroke="url(#neuralGrad)" stroke-width="1.8" />
+      <line x1="126" y1="322" x2="234" y2="322" stroke="url(#neuralGrad)" stroke-width="1.8" />
+      <line x1="140" y1="358" x2="220" y2="358" stroke="url(#neuralGrad)" stroke-width="1.8" />
+
+      <!-- Diagonal Lattice Lines -->
+      <line x1="180" y1="256" x2="207" y2="284" stroke="url(#neuralGrad)" stroke-width="2" />
+      <line x1="207" y1="284" x2="234" y2="322" stroke="url(#neuralGrad)" stroke-width="2" />
+      <line x1="153" y1="284" x2="180" y2="322" stroke="url(#neuralGrad)" stroke-width="2" />
+      <line x1="180" y1="322" x2="207" y2="358" stroke="url(#neuralGrad)" stroke-width="2" />
+      <line x1="126" y1="322" x2="153" y2="358" stroke="url(#neuralGrad)" stroke-width="2" />
+      <line x1="153" y1="358" x2="180" y2="394" stroke="url(#neuralGrad)" stroke-width="2" />
+      <line x1="180" y1="394" x2="180" y2="408" stroke="url(#neuralGrad)" stroke-width="2" />
+
+      <line x1="180" y1="256" x2="153" y2="284" stroke="url(#neuralGrad)" stroke-width="2" />
+      <line x1="153" y1="284" x2="126" y2="322" stroke="url(#neuralGrad)" stroke-width="2" />
+      <line x1="207" y1="284" x2="180" y2="322" stroke="url(#neuralGrad)" stroke-width="2" />
+      <line x1="180" y1="322" x2="153" y2="358" stroke="url(#neuralGrad)" stroke-width="2" />
+      <line x1="234" y1="322" x2="207" y2="358" stroke="url(#neuralGrad)" stroke-width="2" />
+      <line x1="207" y1="358" x2="180" y2="394" stroke="url(#neuralGrad)" stroke-width="2" />
+
+      <!-- Active Neural Dots at Intersections -->
+      <circle cx="180" cy="256" r="3.2" fill="#38bdf8" />
+      <circle cx="180" cy="284" r="3.2" fill="#38bdf8" />
+      <circle cx="180" cy="322" r="3.4" fill="#06b6d4" />
+      <circle cx="180" cy="358" r="3.4" fill="#06b6d4" />
+      <circle cx="180" cy="394" r="3.2" fill="#0284c7" />
+
+      <circle cx="153" cy="284" r="3.2" fill="#38bdf8" />
+      <circle cx="153" cy="322" r="3.4" fill="#06b6d4" />
+      <circle cx="153" cy="358" r="3.2" fill="#0284c7" />
+
+      <circle cx="207" cy="284" r="3.2" fill="#38bdf8" />
+      <circle cx="207" cy="322" r="3.4" fill="#06b6d4" />
+      <circle cx="207" cy="358" r="3.2" fill="#0284c7" />
+
+      <circle cx="126" cy="322" r="2.8" fill="#38bdf8" />
+      <circle cx="234" cy="322" r="2.8" fill="#38bdf8" />
+    </g>
+    
+    
+    <!-- Anti-Cheat Vigilance Radar Arcs -->
+    <g opacity="0.6">
+      <path d="M 120 40 C 138 32, 160 28, 180 28 C 200 28, 222 32, 240 40" stroke="#0071e3" stroke-width="2" stroke-dasharray="4 4" fill="none" />
+      <path d="M 100 24 C 124 14, 152 8, 180 8 C 208 8, 236 14, 260 24" stroke="#00f0ff" stroke-width="1.5" stroke-dasharray="3 5" fill="none" />
+    </g>
+
+    <!-- Central Security Shield Emblem in Chest -->
+    <g transform="translate(162, 310)">
+      <path d="M 18 0 L 34 6 C 34 22, 18 34, 18 34 C 18 34, 2 22, 2 6 Z"
+            fill="#ffffff" stroke="#0071e3" stroke-width="2.5" />
+      <path d="M 13 14 L 13 10 C 13 7.2, 15.2 5, 18 5 C 20.8 5, 23 7.2, 23 10 L 23 14"
+            stroke="#0071e3" stroke-width="2" stroke-linecap="round" fill="none" />
+      <rect x="11" y="14" width="14" height="11" rx="2.5" fill="#0071e3" />
+      <circle cx="18" cy="18.5" r="1.5" fill="#ffffff" />
+      <line x1="18" y1="19" x2="18" y2="22" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+    </g>
+
+
+    <!-- FEET & GROUND BASE -->
+    <line x1="122" y1="444" x2="238" y2="444" stroke="#0c192c" stroke-width="4.2" stroke-linecap="round" />
+    <path d="M 122 444 C 122 418, 174 418, 174 444" stroke="#0c192c" stroke-width="4.2" fill="none" />
+    <path d="M 186 444 C 186 418, 238 418, 238 444" stroke="#0c192c" stroke-width="4.2" fill="none" />
+    <line x1="180" y1="426" x2="180" y2="444" stroke="#0c192c" stroke-width="4.2" />
+    
+  </g>
+</svg>
