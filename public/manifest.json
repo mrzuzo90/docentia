@@ -1,0 +1,23 @@
+{
+  "short_name": "Docentia",
+  "name": "Docentia — Evaluación Docente Inteligente",
+  "description": "Plataforma integral de diseño, calibración psicométrica y corrección óptica de exámenes para docentes.",
+  "icons": [
+    {
+      "src": "/assets/mascot/lechuza-mark.svg",
+      "type": "image/svg+xml",
+      "sizes": "any"
+    },
+    {
+      "src": "/assets/mascot/lechuza-mark.png",
+      "type": "image/png",
+      "sizes": "480x480"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "lang": "es"
+}

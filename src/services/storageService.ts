@@ -36,7 +36,10 @@ function safeSetItem(key: string, value: string): void {
 export const StorageService = {
   getApiKey(): string {
     try {
-      return localStorage.getItem(STORAGE_KEYS.API_KEY) || '';
+      const stored = localStorage.getItem(STORAGE_KEYS.API_KEY);
+      if (stored && stored.trim().length > 0) return stored.trim();
+      const envKey = (import.meta as unknown as { env?: { VITE_GEMINI_API_KEY?: string } }).env?.VITE_GEMINI_API_KEY;
+      return envKey?.trim() || '';
     } catch {
       return '';
     }

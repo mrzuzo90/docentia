@@ -1,13 +1,29 @@
 {
-  "name": "eduexamen-ai",
-  "private": true,
+  "name": "docentia",
   "version": "1.0.0",
+  "description": "Plataforma integral de evaluación docente: diseño psicométrico, generación de exámenes con solucionario, corrección óptica OCR y actas oficiales.",
+  "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mrzuzo90/docentia.git"
+  },
+  "keywords": [
+    "docentia",
+    "educacion",
+    "examenes",
+    "ocr",
+    "rubricas",
+    "moodle",
+    "evaluacion"
+  ],
+  "author": "Docentia Team",
+  "license": "MIT",
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "canvas-confetti": "^1.9.4",
