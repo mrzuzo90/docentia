@@ -926,7 +926,24 @@ export const ExamView: React.FC<ExamViewProps> = ({
             </div>
 
             <div className="divide-y divide-[#d6d6d6]">
-              {exam.testQuestions.map((q, idx) => {
+              {exam.testQuestions.length === 0 ? (
+                <div className="p-8 text-center bg-[#fafafc] m-4 rounded-[20px] border border-dashed border-[#d6d6d6]">
+                  <p className="text-[15px] font-medium text-[#1d1d1f]">No hay preguntas de test en esta convocatoria</p>
+                  <p className="text-[13px] text-[#707070] mt-1 mb-4">Puedes añadir preguntas manualmente o generarlas automáticamente a partir de tus apuntes con IA.</p>
+                  <div className="flex flex-wrap items-center justify-center gap-3">
+                    <button type="button" onClick={handleAddTestQuestion} className="apple-pill-primary text-[13px] py-1.5 px-4">
+                      <Plus className="h-3.5 w-3.5" />
+                      <span>Añadir pregunta</span>
+                    </button>
+                    {onGoToGenerator && (
+                      <button type="button" onClick={onGoToGenerator} className="apple-pill-ghost text-[13px] py-1.5 px-4">
+                        <span>Ir a Cargar Documentos</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                exam.testQuestions.map((q, idx) => {
                 const isEditing = editingItemId === q.id;
                 return (
                   <div key={q.id} className="p-6 bg-[#ffffff] space-y-4">
@@ -1149,7 +1166,7 @@ export const ExamView: React.FC<ExamViewProps> = ({
 
                   </div>
                 );
-              })}
+              }))}
             </div>
           </div>
 
@@ -1181,7 +1198,24 @@ export const ExamView: React.FC<ExamViewProps> = ({
             </div>
 
             <div className="divide-y divide-[#d6d6d6]">
-              {exam.exercises.map((ex, idx) => {
+              {exam.exercises.length === 0 ? (
+                <div className="p-8 text-center bg-[#fafafc] m-4 rounded-[20px] border border-dashed border-[#d6d6d6]">
+                  <p className="text-[15px] font-medium text-[#1d1d1f]">No hay ejercicios de desarrollo en esta convocatoria</p>
+                  <p className="text-[13px] text-[#707070] mt-1 mb-4">Añade problemas con su rúbrica y pasos de resolución o genéralos con IA a partir de tus apuntes.</p>
+                  <div className="flex flex-wrap items-center justify-center gap-3">
+                    <button type="button" onClick={handleAddExercise} className="apple-pill-primary text-[13px] py-1.5 px-4">
+                      <Plus className="h-3.5 w-3.5" />
+                      <span>Añadir ejercicio</span>
+                    </button>
+                    {onGoToGenerator && (
+                      <button type="button" onClick={onGoToGenerator} className="apple-pill-ghost text-[13px] py-1.5 px-4">
+                        <span>Ir a Cargar Documentos</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                exam.exercises.map((ex, idx) => {
                 const isEditing = editingItemId === ex.id;
                 return (
                   <div key={ex.id} className="p-6 bg-[#ffffff] space-y-4">
@@ -1375,7 +1409,7 @@ export const ExamView: React.FC<ExamViewProps> = ({
 
                   </div>
                 );
-              })}
+              }))}
             </div>
           </div>
 

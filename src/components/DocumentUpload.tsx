@@ -204,6 +204,17 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
           <span className="inline-flex items-center px-3.5 py-1.5 rounded-full border border-[#d6d6d6] text-[13px] text-[#707070] bg-[#fafafc]">
             {documents.length} doc(s) · ~{totalPages} págs ({totalWords.toLocaleString()} pal.)
           </span>
+          {documents.length > 0 && (
+            <button
+              type="button"
+              onClick={() => onDocumentsChange([])}
+              className="apple-pill-ghost text-[13px] py-1.5 px-3 text-[#b64400] hover:text-[#b64400]"
+              title="Quitar todos los documentos cargados"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              <span>Vaciar</span>
+            </button>
+          )}
           <button
             type="button"
             onClick={scrollToGenerator}

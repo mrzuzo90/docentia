@@ -101,11 +101,35 @@ export function App() {
   };
 
   const handleCreateNewExam = () => {
+    const draftId = `exam-${Date.now()}`;
+    const draftExam: Exam = {
+      id: draftId,
+      title: 'Nueva Convocatoria',
+      subject: 'Materia sin asignar',
+      targetLevel: 'Educación Secundaria / Bachillerato',
+      institution: exam.institution || 'Centro Educativo',
+      durationMinutes: 50,
+      testPenalty: 0.25,
+      instructions: 'Responde a todas las cuestiones en el espacio asignado.',
+      status: 'draft',
+      createdAt: new Date().toISOString(),
+      documents: [],
+      testQuestions: [],
+      exercises: [],
+      totalScore: 10,
+      testSectionWeight: 4.0,
+      exerciseSectionWeight: 6.0
+    };
+    StorageService.saveExam(draftExam);
+    setExams(StorageService.getAllExams());
+    setExam(draftExam);
+    setDocuments([]);
+    setSubmissions([]);
     setActiveTab('upload');
     window.scrollTo({ top: 0, behavior: 'smooth' });
     addToast(
-      'Diseño de Nueva Convocatoria',
-      'Sube tus documentos PDF o temarios en el Paso 1 y pulsa Generar Examen en el Paso 2.',
+      'Nueva Convocatoria en blanco creada',
+      'Lienzo limpio: arrastra tus documentos o escribe tus apuntes en el Paso 1 para comenzar.',
       'info'
     );
   };
@@ -450,6 +474,7 @@ export function App() {
 
               <div id="generador-examen">
                 <ExamGenerator
+                  key={exam.id}
                   documents={documents}
                   initialMetadata={{
                     title: exam.title,
