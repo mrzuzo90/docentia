@@ -6,10 +6,196 @@ import {
   StudentGradeReport,
   TestQuestion,
   OpenExercise,
-  SourceDocument
+  SourceDocument,
+  AIProviderId,
+  AIProviderConfig
 } from '../types';
 import { StorageService } from './storageService';
 import { DocumentParserService } from './pdfService';
+
+/**
+ * Robust JSON parser that handles pure JSON, markdown blocks (```json ... ```),
+ * and substring extractions from thinking/reasoning models.
+ */
+function parseJsonSafely(raw: string): any {
+  const trimmed = raw.trim();
+  try {
+    return JSON.parse(trimmed);
+  } catch {
+    // continue
+  }
+
+  const mdMatch = trimmed.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+  if (mdMatch) {
+    try {
+      return JSON.parse(mdMatch[1].trim());
+    } catch {
+      // continue
+    }
+  }
+
+  const firstBrace = trimmed.indexOf('{');
+  const lastBrace = trimmed.lastIndexOf('}');
+  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+    try {
+      return JSON.parse(trimmed.slice(firstBrace, lastBrace + 1));
+    } catch {
+      // continue
+    }
+  }
+
+  throw new Error('No se pudo extraer una estructura JSON válida de la respuesta del modelo de IA.');
+}
+
+/**
+ * Standard OpenAI-compatible Chat Completions client (DeepSeek, OpenRouter, OpenAI, LocalAI/Ollama)
+ */
+async function callOpenAICompatible(
+  endpoint: string,
+  apiKey: string,
+  model: string,
+  systemPrompt: string,
+  userPrompt: string,
+  extraHeaders?: Record<string, string>,
+  imageBase64?: string,
+  mimeType?: string
+): Promise<string> {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${apiKey}`,
+    ...extraHeaders
+  };
+
+  let userContent: any = userPrompt;
+  if (imageBase64 && mimeType) {
+    userContent = [
+      { type: 'text', text: userPrompt },
+      {
+        type: 'image_url',
+        image_url: {
+          url: `data:${mimeType};base64,${imageBase64}`
+        }
+      }
+    ];
+  }
+
+  const payload: any = {
+    model,
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userContent }
+    ],
+    temperature: 0.2
+  };
+
+  // Only attach json_object if model is not a pure chain-of-thought reasoner (e.g. deepseek-reasoner, o1)
+  const isReasoner = model.toLowerCase().includes('reasoner') || model.toLowerCase().includes('o1');
+  if (!isReasoner) {
+    payload.response_format = { type: 'json_object' };
+  }
+
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(payload)
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(`Error ${response.status} del proveedor: ${errorBody.slice(0, 320)}`);
+  }
+
+  const data = await response.json();
+  const choice = data.choices?.[0];
+  const content = choice?.message?.content;
+  if (!content) {
+    throw new Error('El modelo de IA devolvió una respuesta vacía.');
+  }
+
+  return content;
+}
+
+function normalizeGeneratedExam(
+  parsed: any,
+  testPointsEach: number,
+  exPointsEach: number
+): { testQuestions: TestQuestion[]; exercises: OpenExercise[] } {
+  const testQuestions: TestQuestion[] = (parsed.testQuestions || []).map(
+    (q: any, i: number) => ({
+      id: q.id || `q-${Date.now()}-${i + 1}`,
+      question: q.question || 'Enunciado de la cuestión',
+      options: q.options || { A: '', B: '', C: '', D: '' },
+      correctAnswer: (['A', 'B', 'C', 'D'].includes(q.correctAnswer)
+        ? q.correctAnswer
+        : 'A') as 'A' | 'B' | 'C' | 'D',
+      explanation: q.explanation || '',
+      points: Number(q.points ?? testPointsEach)
+    })
+  );
+
+  const exercises: OpenExercise[] = (parsed.exercises || []).map((ex: any, i: number) => ({
+    id: ex.id || `ex-${Date.now()}-${i + 1}`,
+    title: ex.title || `Ejercicio ${i + 1}`,
+    statement: ex.statement || '',
+    rubricCriteria:
+      Array.isArray(ex.rubricCriteria) && ex.rubricCriteria.length > 0
+        ? ex.rubricCriteria
+        : [
+            'Planteamiento conceptual riguroso',
+            'Desarrollo metodológico correcto',
+            'Conclusión justificada'
+          ],
+    solutionSteps: ex.solutionSteps || '',
+    points: Number(ex.points ?? exPointsEach)
+  }));
+
+  return { testQuestions, exercises };
+}
+
+function normalizeGradingReport(
+  parsed: any,
+  studentName: string,
+  totalTestMax: number,
+  totalExMax: number
+): StudentGradeReport {
+  const testScore = Number((parsed.testSectionScore ?? 0).toFixed(2));
+  const exScore = Number((parsed.exerciseSectionScore ?? 0).toFixed(2));
+  const testOut10 = totalTestMax > 0 ? Number(((testScore / totalTestMax) * 10).toFixed(2)) : 0;
+  const exOut10 = totalExMax > 0 ? Number(((exScore / totalExMax) * 10).toFixed(2)) : 0;
+
+  return {
+    id: `rep-${Date.now()}`,
+    submissionId: `sub-${Date.now()}`,
+    studentName,
+    testSectionScore: testScore,
+    testSectionMax: Number(totalTestMax.toFixed(2)),
+    testSectionScoreOutOf10: Number((parsed.testSectionScoreOutOf10 ?? testOut10).toFixed(2)),
+    exerciseSectionScore: exScore,
+    exerciseSectionMax: Number(totalExMax.toFixed(2)),
+    exerciseSectionScoreOutOf10: Number((parsed.exerciseSectionScoreOutOf10 ?? exOut10).toFixed(2)),
+    finalScore: Number((parsed.finalScore ?? testScore + exScore).toFixed(2)),
+    overallFeedback: parsed.overallFeedback || 'Evaluación completada.',
+    needsManualReview: Boolean(
+      parsed.needsManualReview ||
+        (parsed.corrections || []).some((c: any) => c.needsManualReview)
+    ),
+    manualReviewReasons: parsed.manualReviewReasons || [],
+    gradedAt: new Date().toISOString(),
+    corrections: (parsed.corrections || []).map((c: any, i: number) => ({
+      questionId: c.questionId || `q${i + 1}`,
+      type: c.type || (i < 5 ? 'test' : 'exercise'),
+      questionTitle: c.questionTitle || `Cuestión ${i + 1}`,
+      studentAnswer: c.studentAnswer || '',
+      ocrExtractedText: c.ocrExtractedText || c.studentAnswer || '',
+      ocrConfidence: c.ocrConfidence || 'high',
+      scoreAwarded: Number((c.scoreAwarded || 0).toFixed(2)),
+      maxScore: Number((c.maxScore || 1.0).toFixed(2)),
+      feedback: c.feedback || '',
+      needsManualReview: Boolean(c.needsManualReview),
+      reviewReason: c.reviewReason || undefined
+    }))
+  };
+}
 
 export const GeminiService = {
   getApiKey(): string {
@@ -17,36 +203,153 @@ export const GeminiService = {
   },
 
   getModelName(): string {
-    return StorageService.getModelName() || 'gemini-2.5-flash';
+    return StorageService.getModelName();
+  },
+
+  getActiveProvider(): AIProviderId {
+    return StorageService.getActiveProvider();
   },
 
   /**
-   * Generates questions and exercises from source documents using Gemini AI
-   * Supports extracted text, in-memory multimodal PDF/image blobs, multi-model fallback,
-   * and an intelligent NLP local generator when no API key is configured.
+   * Health-check connection test with low token footprint
+   */
+  async testConnection(
+    provider: AIProviderId,
+    config: Partial<AIProviderConfig>
+  ): Promise<{ success: boolean; message: string; latencyMs: number }> {
+    const start = performance.now();
+    try {
+      if (provider === 'local') {
+        return {
+          success: true,
+          message: 'Motor semántico local disponible (0 € de coste, 100% privado en navegador).',
+          latencyMs: 1
+        };
+      }
+
+      if (provider === 'gemini') {
+        const key = config.geminiKey?.trim() || StorageService.getAIConfig().geminiKey;
+        if (!key) throw new Error('Introduce tu API Key de Google Gemini para conectar.');
+        const genAI = new GoogleGenerativeAI(key);
+        const model = genAI.getGenerativeModel({
+          model: config.geminiModel || 'gemini-2.5-flash'
+        });
+        const res = await model.generateContent('Di "Conectado".');
+        const text = res.response.text();
+        return {
+          success: true,
+          message: `Conexión con Google Gemini exitosa (${config.geminiModel || 'gemini-2.5-flash'}): "${text.trim().slice(0, 30)}"`,
+          latencyMs: Math.round(performance.now() - start)
+        };
+      }
+
+      if (provider === 'deepseek') {
+        const key = config.deepseekKey?.trim() || StorageService.getAIConfig().deepseekKey;
+        if (!key) throw new Error('Introduce tu API Key de DeepSeek Platform.');
+        const res = await fetch('https://api.deepseek.com/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${key}`
+          },
+          body: JSON.stringify({
+            model: config.deepseekModel || 'deepseek-chat',
+            messages: [{ role: 'user', content: 'Di "Conectado".' }],
+            max_tokens: 15
+          })
+        });
+        if (!res.ok) {
+          const errText = await res.text();
+          throw new Error(`Error DeepSeek HTTP ${res.status}: ${errText.slice(0, 160)}`);
+        }
+        return {
+          success: true,
+          message: `Conexión con DeepSeek (${config.deepseekModel || 'deepseek-chat'}) verificada.`,
+          latencyMs: Math.round(performance.now() - start)
+        };
+      }
+
+      if (provider === 'openrouter') {
+        const key = config.openrouterKey?.trim() || StorageService.getAIConfig().openrouterKey;
+        if (!key) throw new Error('Introduce tu API Key de OpenRouter.');
+        const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${key}`,
+            'HTTP-Referer': 'https://docentia.edu.es',
+            'X-Title': 'Docentia Evaluacion'
+          },
+          body: JSON.stringify({
+            model: config.openrouterModel || 'deepseek/deepseek-r1',
+            messages: [{ role: 'user', content: 'Di "Conectado".' }],
+            max_tokens: 15
+          })
+        });
+        if (!res.ok) {
+          const errText = await res.text();
+          throw new Error(`Error OpenRouter HTTP ${res.status}: ${errText.slice(0, 160)}`);
+        }
+        return {
+          success: true,
+          message: `Conexión con OpenRouter (${config.openrouterModel || 'deepseek/deepseek-r1'}) verificada.`,
+          latencyMs: Math.round(performance.now() - start)
+        };
+      }
+
+      if (provider === 'openai') {
+        const key = config.openaiKey?.trim() || StorageService.getAIConfig().openaiKey;
+        if (!key) throw new Error('Introduce tu API Key de OpenAI o endpoint compatible.');
+        const endpoint = `${(config.customBaseUrl || 'https://api.openai.com/v1').replace(/\/$/, '')}/chat/completions`;
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${key}`
+          },
+          body: JSON.stringify({
+            model: config.openaiModel || 'gpt-4o',
+            messages: [{ role: 'user', content: 'Di "Conectado".' }],
+            max_tokens: 15
+          })
+        });
+        if (!res.ok) {
+          const errText = await res.text();
+          throw new Error(`Error OpenAI HTTP ${res.status}: ${errText.slice(0, 160)}`);
+        }
+        return {
+          success: true,
+          message: `Conexión con OpenAI / Compatible (${config.openaiModel || 'gpt-4o'}) verificada.`,
+          latencyMs: Math.round(performance.now() - start)
+        };
+      }
+
+      return { success: false, message: 'Proveedor no reconocido.', latencyMs: 0 };
+    } catch (err: any) {
+      return {
+        success: false,
+        message: err?.message || 'Error de conexión desconocido.',
+        latencyMs: Math.round(performance.now() - start)
+      };
+    }
+  },
+
+  /**
+   * Generates questions and exercises from source documents using the active AI provider
+   * (Gemini, DeepSeek, OpenRouter, OpenAI or Local NLP Engine)
    */
   async generateExamFromSource(
     documents: SourceDocument[],
     config: ExamGenerationConfig,
     metadata: { title: string; subject: string; targetLevel: string; instructions?: string }
   ): Promise<{ testQuestions: TestQuestion[]; exercises: OpenExercise[] }> {
-    const apiKey = this.getApiKey();
+    const aiConfig = StorageService.getAIConfig();
+    const provider = aiConfig.provider;
+
     const combinedText =
       documents.length > 0
         ? documents.map(d => `=== DOCUMENTO: ${d.name} ===\n${d.content}`).join('\n\n')
         : `Materia: ${metadata.subject}. Nivel: ${metadata.targetLevel}. Tema: ${config.topicFocus || metadata.title}.`;
-
-    if (!apiKey) {
-      // Simulate brief processing delay for smooth UX feedback
-      await new Promise(r => setTimeout(r, 650));
-      return this.generateIntelligentLocalExam(combinedText, config, metadata);
-    }
-
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const preferredModel = this.getModelName();
-    const modelsToTry = Array.from(
-      new Set([preferredModel, 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro'])
-    );
 
     const testPointsEach =
       config.numTestQuestions > 0
@@ -57,10 +360,17 @@ export const GeminiService = {
         ? Number((config.exerciseSectionWeight / config.numExercises).toFixed(2))
         : 0;
 
-    const prompt = `Actúa como Catedrático y Coordinador de Evaluación de la materia "${metadata.subject}" para el nivel "${metadata.targetLevel}".
-A partir de los documentos académicos adjuntos, diseña una prueba de evaluación rigurosa, precisa y con su solucionario completo.
+    // 01. LOCAL ENGINE
+    if (provider === 'local') {
+      await new Promise(r => setTimeout(r, 650));
+      return this.generateIntelligentLocalExam(combinedText, config, metadata);
+    }
 
-PARÁMETROS TÉCNICOS DEL EXAMEN:
+    const systemPrompt = `Actúa como Catedrático y Coordinador de Evaluación de la materia "${metadata.subject}" para el nivel "${metadata.targetLevel}".
+A partir del temario aportado, diseña una prueba académica rigurosa con su solucionario oficial y desglose de baremo.
+Devuelve EXCLUSIVAMENTE un objeto JSON válido con las claves "testQuestions" y "exercises".`;
+
+    const userPrompt = `PARÁMETROS TÉCNICOS DEL EXAMEN:
 - Preguntas tipo test (4 opciones A, B, C, D, solo 1 válida): exactamente ${config.numTestQuestions} preguntas.
 - Ejercicios de desarrollo / problemas prácticos: exactamente ${config.numExercises} ejercicios.
 - Nivel de exigencia cognitiva: ${config.difficulty}.
@@ -69,12 +379,12 @@ PARÁMETROS TÉCNICOS DEL EXAMEN:
 ${config.topicFocus ? `- Foco temático prioritario: ${config.topicFocus}` : ''}
 ${config.customInstructions ? `- Directrices adicionales: ${config.customInstructions}` : ''}
 
-CONTENIDO DOCUMENTAL FUENTE:
+CONTENIDO TEMÁTICO DE LOS APUNTES:
 """
-${combinedText.slice(0, 35000)}
+${combinedText.slice(0, 42000)}
 """
 
-Devuelve exclusivamente un objeto JSON válido con esta estructura:
+Devuelve un JSON con este formato exacto:
 {
   "testQuestions": [
     {
@@ -87,7 +397,7 @@ Devuelve exclusivamente un objeto JSON válido con esta estructura:
         "D": "Opción D"
       },
       "correctAnswer": "A",
-      "explanation": "Justificación académica detallada de la respuesta correcta y refutación de los distractores",
+      "explanation": "Justificación didáctica detallada de la respuesta correcta",
       "points": ${testPointsEach}
     }
   ],
@@ -95,19 +405,99 @@ Devuelve exclusivamente un objeto JSON válido con esta estructura:
     {
       "id": "ex1",
       "title": "Título técnico del problema o cuestión de desarrollo",
-      "statement": "Enunciado completo con apartados a), b), c) y puntuación desglosada",
+      "statement": "Enunciado completo con apartados a), b), c)",
       "rubricCriteria": [
-        "Criterio de evaluación 1 con puntuación asignada",
-        "Criterio de evaluación 2 con puntuación asignada",
-        "Criterio de evaluación 3 con puntuación asignada"
+        "Criterio de evaluación 1 con puntuación",
+        "Criterio de evaluación 2 con puntuación"
       ],
-      "solutionSteps": "Resolución modelo completa paso a paso con demostraciones, fórmulas o argumentación esperada",
+      "solutionSteps": "Resolución modelo completa paso a paso",
       "points": ${exPointsEach}
     }
   ]
 }`;
 
-    const parts: any[] = [{ text: prompt }];
+    // 02. DEEPSEEK
+    if (provider === 'deepseek') {
+      if (!aiConfig.deepseekKey) {
+        return this.generateIntelligentLocalExam(combinedText, config, metadata);
+      }
+      try {
+        const raw = await callOpenAICompatible(
+          'https://api.deepseek.com/chat/completions',
+          aiConfig.deepseekKey,
+          aiConfig.deepseekModel || 'deepseek-chat',
+          systemPrompt,
+          userPrompt
+        );
+        const parsed = parseJsonSafely(raw);
+        return normalizeGeneratedExam(parsed, testPointsEach, exPointsEach);
+      } catch (err) {
+        console.warn('Fallo en DeepSeek, usando motor local:', err);
+        return this.generateIntelligentLocalExam(combinedText, config, metadata);
+      }
+    }
+
+    // 03. OPENROUTER
+    if (provider === 'openrouter') {
+      if (!aiConfig.openrouterKey) {
+        return this.generateIntelligentLocalExam(combinedText, config, metadata);
+      }
+      try {
+        const raw = await callOpenAICompatible(
+          'https://openrouter.ai/api/v1/chat/completions',
+          aiConfig.openrouterKey,
+          aiConfig.openrouterModel || 'deepseek/deepseek-r1',
+          systemPrompt,
+          userPrompt,
+          {
+            'HTTP-Referer': 'https://docentia.edu.es',
+            'X-Title': 'Docentia Evaluacion'
+          }
+        );
+        const parsed = parseJsonSafely(raw);
+        return normalizeGeneratedExam(parsed, testPointsEach, exPointsEach);
+      } catch (err) {
+        console.warn('Fallo en OpenRouter, usando motor local:', err);
+        return this.generateIntelligentLocalExam(combinedText, config, metadata);
+      }
+    }
+
+    // 04. OPENAI / CUSTOM BASE URL
+    if (provider === 'openai') {
+      if (!aiConfig.openaiKey) {
+        return this.generateIntelligentLocalExam(combinedText, config, metadata);
+      }
+      try {
+        const endpoint = `${(aiConfig.customBaseUrl || 'https://api.openai.com/v1').replace(/\/$/, '')}/chat/completions`;
+        const raw = await callOpenAICompatible(
+          endpoint,
+          aiConfig.openaiKey,
+          aiConfig.openaiModel || 'gpt-4o',
+          systemPrompt,
+          userPrompt
+        );
+        const parsed = parseJsonSafely(raw);
+        return normalizeGeneratedExam(parsed, testPointsEach, exPointsEach);
+      } catch (err) {
+        console.warn('Fallo en OpenAI, usando motor local:', err);
+        return this.generateIntelligentLocalExam(combinedText, config, metadata);
+      }
+    }
+
+    // 05. GOOGLE GEMINI (Default)
+    const apiKey = aiConfig.geminiKey;
+    if (!apiKey) {
+      await new Promise(r => setTimeout(r, 650));
+      return this.generateIntelligentLocalExam(combinedText, config, metadata);
+    }
+
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const preferredModel = aiConfig.geminiModel || 'gemini-2.5-flash';
+    const modelsToTry = Array.from(
+      new Set([preferredModel, 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro'])
+    );
+
+    const parts: any[] = [{ text: `${systemPrompt}\n\n${userPrompt}` }];
 
     // Attach PDF or image inlineData from memory store or document if available and under 8MB
     for (const doc of documents) {
@@ -142,41 +532,8 @@ Devuelve exclusivamente un objeto JSON válido con esta estructura:
 
         const result = await model.generateContent(parts);
         const rawText = result.response.text();
-        const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-        const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : rawText);
-
-        const testQuestions: TestQuestion[] = (parsed.testQuestions || []).map(
-          (q: any, i: number) => ({
-            id: q.id || `q-${Date.now()}-${i + 1}`,
-            question: q.question,
-            options: q.options || { A: '', B: '', C: '', D: '' },
-            correctAnswer: (['A', 'B', 'C', 'D'].includes(q.correctAnswer)
-              ? q.correctAnswer
-              : 'A') as 'A' | 'B' | 'C' | 'D',
-            explanation: q.explanation || '',
-            points: Number(q.points ?? testPointsEach)
-          })
-        );
-
-        const exercises: OpenExercise[] = (parsed.exercises || []).map((ex: any, i: number) => ({
-          id: ex.id || `ex-${Date.now()}-${i + 1}`,
-          title: ex.title || `Ejercicio ${i + 1}`,
-          statement: ex.statement || '',
-          rubricCriteria:
-            Array.isArray(ex.rubricCriteria) && ex.rubricCriteria.length > 0
-              ? ex.rubricCriteria
-              : [
-                  'Planteamiento conceptual riguroso',
-                  'Desarrollo metodológico correcto',
-                  'Conclusión justificada'
-                ],
-          solutionSteps: ex.solutionSteps || '',
-          points: Number(ex.points ?? exPointsEach)
-        }));
-
-        if (testQuestions.length > 0 || exercises.length > 0) {
-          return { testQuestions, exercises };
-        }
+        const parsed = parseJsonSafely(rawText);
+        return normalizeGeneratedExam(parsed, testPointsEach, exPointsEach);
       } catch (err) {
         console.warn(`Model ${candidateModel} failed, trying next:`, err);
       }
@@ -188,30 +545,23 @@ Devuelve exclusivamente un objeto JSON válido con esta estructura:
 
   /**
    * Evaluates student's solved exam (multimodal image/PDF scan or OCR text)
+   * with the active AI Provider or simulated local analyzer
    */
   async gradeStudentExam(
     exam: Exam,
     studentName: string,
     submissionInput: { textContent?: string; imageBase64?: string; mimeType?: string }
   ): Promise<StudentGradeReport> {
-    const apiKey = this.getApiKey();
-
-    if (!apiKey) {
-      await new Promise(r => setTimeout(r, 550));
-      return this.generateSimulatedGrading(exam, studentName, submissionInput);
-    }
-
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({
-      model: this.getModelName(),
-      generationConfig: {
-        responseMimeType: 'application/json',
-        temperature: 0.15
-      }
-    });
+    const aiConfig = StorageService.getAIConfig();
+    const provider = aiConfig.provider;
 
     const totalTestMax = exam.testQuestions.reduce((a, b) => a + b.points, 0);
     const totalExMax = exam.exercises.reduce((a, b) => a + b.points, 0);
+
+    if (provider === 'local') {
+      await new Promise(r => setTimeout(r, 550));
+      return this.generateSimulatedGrading(exam, studentName, submissionInput);
+    }
 
     const solucionarioContext = `
 SOLUCIONARIO OFICIAL Y BAREMO DE CALIFICACIÓN:
@@ -266,23 +616,111 @@ Devuelve un JSON con esta estructura exacta:
   "finalScore": number,
   "overallFeedback": "Valoración global técnica y pedagógica",
   "needsManualReview": boolean,
-  "manualReviewReasons": ["Motivo detallado de cada incidencia que requiere revisión del profesor"],
+  "manualReviewReasons": ["Motivo de revisión"],
   "corrections": [
     {
       "questionId": "q1",
-      "type": "test" | "exercise",
+      "type": "test",
       "questionTitle": "Título de la pregunta",
-      "studentAnswer": "Resumen de la respuesta del alumno",
-      "ocrExtractedText": "Transcripción literal OCR",
-      "ocrConfidence": "high" | "medium" | "low" | "illegible",
+      "studentAnswer": "Resumen",
+      "ocrExtractedText": "Transcripción literal",
+      "ocrConfidence": "high",
       "scoreAwarded": number,
       "maxScore": number,
-      "feedback": "Justificación de la nota según rúbrica",
-      "needsManualReview": boolean,
-      "reviewReason": "Explicación de la duda de lectura si needsManualReview es true"
+      "feedback": "Justificación",
+      "needsManualReview": false
     }
   ]
 }`;
+
+    // 02. DEEPSEEK GRADING
+    if (provider === 'deepseek' && aiConfig.deepseekKey) {
+      try {
+        const studentExamPrompt = `${solucionarioContext}\n\nEXAMEN ENTREGADO POR EL ALUMNO (${studentName}):\n"""\n${
+          submissionInput.textContent || 'Transcripción óptica de pliego entregado.'
+        }\n"""`;
+        const raw = await callOpenAICompatible(
+          'https://api.deepseek.com/chat/completions',
+          aiConfig.deepseekKey,
+          aiConfig.deepseekModel || 'deepseek-chat',
+          instructions,
+          studentExamPrompt
+        );
+        const parsed = parseJsonSafely(raw);
+        return normalizeGradingReport(parsed, studentName, totalTestMax, totalExMax);
+      } catch (err) {
+        console.warn('DeepSeek grading failed, falling back to simulated:', err);
+        return this.generateSimulatedGrading(exam, studentName, submissionInput);
+      }
+    }
+
+    // 03. OPENROUTER GRADING
+    if (provider === 'openrouter' && aiConfig.openrouterKey) {
+      try {
+        const studentExamPrompt = `${solucionarioContext}\n\nEXAMEN ENTREGADO POR EL ALUMNO (${studentName}):\n"""\n${
+          submissionInput.textContent || 'Analiza el pliego adjunto.'
+        }\n"""`;
+        const raw = await callOpenAICompatible(
+          'https://openrouter.ai/api/v1/chat/completions',
+          aiConfig.openrouterKey,
+          aiConfig.openrouterModel || 'deepseek/deepseek-r1',
+          instructions,
+          studentExamPrompt,
+          {
+            'HTTP-Referer': 'https://docentia.edu.es',
+            'X-Title': 'Docentia Evaluacion'
+          },
+          submissionInput.imageBase64,
+          submissionInput.mimeType
+        );
+        const parsed = parseJsonSafely(raw);
+        return normalizeGradingReport(parsed, studentName, totalTestMax, totalExMax);
+      } catch (err) {
+        console.warn('OpenRouter grading failed, falling back to simulated:', err);
+        return this.generateSimulatedGrading(exam, studentName, submissionInput);
+      }
+    }
+
+    // 04. OPENAI GRADING
+    if (provider === 'openai' && aiConfig.openaiKey) {
+      try {
+        const endpoint = `${(aiConfig.customBaseUrl || 'https://api.openai.com/v1').replace(/\/$/, '')}/chat/completions`;
+        const studentExamPrompt = `${solucionarioContext}\n\nEXAMEN ENTREGADO POR EL ALUMNO (${studentName}):\n"""\n${
+          submissionInput.textContent || 'Analiza el pliego adjunto.'
+        }\n"""`;
+        const raw = await callOpenAICompatible(
+          endpoint,
+          aiConfig.openaiKey,
+          aiConfig.openaiModel || 'gpt-4o',
+          instructions,
+          studentExamPrompt,
+          undefined,
+          submissionInput.imageBase64,
+          submissionInput.mimeType
+        );
+        const parsed = parseJsonSafely(raw);
+        return normalizeGradingReport(parsed, studentName, totalTestMax, totalExMax);
+      } catch (err) {
+        console.warn('OpenAI grading failed, falling back to simulated:', err);
+        return this.generateSimulatedGrading(exam, studentName, submissionInput);
+      }
+    }
+
+    // 05. GEMINI GRADING (Default)
+    const apiKey = aiConfig.geminiKey;
+    if (!apiKey) {
+      await new Promise(r => setTimeout(r, 550));
+      return this.generateSimulatedGrading(exam, studentName, submissionInput);
+    }
+
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({
+      model: aiConfig.geminiModel || 'gemini-2.5-flash',
+      generationConfig: {
+        responseMimeType: 'application/json',
+        temperature: 0.15
+      }
+    });
 
     const parts: any[] = [{ text: instructions }, { text: solucionarioContext }];
 
@@ -307,46 +745,8 @@ Devuelve un JSON con esta estructura exacta:
     try {
       const result = await model.generateContent(parts);
       const rawText = result.response.text();
-      const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-      const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : rawText);
-
-      const testScore = Number((parsed.testSectionScore ?? 0).toFixed(2));
-      const exScore = Number((parsed.exerciseSectionScore ?? 0).toFixed(2));
-      const testOut10 = totalTestMax > 0 ? Number(((testScore / totalTestMax) * 10).toFixed(2)) : 0;
-      const exOut10 = totalExMax > 0 ? Number(((exScore / totalExMax) * 10).toFixed(2)) : 0;
-
-      return {
-        id: `rep-${Date.now()}`,
-        submissionId: `sub-${Date.now()}`,
-        studentName,
-        testSectionScore: testScore,
-        testSectionMax: Number(totalTestMax.toFixed(2)),
-        testSectionScoreOutOf10: Number((parsed.testSectionScoreOutOf10 ?? testOut10).toFixed(2)),
-        exerciseSectionScore: exScore,
-        exerciseSectionMax: Number(totalExMax.toFixed(2)),
-        exerciseSectionScoreOutOf10: Number((parsed.exerciseSectionScoreOutOf10 ?? exOut10).toFixed(2)),
-        finalScore: Number((parsed.finalScore ?? testScore + exScore).toFixed(2)),
-        overallFeedback: parsed.overallFeedback || 'Evaluación completada.',
-        needsManualReview: Boolean(
-          parsed.needsManualReview ||
-            (parsed.corrections || []).some((c: any) => c.needsManualReview)
-        ),
-        manualReviewReasons: parsed.manualReviewReasons || [],
-        gradedAt: new Date().toISOString(),
-        corrections: (parsed.corrections || []).map((c: any) => ({
-          questionId: c.questionId,
-          type: c.type || 'exercise',
-          questionTitle: c.questionTitle || 'Pregunta',
-          studentAnswer: c.studentAnswer || '',
-          ocrExtractedText: c.ocrExtractedText || c.studentAnswer || '',
-          ocrConfidence: c.ocrConfidence || 'high',
-          scoreAwarded: Number((c.scoreAwarded || 0).toFixed(2)),
-          maxScore: Number((c.maxScore || 1.0).toFixed(2)),
-          feedback: c.feedback || '',
-          needsManualReview: Boolean(c.needsManualReview),
-          reviewReason: c.reviewReason || undefined
-        }))
-      };
+      const parsed = parseJsonSafely(rawText);
+      return normalizeGradingReport(parsed, studentName, totalTestMax, totalExMax);
     } catch (error) {
       console.error('Error grading with Gemini API, falling back to local analyzer:', error);
       return this.generateSimulatedGrading(exam, studentName, submissionInput);
@@ -581,3 +981,6 @@ Devuelve un JSON con esta estructura exacta:
     };
   }
 };
+
+export const AIService = GeminiService;
+

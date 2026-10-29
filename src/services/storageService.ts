@@ -1,4 +1,4 @@
-import { Exam, StudentSubmission } from '../types';
+import { Exam, StudentSubmission, AIProviderConfig, AIProviderId } from '../types';
 import { SAMPLE_EXAM, SAMPLE_EXAM_PHYSICS, SAMPLE_STUDENT_SUBMISSIONS } from './mockData';
 
 const STORAGE_KEYS = {
@@ -6,7 +6,8 @@ const STORAGE_KEYS = {
   CURRENT_EXAM_ID: 'eduexamen_v2_current_id',
   SUBMISSIONS_PREFIX: 'eduexamen_v2_submissions_',
   API_KEY: 'eduexamen_gemini_key',
-  MODEL_NAME: 'eduexamen_gemini_model'
+  MODEL_NAME: 'eduexamen_gemini_model',
+  AI_CONFIG: 'docentia_ai_provider_config_v1'
 };
 
 // In-memory fallback cache so the app never fails even if localStorage quota is exceeded
@@ -34,31 +35,117 @@ function safeSetItem(key: string, value: string): void {
 }
 
 export const StorageService = {
-  getApiKey(): string {
+  getAIConfig(): AIProviderConfig {
+    const env = (import.meta as unknown as { env?: Record<string, string> }).env || {};
+    const defaultGeminiKey =
+      localStorage.getItem(STORAGE_KEYS.API_KEY)?.trim() || env.VITE_GEMINI_API_KEY?.trim() || '';
+    const defaultGeminiModel =
+      localStorage.getItem(STORAGE_KEYS.MODEL_NAME)?.trim() || 'gemini-2.5-flash';
+
+    const defaults: AIProviderConfig = {
+      provider:
+        (env.VITE_AI_PROVIDER as AIProviderId) || (defaultGeminiKey ? 'gemini' : 'local'),
+      geminiKey: defaultGeminiKey,
+      geminiModel: defaultGeminiModel,
+      deepseekKey: env.VITE_DEEPSEEK_API_KEY?.trim() || '',
+      deepseekModel: 'deepseek-chat',
+      openrouterKey: env.VITE_OPENROUTER_API_KEY?.trim() || '',
+      openrouterModel: 'deepseek/deepseek-r1',
+      openaiKey: env.VITE_OPENAI_API_KEY?.trim() || '',
+      openaiModel: 'gpt-4o',
+      customBaseUrl: 'https://api.openai.com/v1'
+    };
+
     try {
-      const stored = localStorage.getItem(STORAGE_KEYS.API_KEY);
-      if (stored && stored.trim().length > 0) return stored.trim();
-      const envKey = (import.meta as unknown as { env?: { VITE_GEMINI_API_KEY?: string } }).env?.VITE_GEMINI_API_KEY;
-      return envKey?.trim() || '';
+      const stored = localStorage.getItem(STORAGE_KEYS.AI_CONFIG);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        return {
+          ...defaults,
+          ...parsed,
+          geminiKey: parsed.geminiKey || defaultGeminiKey,
+          geminiModel: parsed.geminiModel || defaultGeminiModel
+        };
+      }
     } catch {
-      return '';
+      // Fallback
+    }
+
+    return defaults;
+  },
+
+  saveAIConfig(config: AIProviderConfig): void {
+    safeSetItem(STORAGE_KEYS.AI_CONFIG, JSON.stringify(config));
+    if (config.geminiKey) {
+      safeSetItem(STORAGE_KEYS.API_KEY, config.geminiKey);
+    }
+    if (config.geminiModel) {
+      safeSetItem(STORAGE_KEYS.MODEL_NAME, config.geminiModel);
+    }
+  },
+
+  getActiveProvider(): AIProviderId {
+    return this.getAIConfig().provider;
+  },
+
+  getApiKey(): string {
+    const config = this.getAIConfig();
+    switch (config.provider) {
+      case 'gemini':
+        return config.geminiKey;
+      case 'deepseek':
+        return config.deepseekKey;
+      case 'openrouter':
+        return config.openrouterKey;
+      case 'openai':
+        return config.openaiKey;
+      case 'local':
+      default:
+        return '';
     }
   },
 
   setApiKey(key: string): void {
+    const config = this.getAIConfig();
+    config.geminiKey = key.trim();
+    this.saveAIConfig(config);
     safeSetItem(STORAGE_KEYS.API_KEY, key.trim());
   },
 
   getModelName(): string {
-    try {
-      return localStorage.getItem(STORAGE_KEYS.MODEL_NAME) || 'gemini-2.5-flash';
-    } catch {
-      return 'gemini-2.5-flash';
+    const config = this.getAIConfig();
+    switch (config.provider) {
+      case 'gemini':
+        return config.geminiModel || 'gemini-2.5-flash';
+      case 'deepseek':
+        return config.deepseekModel || 'deepseek-chat';
+      case 'openrouter':
+        return config.openrouterModel || 'deepseek/deepseek-r1';
+      case 'openai':
+        return config.openaiModel || 'gpt-4o';
+      case 'local':
+      default:
+        return 'local-nlp';
     }
   },
 
   setModelName(model: string): void {
-    safeSetItem(STORAGE_KEYS.MODEL_NAME, model);
+    const config = this.getAIConfig();
+    switch (config.provider) {
+      case 'gemini':
+        config.geminiModel = model;
+        break;
+      case 'deepseek':
+        config.deepseekModel = model;
+        break;
+      case 'openrouter':
+        config.openrouterModel = model;
+        break;
+      case 'openai':
+        config.openaiModel = model;
+        break;
+    }
+    this.saveAIConfig(config);
   },
 
   getAllExams(): Exam[] {

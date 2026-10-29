@@ -8,7 +8,8 @@ import {
   Clock,
   Loader2,
   CheckSquare,
-  FileEdit
+  FileEdit,
+  Cpu
 } from 'lucide-react';
 import { ExamGenerationConfig, SourceDocument } from '../types';
 
@@ -35,6 +36,8 @@ interface ExamGeneratorProps {
   isGenerating: boolean;
   creditsBalance: number;
   onOpenPricing?: () => void;
+  onOpenAISettings?: () => void;
+  activeAIProvider?: string;
 }
 
 export const ExamGenerator: React.FC<ExamGeneratorProps> = ({
@@ -43,7 +46,9 @@ export const ExamGenerator: React.FC<ExamGeneratorProps> = ({
   onGenerate,
   isGenerating,
   creditsBalance,
-  onOpenPricing
+  onOpenPricing,
+  onOpenAISettings,
+  activeAIProvider = 'gemini'
 }) => {
   const [title, setTitle] = useState(initialMetadata.title || 'Examen Trimestral');
   const [subject, setSubject] = useState(initialMetadata.subject || 'Biología y Geología');
@@ -125,6 +130,19 @@ export const ExamGenerator: React.FC<ExamGeneratorProps> = ({
           <p className="text-[15px] text-[#707070] mt-1">
             Define la ponderación entre preguntas tipo test y ejercicios con solucionario detallado.
           </p>
+          <div className="flex items-center gap-2 mt-2">
+            <span className="text-[12px] text-[#707070]">Motor:</span>
+            <button
+              type="button"
+              onClick={onOpenAISettings}
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[#d6d6d6] hover:border-[#1d1d1f] text-[12px] font-medium text-[#1d1d1f] bg-[#fafafc] transition"
+              title="Cambiar proveedor de IA (Gemini, DeepSeek, OpenRouter, OpenAI, Local)"
+            >
+              <Cpu className="h-3 w-3 text-[#0071e3]" />
+              <span className="capitalize">{activeAIProvider || 'IA'}</span>
+              <span className="text-[#0071e3] text-[11px] underline ml-0.5">Cambiar</span>
+            </button>
+          </div>
         </div>
 
         <button

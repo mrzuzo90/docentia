@@ -14,7 +14,8 @@ import {
   Copy,
   Plus,
   RotateCcw,
-  Coins
+  Coins,
+  Cpu
 } from 'lucide-react';
 import { Navbar } from './components/Navbar';
 import { DocumentUpload } from './components/DocumentUpload';
@@ -24,6 +25,7 @@ import { GradingView } from './components/GradingView';
 import { GradebookView } from './components/GradebookView';
 import { PricingModal } from './components/PricingModal';
 import { OnlineExamPortal } from './components/OnlineExamPortal';
+import { AISettingsModal } from './components/AISettingsModal';
 import { DuoMascot, DuoCompanionDock } from './components/DuoMascot';
 import {
   Exam,
@@ -31,7 +33,8 @@ import {
   SourceDocument,
   StudentSubmission,
   ToastMessage,
-  UserBillingAccount
+  UserBillingAccount,
+  AIProviderId
 } from './types';
 import { StorageService } from './services/storageService';
 import { GeminiService } from './services/geminiService';
@@ -61,6 +64,10 @@ export function App() {
   const [pricingModalTab, setPricingModalTab] = useState<'plans' | 'packs' | 'ledger'>('plans');
   const [insufficientCreditsMsg, setInsufficientCreditsMsg] = useState<string | null>(null);
   const [isOnlinePortalOpen, setIsOnlinePortalOpen] = useState(false);
+  const [isAISettingsOpen, setIsAISettingsOpen] = useState(false);
+  const [activeAIProvider, setActiveAIProvider] = useState<AIProviderId>(() =>
+    StorageService.getActiveProvider()
+  );
   const [isCommandOpen, setIsCommandOpen] = useState(false);
   const [commandQuery, setCommandQuery] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -356,6 +363,13 @@ export function App() {
       }
     },
     {
+      id: 'cmd-ai-settings',
+      label: `Configurar Motor de IA (Activo: ${activeAIProvider.toUpperCase()}) · Gemini, DeepSeek, OpenRouter...`,
+      category: 'Inteligencia Artificial',
+      icon: Cpu,
+      run: () => setIsAISettingsOpen(true)
+    },
+    {
       id: 'cmd-new-exam',
       label: 'Crear Nueva Convocatoria de Examen',
       category: 'Archivo',
@@ -389,6 +403,8 @@ export function App() {
         onLoadDemo={handleLoadDemo}
         pendingReviewsCount={pendingReviewsCount}
         totalSubmissionsCount={submissions.length}
+        onOpenAISettings={() => setIsAISettingsOpen(true)}
+        activeAIProvider={activeAIProvider}
       />
 
       {/* Main Content Container (1200px max-width on pure Paper White canvas) */}
@@ -486,6 +502,8 @@ export function App() {
                   isGenerating={isGenerating}
                   creditsBalance={billingAccount.creditsBalance}
                   onOpenPricing={() => handleOpenPricingModal('plans', null)}
+                  onOpenAISettings={() => setIsAISettingsOpen(true)}
+                  activeAIProvider={activeAIProvider}
                 />
               </div>
             </div>
@@ -782,6 +800,20 @@ export function App() {
         insufficientCreditsMessage={insufficientCreditsMsg}
         initialTab={pricingModalTab}
         onNotify={addToast}
+      />
+
+      {/* AI Engine & Provider Settings Modal (Gemini, DeepSeek, OpenRouter, OpenAI, Local) */}
+      <AISettingsModal
+        isOpen={isAISettingsOpen}
+        onClose={() => setIsAISettingsOpen(false)}
+        onProviderChanged={(prov, model) => {
+          setActiveAIProvider(prov);
+          addToast(
+            'Motor de IA Actualizado',
+            `Proveedor activo: ${prov.toUpperCase()} · Modelo: ${model}`,
+            'success'
+          );
+        }}
       />
 
     </div>

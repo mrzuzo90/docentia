@@ -11,9 +11,10 @@ import {
   Trash2,
   ChevronDown,
   Volume2,
-  VolumeX
+  VolumeX,
+  Cpu
 } from 'lucide-react';
-import { Exam, UserBillingAccount } from '../types';
+import { Exam, UserBillingAccount, AIProviderId } from '../types';
 import { SoundService } from '../services/soundService';
 
 interface NavbarProps {
@@ -30,6 +31,8 @@ interface NavbarProps {
   onLoadDemo: () => void;
   pendingReviewsCount: number;
   totalSubmissionsCount: number;
+  onOpenAISettings?: () => void;
+  activeAIProvider?: AIProviderId;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -44,7 +47,9 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenPricingModal,
   onLoadDemo,
   pendingReviewsCount,
-  totalSubmissionsCount
+  totalSubmissionsCount,
+  onOpenAISettings,
+  activeAIProvider = 'gemini'
 }) => {
   const [isExamMenuOpen, setIsExamMenuOpen] = useState(false);
   const [isMuted, setIsMuted] = useState(() => SoundService.isMuted());
@@ -253,6 +258,20 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span>{pendingReviewsCount} por revisar</span>
             </button>
           )}
+
+          {/* AI Engine Selector Pill */}
+          <button
+            type="button"
+            onClick={() => {
+              SoundService.playClick();
+              onOpenAISettings?.();
+            }}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#d6d6d6] hover:border-[#1d1d1f] text-[13px] text-[#1d1d1f] bg-[#ffffff] transition"
+            title="Configurar motor de IA (Gemini, DeepSeek, OpenRouter, OpenAI, Local)"
+          >
+            <Cpu className="w-3.5 h-3.5 text-[#0071e3]" />
+            <span className="capitalize">{activeAIProvider || 'IA'}</span>
+          </button>
 
           {/* Credits Balance Pill */}
           <button

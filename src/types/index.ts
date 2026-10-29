@@ -187,3 +187,18 @@ export interface UserBillingAccount {
   transactions: CreditTransaction[];
 }
 
+export type AIProviderId = 'gemini' | 'deepseek' | 'openrouter' | 'openai' | 'local';
+
+export interface AIProviderConfig {
+  provider: AIProviderId;
+  geminiKey: string;
+  geminiModel: string;
+  deepseekKey: string;
+  deepseekModel: string;
+  openrouterKey: string;
+  openrouterModel: string;
+  openaiKey: string;
+  openaiModel: string;
+  customBaseUrl: string;
+}
+
